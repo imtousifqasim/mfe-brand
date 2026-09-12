@@ -38,6 +38,7 @@ const ADMIN_NAV_GROUPS = [
       { href: '/admin/database', label: 'Database Monitoring', icon: Database },
       { href: '/admin/audit-logs', label: 'Audit Activity Logs', icon: History },
       { href: '/admin/settings', label: 'Store & Gateways', icon: Settings },
+      { href: '/admin/profile', label: 'Security & Profile (2FA)', icon: ShieldAlert },
     ]
   }
 ];
@@ -107,14 +108,18 @@ export default function AdminLayout({
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
 
-          <div className="flex items-center gap-2 pl-3 border-l border-slate-800">
-            <div className="w-7 h-7 rounded-full bg-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center">
+          <Link 
+            href="/admin/profile" 
+            className="flex items-center gap-2 pl-3 border-l border-slate-800 hover:opacity-80 transition group"
+            title="Manage Admin Profile & 2FA Security"
+          >
+            <div className="w-7 h-7 rounded-full bg-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center group-hover:scale-105 transition">
               A
             </div>
-            <span className="text-xs font-bold text-slate-300 hidden md:inline">
+            <span className="text-xs font-bold text-slate-300 hidden md:inline group-hover:text-amber-400 transition">
               Super Administrator
             </span>
-          </div>
+          </Link>
 
           <button
             onClick={handleLogout}

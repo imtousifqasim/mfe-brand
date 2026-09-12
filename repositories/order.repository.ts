@@ -10,62 +10,7 @@ import { Order, OrderItem, OrderAddress, OrderStatus } from '@/types/database';
 import { SEED_COURIERS } from '@/lib/data/seed-data';
 
 export class OrderRepository {
-  private static mockOrders: Order[] = [
-    {
-      id: 'ord-101',
-      order_number: 'MFE-20260911-0001',
-      customer_id: null,
-      customer_name: 'Tousif Qasim',
-      customer_email: 'tousif@example.com',
-      customer_phone: '+92 300 9876543',
-      subtotal: 19999,
-      discount_amount: 1999.9,
-      shipping_amount: 0,
-      grand_total: 17999.1,
-      coupon_code: 'MFE10',
-      status: 'shipped',
-      payment_method: 'cod',
-      payment_status: 'unpaid',
-      courier_id: 'cour-1',
-      courier: SEED_COURIERS[0],
-      tracking_id: 'TCS-98471203',
-      tracking_url: 'https://www.tcsexpress.com/tracking?track=TCS-98471203',
-      notes: 'Customer requested afternoon delivery.',
-      created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-      updated_at: new Date().toISOString(),
-      items: [
-        {
-          id: 'item-1',
-          order_id: 'ord-101',
-          product_id: 'prod-1',
-          product_name: 'Royal Velvet Embroidered 3-Piece Suit',
-          sku: 'MFE-VEL-001',
-          unit_price: 19999,
-          quantity: 1,
-          subtotal: 19999,
-          image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
-        }
-      ],
-      shipping_address: {
-        address_type: 'shipping',
-        first_name: 'Tousif',
-        last_name: 'Qasim',
-        phone: '+92 300 9876543',
-        email: 'tousif@example.com',
-        address_line1: 'House 42, Street 8, Phase 5 DHA',
-        city: 'Lahore',
-        province: 'Punjab',
-        postal_code: '54000',
-        country: 'Pakistan',
-      },
-      status_history: [
-        { id: 'h-1', new_status: 'pending', notes: 'Order placed by customer via Cash on Delivery.', created_at: new Date(Date.now() - 86400000 * 2).toISOString() },
-        { id: 'h-2', new_status: 'confirmed', notes: 'Customer contact verified by dispatch team.', created_at: new Date(Date.now() - 86400000 * 1.5).toISOString() },
-        { id: 'h-3', new_status: 'packed', notes: 'Quality check completed and packed at central warehouse.', created_at: new Date(Date.now() - 86400000).toISOString() },
-        { id: 'h-4', new_status: 'shipped', notes: 'Dispatched with TCS Express. Tracking ID: TCS-98471203', created_at: new Date().toISOString() },
-      ]
-    }
-  ];
+  private static mockOrders: Order[] = [];
 
   static generateOrderNumber(): string {
     const today = new Date();
@@ -195,7 +140,7 @@ export class OrderRepository {
     return newOrder;
   }
 
-  static async getOrders(filters: { customerId?: string; status?: OrderStatus } = {}): Promise<Order[]> {
+  static async getOrders(filters: { customerId?: string; email?: string; status?: OrderStatus } = {}): Promise<Order[]> {
     try {
       const shardOrders = await queryAcrossAllShards<Order>(async (supabase) => {
         let query = supabase
@@ -208,6 +153,7 @@ export class OrderRepository {
           .order('created_at', { ascending: false });
 
         if (filters.customerId) query = query.eq('customer_id', filters.customerId);
+        if (filters.email) query = query.eq('customer_email', filters.email.toLowerCase().trim());
         if (filters.status) query = query.eq('status', filters.status);
 
         const { data, error } = await query;
@@ -222,13 +168,14 @@ export class OrderRepository {
         );
       });
 
-      if (shardOrders && shardOrders.length > 0) return shardOrders;
+      if (shardOrders) return shardOrders;
     } catch {
       // Fallback
     }
 
     let list = [...this.mockOrders];
     if (filters.customerId) list = list.filter(o => o.customer_id === filters.customerId);
+    if (filters.email) list = list.filter(o => o.customer_email?.toLowerCase() === filters.email?.toLowerCase());
     if (filters.status) list = list.filter(o => o.status === filters.status);
     return list;
   }

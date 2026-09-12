@@ -12,8 +12,9 @@ import {
   ArrowRight, 
   AlertCircle, 
   Loader2, 
-  Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  KeyRound,
+  Smartphone
 } from 'lucide-react';
 
 function AdminLoginForm() {
@@ -24,6 +25,9 @@ function AdminLoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [totpCode, setTotpCode] = useState('');
+  const [step, setStep] = useState<'credentials' | '2fa'>('credentials');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLocked, setIsLocked] = useState(false);
@@ -51,10 +55,19 @@ function AdminLoginForm() {
     setLoading(true);
 
     try {
+      const payload: { username: string; password: string; totpCode?: string } = {
+        username: username.trim(),
+        password,
+      };
+
+      if (step === '2fa') {
+        payload.totpCode = totpCode.trim();
+      }
+
       const res = await fetch('/api/admin/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -69,10 +82,17 @@ function AdminLoginForm() {
         return;
       }
 
+      // Check if 2FA code is needed
+      if (data.require2FA) {
+        setStep('2fa');
+        setLoading(false);
+        return;
+      }
+
       // Success -> Redirect to intended admin page
       router.replace(redirectTarget);
       router.refresh();
-    } catch (err) {
+    } catch {
       setError('A connection error occurred. Please try again.');
       setLoading(false);
     }
@@ -99,7 +119,9 @@ function AdminLoginForm() {
           Haute Couture • Control Center
         </p>
         <p className="text-xs text-slate-400 mt-2">
-          Strictly restricted administrative access. Authenticate to proceed.
+          {step === 'credentials'
+            ? 'Strictly restricted administrative access. Authenticate to proceed.'
+            : 'Two-Factor Authentication required. Enter the code from your Authenticator app.'}
         </p>
       </div>
 
@@ -124,80 +146,157 @@ function AdminLoginForm() {
 
       {/* Login Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="block text-[11px] font-semibold tracking-wider uppercase text-slate-300 mb-2">
-            Administrator Username
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              required
-              autoFocus
-              disabled={loading || isLocked}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter admin username"
-              className="w-full pl-10 pr-4 py-3 text-sm bg-slate-950/80 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition disabled:opacity-50"
-            />
-            <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          </div>
-        </div>
+        {step === 'credentials' ? (
+          <>
+            <div>
+              <label className="block text-[11px] font-semibold tracking-wider uppercase text-slate-300 mb-2">
+                Administrator Username
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  disabled={loading || isLocked}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter admin username"
+                  className="w-full pl-10 pr-4 py-3 text-sm bg-slate-950/80 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition disabled:opacity-50"
+                />
+                <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
 
-        <div>
-          <label className="block text-[11px] font-semibold tracking-wider uppercase text-slate-300 mb-2">
-            Administrative Secret Key
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              required
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-[11px] font-semibold tracking-wider uppercase text-slate-300">
+                  Administrative Secret Key
+                </label>
+                <Link
+                  href="/admin/forgot-password"
+                  className="text-[10px] font-bold text-amber-400 hover:text-amber-300 transition uppercase tracking-wider"
+                >
+                  Forgot Key?
+                </Link>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  disabled={loading || isLocked}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter administrative password"
+                  className="w-full pl-10 pr-11 py-3 text-sm bg-slate-950/80 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition disabled:opacity-50"
+                />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="p-1 text-slate-400 hover:text-white absolute right-3 top-1/2 -translate-y-1/2 transition"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
               disabled={loading || isLocked}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter administrative password"
-              className="w-full pl-10 pr-11 py-3 text-sm bg-slate-950/80 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition disabled:opacity-50"
-            />
-            <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              className="w-full mt-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                  <span>Verifying Credentials...</span>
+                </>
+              ) : isLocked ? (
+                <span>Security Lockout Active</span>
+              ) : (
+                <>
+                  <span>Authorize & Enter</span>
+                  <ArrowRight className="w-4 h-4 text-slate-950" />
+                </>
+              )}
+            </button>
+          </>
+        ) : (
+          /* Step 2: Two-Factor Authenticator Code */
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 flex items-center gap-3">
+              <Smartphone className="w-5 h-5 text-amber-400 shrink-0" />
+              <span>Enter the 6-digit verification code from Google Authenticator or your 2FA app.</span>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold tracking-wider uppercase text-slate-300 mb-2">
+                6-Digit Authenticator Code
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  maxLength={6}
+                  disabled={loading || isLocked}
+                  value={totpCode}
+                  onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="000000"
+                  className="w-full pl-10 pr-4 py-3 text-center tracking-[0.4em] font-mono text-lg font-bold bg-slate-950/80 border border-slate-800 rounded-xl text-amber-400 placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition disabled:opacity-50"
+                />
+                <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || isLocked || totpCode.length !== 6}
+              className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                  <span>Verifying 2FA Code...</span>
+                </>
+              ) : (
+                <>
+                  <span>Verify Code & Enter</span>
+                  <ArrowRight className="w-4 h-4 text-slate-950" />
+                </>
+              )}
+            </button>
+
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="p-1 text-slate-400 hover:text-white absolute right-3 top-1/2 -translate-y-1/2 transition"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              onClick={() => {
+                setStep('credentials');
+                setTotpCode('');
+                setError(null);
+              }}
+              className="w-full py-2.5 text-xs text-slate-400 hover:text-white transition text-center font-medium"
             >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              ← Back to Username & Password
             </button>
           </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading || isLocked}
-          className="w-full mt-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-              <span>Verifying Credentials...</span>
-            </>
-          ) : isLocked ? (
-            <span>Security Lockout Active</span>
-          ) : (
-            <>
-              <span>Authorize & Enter</span>
-              <ArrowRight className="w-4 h-4 text-slate-950" />
-            </>
-          )}
-        </button>
+        )}
       </form>
 
       {/* Return to Storefront */}
-      <div className="mt-8 pt-6 border-t border-slate-800/80 text-center">
+      <div className="mt-8 pt-6 border-t border-slate-800/80 text-center flex items-center justify-between text-xs">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-amber-400 transition"
+          className="inline-flex items-center gap-1.5 font-semibold text-slate-400 hover:text-amber-400 transition"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Return to Storefront</span>
+          <span>Return to Store</span>
+        </Link>
+
+        <Link
+          href="/admin/forgot-password"
+          className="font-semibold text-slate-400 hover:text-amber-400 transition"
+        >
+          Password Recovery
         </Link>
       </div>
 

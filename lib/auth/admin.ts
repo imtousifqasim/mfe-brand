@@ -1,4 +1,7 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import { verifyTOTPCode } from './totp';
+
 export { 
   ADMIN_COOKIE_NAME, 
   createAdminSessionToken, 
@@ -31,7 +34,6 @@ export function checkLoginRateLimit(ip: string): {
     return { allowed: true, remainingAttempts: MAX_ATTEMPTS };
   }
 
-  // Check if currently locked out
   if (record.lockedUntil > now) {
     const lockoutRemainingSec = Math.ceil((record.lockedUntil - now) / 1000);
     return {
@@ -41,7 +43,6 @@ export function checkLoginRateLimit(ip: string): {
     };
   }
 
-  // If window has passed since last attempt, reset
   if (now - record.lastAttempt > WINDOW_MS) {
     rateLimitStore.delete(ip);
     return { allowed: true, remainingAttempts: MAX_ATTEMPTS };
@@ -66,7 +67,6 @@ export function recordFailedLogin(ip: string): {
     lockedUntil: 0,
   };
 
-  // If previous window expired, reset attempts
   if (now - record.lastAttempt > WINDOW_MS && record.lockedUntil <= now) {
     record.attempts = 0;
   }
@@ -107,29 +107,358 @@ function getExpectedHash(): string {
   return (process.env.ADMIN_PASSWORD_HASH || '').replace(/^['"]|['"]$/g, '').trim();
 }
 
-// Credentials validation
+export interface AdminUserRecord {
+  id: string;
+  username: string;
+  email: string;
+  full_name: string;
+  role: string;
+  two_factor_enabled: boolean;
+  two_factor_secret?: string | null;
+  last_login_at?: string | null;
+}
+
+// Check admin credentials and 2FA status from Supabase
+export async function verifyAdminCredentialsWith2FA(
+  usernameInput: string,
+  passwordInput: string
+): Promise<{
+  valid: boolean;
+  require2FA?: boolean;
+  username?: string;
+  adminId?: string;
+  two_factor_secret?: string | null;
+}> {
+  const cleanUsername = usernameInput.trim();
+
+  try {
+    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
+    const supabase = getActiveWriteAdmin();
+    const { data: adminRecord, error } = await supabase
+      .from('admins')
+      .select('id, username, password_hash, is_active, two_factor_enabled, two_factor_secret')
+      .eq('username', cleanUsername)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (!error && adminRecord && adminRecord.password_hash) {
+      const isMatch = await bcrypt.compare(passwordInput, adminRecord.password_hash);
+      if (isMatch) {
+        if (adminRecord.two_factor_enabled && adminRecord.two_factor_secret) {
+          return {
+            valid: true,
+            require2FA: true,
+            username: adminRecord.username,
+            adminId: adminRecord.id,
+            two_factor_secret: adminRecord.two_factor_secret,
+          };
+        }
+        
+        // Update last login
+        supabase
+          .from('admins')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('id', adminRecord.id)
+          .then();
+
+        return {
+          valid: true,
+          require2FA: false,
+          username: adminRecord.username,
+          adminId: adminRecord.id,
+        };
+      }
+      return { valid: false };
+    }
+  } catch (dbErr) {
+    console.warn('DB query for admin table failed, checking env fallback:', dbErr);
+  }
+
+  // Fallback to environment credentials if DB unavailable
+  const expectedUsername = (process.env.ADMIN_USERNAME || 'mfe_admin').replace(/^['"]|['"]$/g, '').trim();
+  const expectedHash = getExpectedHash();
+
+  if (!expectedHash || cleanUsername !== expectedUsername) {
+    return { valid: false };
+  }
+
+  try {
+    const isMatch = await bcrypt.compare(passwordInput, expectedHash);
+    return {
+      valid: isMatch,
+      require2FA: false,
+      username: expectedUsername,
+    };
+  } catch {
+    return { valid: false };
+  }
+}
+
+// Standard verifyAdminCredentials for backwards compatibility
 export async function verifyAdminCredentials(
   usernameInput: string,
   passwordInput: string
 ): Promise<boolean> {
-  const expectedUsername = (process.env.ADMIN_USERNAME || 'mfe_admin').replace(/^['"]|['"]$/g, '').trim();
-  const expectedHash = getExpectedHash();
+  const res = await verifyAdminCredentialsWith2FA(usernameInput, passwordInput);
+  return res.valid;
+}
 
-  if (!expectedHash) {
-    console.error('ADMIN_PASSWORD_HASH / ADMIN_PASSWORD_HASH_B64 is not set in environment variables');
-    return false;
-  }
-
-  // Check username match
-  if (usernameInput.trim() !== expectedUsername) {
-    return false;
-  }
-
-  // Compare bcrypt hash
+// Verify TOTP 2FA code for an admin
+export async function verifyAdmin2FACode(
+  username: string,
+  totpCode: string
+): Promise<boolean> {
   try {
-    return await bcrypt.compare(passwordInput, expectedHash);
+    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
+    const supabase = getActiveWriteAdmin();
+    const { data: adminRecord } = await supabase
+      .from('admins')
+      .select('id, two_factor_enabled, two_factor_secret')
+      .eq('username', username)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (!adminRecord || !adminRecord.two_factor_enabled || !adminRecord.two_factor_secret) {
+      return false;
+    }
+
+    const isValid = verifyTOTPCode(adminRecord.two_factor_secret, totpCode);
+    if (isValid) {
+      supabase
+        .from('admins')
+        .update({ last_login_at: new Date().toISOString() })
+        .eq('id', adminRecord.id)
+        .then();
+    }
+    return isValid;
   } catch (err) {
-    console.error('Bcrypt comparison error:', err);
+    console.error('2FA verification error:', err);
     return false;
+  }
+}
+
+// Get admin profile details by username
+export async function getAdminProfile(username: string): Promise<AdminUserRecord | null> {
+  try {
+    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
+    const supabase = getActiveWriteAdmin();
+    const { data, error } = await supabase
+      .from('admins')
+      .select('id, username, email, full_name, role, two_factor_enabled, last_login_at')
+      .eq('username', username)
+      .maybeSingle();
+
+    if (error || !data) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+// Update admin profile details (full_name, email, or new username)
+export async function updateAdminProfile(
+  currentUsername: string,
+  updates: { full_name?: string; email?: string; newUsername?: string }
+): Promise<{ success: boolean; error?: string; updatedUsername?: string }> {
+  try {
+    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
+    const supabase = getActiveWriteAdmin();
+
+    const updatePayload: Record<string, any> = {
+      updated_at: new Date().toISOString()
+    };
+
+    if (updates.full_name) updatePayload.full_name = updates.full_name.trim();
+    if (updates.email) updatePayload.email = updates.email.trim();
+    if (updates.newUsername && updates.newUsername !== currentUsername) {
+      // Check if username already exists
+      const { data: existing } = await supabase
+        .from('admins')
+        .select('id')
+        .eq('username', updates.newUsername.trim())
+        .maybeSingle();
+
+      if (existing) {
+        return { success: false, error: 'Administrative username is already in use.' };
+      }
+      updatePayload.username = updates.newUsername.trim();
+    }
+
+    const { error } = await supabase
+      .from('admins')
+      .update(updatePayload)
+      .eq('username', currentUsername);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return {
+      success: true,
+      updatedUsername: updatePayload.username || currentUsername
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Database error' };
+  }
+}
+
+// Update admin password directly in DB with bcrypt hash
+export async function updateAdminPassword(
+  username: string,
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (!newPassword || newPassword.length < 8) {
+      return { success: false, error: 'Password must be at least 8 characters long.' };
+    }
+
+    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
+    const supabase = getActiveWriteAdmin();
+
+    const { data: adminRecord, error: fetchErr } = await supabase
+      .from('admins')
+      .select('id, password_hash')
+      .eq('username', username)
+      .maybeSingle();
+
+    if (fetchErr || !adminRecord) {
+      return { success: false, error: 'Admin record not found.' };
+    }
+
+    const isCurrentValid = await bcrypt.compare(currentPassword, adminRecord.password_hash);
+    if (!isCurrentValid) {
+      return { success: false, error: 'Current password does not match.' };
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+
+    const { error: updateErr } = await supabase
+      .from('admins')
+      .update({
+        password_hash: newHash,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', adminRecord.id);
+
+    if (updateErr) {
+      return { success: false, error: updateErr.message };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Password update failed' };
+  }
+}
+
+// Enable or disable Two-Factor Authentication in database
+export async function setAdminTwoFactor(
+  username: string,
+  secret: string | null,
+  enabled: boolean
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
+    const supabase = getActiveWriteAdmin();
+
+    const { error } = await supabase
+      .from('admins')
+      .update({
+        two_factor_enabled: enabled,
+        two_factor_secret: secret,
+        updated_at: new Date().toISOString()
+      })
+      .eq('username', username);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Database error' };
+  }
+}
+
+// Generate a 6-digit or UUID password reset token stored in DB with 1-hour expiry
+export async function generateAdminPasswordResetToken(
+  usernameOrEmail: string
+): Promise<{ success: boolean; error?: string; resetCode?: string }> {
+  try {
+    const cleanInput = usernameOrEmail.trim().toLowerCase();
+    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
+    const supabase = getActiveWriteAdmin();
+
+    // Query admin by username or email
+    const { data: adminRecord } = await supabase
+      .from('admins')
+      .select('id, username, email')
+      .or(`username.ilike.${cleanInput},email.ilike.${cleanInput}`)
+      .maybeSingle();
+
+    if (!adminRecord) {
+      // Don't leak whether user exists for security, but return generic success
+      return { success: true };
+    }
+
+    // Generate a 6-digit numeric reset OTP
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+    await supabase
+      .from('admins')
+      .update({
+        reset_token: resetCode,
+        reset_token_expires_at: expiresAt,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', adminRecord.id);
+
+    return { success: true, resetCode };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to generate reset token' };
+  }
+}
+
+// Reset admin password using reset token
+export async function resetAdminPasswordWithToken(
+  resetCode: string,
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (!newPassword || newPassword.length < 8) {
+      return { success: false, error: 'New password must be at least 8 characters long.' };
+    }
+
+    const cleanCode = resetCode.trim();
+    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
+    const supabase = getActiveWriteAdmin();
+
+    const { data: adminRecord, error } = await supabase
+      .from('admins')
+      .select('id, reset_token, reset_token_expires_at')
+      .eq('reset_token', cleanCode)
+      .maybeSingle();
+
+    if (error || !adminRecord) {
+      return { success: false, error: 'Invalid or expired password reset verification code.' };
+    }
+
+    if (new Date(adminRecord.reset_token_expires_at).getTime() < Date.now()) {
+      return { success: false, error: 'Password reset code has expired. Please request a new one.' };
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+
+    await supabase
+      .from('admins')
+      .update({
+        password_hash: newHash,
+        reset_token: null,
+        reset_token_expires_at: null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', adminRecord.id);
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to reset password' };
   }
 }
