@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Tag, Check, ArrowRight, Phone, Sparkles } from 'lucide-react';
+import { Tag, Check, ArrowRight, Phone, Sparkles, ChevronDown } from 'lucide-react';
 
 interface AnnouncementBarProps {
   message?: string;
@@ -27,7 +27,7 @@ export function AnnouncementBar({
 
   return (
     <aside aria-label="Announcement" className="bg-[#0c0c0e] text-neutral-300 text-[11px] font-sans border-b border-white/[0.06] transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col md:flex-row items-center justify-between gap-2.5">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col md:flex-row items-center justify-between gap-2">
         
         {/* Left: Brand Promise */}
         <div className="flex items-center gap-2.5 tracking-wider uppercase font-semibold text-[10px] text-neutral-400">
@@ -35,12 +35,12 @@ export function AnnouncementBar({
           <span>{message}</span>
         </div>
 
-        {/* Center: Exclusive Coupon Code Pill */}
+        {/* Center: Exclusive Coupon Code Pill (Unified Single Accent Color) */}
         <div className="flex items-center gap-3">
           {couponCode && (
             <button
               onClick={copyCode}
-              className="group inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-amber-500/30 text-neutral-200 transition text-[11px] shadow-sm"
+              className="group inline-flex items-center gap-2 px-3.5 py-0.5 rounded-full bg-neutral-900 hover:bg-neutral-800 border border-amber-500/30 text-neutral-200 transition text-[11px] shadow-sm cursor-pointer"
               title="Click to copy coupon code for 10% discount"
             >
               <Sparkles className="w-3 h-3 text-amber-400 group-hover:rotate-12 transition-transform" />
@@ -63,7 +63,7 @@ export function AnnouncementBar({
           )}
         </div>
 
-        {/* Right: Concierge Contact & Currency */}
+        {/* Right: Concierge Contact & Interactive Currency Selector */}
         <div className="hidden sm:flex items-center gap-4 text-neutral-400 text-[11px]">
           <a
             href="https://wa.me/923001234567"
@@ -71,13 +71,14 @@ export function AnnouncementBar({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 hover:text-amber-400 transition"
           >
-            <Phone className="w-3 h-3 text-emerald-400" />
-            <span>WhatsApp Concierge: +92 300 1234567</span>
+            <Phone className="w-3 h-3 text-amber-400" />
+            <span>Concierge: +92 300 1234567</span>
           </a>
-          <span className="text-neutral-700">|</span>
-          <span className="font-semibold text-neutral-300 uppercase tracking-widest text-[10px]">
-            PKR (₨)
-          </span>
+          <span className="text-neutral-800">|</span>
+          <div className="inline-flex items-center gap-1 font-semibold text-neutral-300 uppercase tracking-widest text-[10px] cursor-pointer hover:text-white transition">
+            <span>PKR (₨)</span>
+            <ChevronDown className="w-3 h-3 text-neutral-400" />
+          </div>
         </div>
 
       </div>

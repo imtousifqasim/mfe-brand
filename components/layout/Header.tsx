@@ -131,11 +131,11 @@ export function Header() {
   return (
     <header className={`sticky top-0 z-40 transition-all duration-300 font-sans ${
       isScrolled 
-        ? 'bg-white/98 shadow-md shadow-black/[0.04] border-b border-[#eae7e2]' 
+        ? 'bg-white/98 shadow-md shadow-black/[0.03] border-b border-[#eae7e2]' 
         : 'bg-white border-b border-[#eae7e2]'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-2 sm:gap-4">
+        <div className="flex items-center justify-between h-20 gap-3 sm:gap-6">
           
           {/* Mobile Menu Trigger */}
           <div className="flex items-center lg:hidden shrink-0 relative z-20">
@@ -150,19 +150,19 @@ export function Header() {
             </button>
           </div>
 
-          {/* Luxury Typographic Brand Logo */}
-          <div className="flex items-center gap-6 lg:gap-10 min-w-0">
-            <Link href="/" className="flex flex-col group py-1 min-w-0">
-              <span className="font-display text-lg sm:text-2xl lg:text-3xl font-bold tracking-[0.14em] sm:tracking-[0.22em] uppercase text-[#141414] transition-all duration-300 group-hover:text-[#b87414] truncate">
+          {/* Luxury Typographic Brand Logo (Clean Two-Line Lockup with Generous Spacing) */}
+          <div className="flex items-center gap-6 lg:gap-9 min-w-0">
+            <Link href="/" className="flex flex-col group py-1 shrink-0 justify-center">
+              <span className="font-display text-xl sm:text-2xl lg:text-[25px] font-bold tracking-[0.24em] uppercase text-[#141414] transition-colors duration-300 group-hover:text-[#b87414] leading-none">
                 MFE BRAND
               </span>
-              <span className="text-[7.5px] sm:text-[8px] tracking-[0.32em] sm:tracking-[0.45em] font-sans font-bold text-[#b87414] uppercase -mt-0.5">
-                Haute Couture • Est. 2026
+              <span className="text-[7.5px] sm:text-[8.5px] tracking-[0.40em] font-sans font-medium text-[#b87414] uppercase mt-1 leading-none">
+                HAUTE COUTURE • EST. 2026
               </span>
             </Link>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-8 text-[12px] font-semibold tracking-[0.14em] uppercase font-sans text-[#141414]">
+            {/* Desktop Navigation Links (Standardized 28px gaps, matching font-size & tracking) */}
+            <nav className="hidden lg:flex items-center gap-7 text-[12px] font-semibold tracking-[0.14em] uppercase font-sans text-[#141414]">
               
               {/* Interactive Mega-Menu Trigger */}
               <div 
@@ -172,74 +172,77 @@ export function Header() {
               >
                 <button 
                   className={`inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
-                    megaMenuOpen ? 'text-[#d99026]' : 'hover:text-[#d99026]'
+                    megaMenuOpen ? 'text-[#b87414]' : 'hover:text-[#b87414]'
                   }`}
                 >
                   <span>Collections</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${megaMenuOpen ? 'rotate-180 text-[#d99026]' : 'text-[#6b6b6b]'}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${megaMenuOpen ? 'rotate-180 text-[#b87414]' : 'text-[#6b6b6b]'}`} />
                 </button>
 
                 {/* Animated underline */}
-                <span className={`absolute bottom-5 left-0 h-[2px] bg-[#d99026] transition-all duration-300 rounded-full ${
+                <span className={`absolute bottom-5 left-0 h-[2px] bg-[#b87414] transition-all duration-300 rounded-full ${
                   megaMenuOpen ? 'w-full' : 'w-0'
                 }`} />
               </div>
 
               <Link 
                 href="/products" 
-                className={`relative py-7 transition hover:text-[#d99026] ${
-                  pathname === '/products' ? 'text-[#d99026] font-bold' : ''
+                className={`relative py-7 transition-colors hover:text-[#b87414] ${
+                  pathname === '/products' ? 'text-[#b87414] font-bold' : ''
                 }`}
               >
                 All Pieces
                 {pathname === '/products' && (
-                  <span className="absolute bottom-5 left-0 w-full h-[2px] bg-[#d99026] rounded-full" />
+                  <span className="absolute bottom-5 left-0 w-full h-[2px] bg-[#b87414] rounded-full" />
                 )}
               </Link>
 
               <Link 
                 href="/products?category=unstitched-luxury" 
-                className="relative py-7 hover:text-[#d99026] transition"
+                className="relative py-7 hover:text-[#b87414] transition-colors"
               >
                 Unstitched
               </Link>
 
               <Link 
                 href="/products?category=ready-to-wear-pret" 
-                className="relative py-7 hover:text-[#d99026] transition"
+                className="relative py-7 hover:text-[#b87414] transition-colors"
               >
                 Pret
               </Link>
 
               <Link 
                 href="/products?category=festive-formals" 
-                className="relative py-7 hover:text-[#d99026] transition"
+                className="relative py-7 hover:text-[#b87414] transition-colors"
               >
                 Formals
               </Link>
 
+              {/* Best Deals (Unified single gold/amber accent, no competing pink) */}
               <Link 
                 href="/products?isBestDeal=true" 
-                className="relative py-7 inline-flex items-center gap-1.5 text-rose-600 hover:text-rose-700 font-bold tracking-wider"
+                className={`relative py-7 inline-flex items-center gap-1.5 transition-colors ${
+                  pathname === '/products?isBestDeal=true' ? 'text-[#b87414] font-bold' : 'hover:text-[#b87414]'
+                }`}
               >
-                <Sparkles className="w-3.5 h-3.5 text-rose-500" />
+                <Sparkles className="w-3.5 h-3.5 text-[#b87414]" />
                 <span>Best Deals</span>
               </Link>
 
               <Link 
                 href="/track-order" 
-                className="relative py-7 inline-flex items-center gap-1.5 text-[#6b6b6b] hover:text-[#141414] text-xs font-normal"
+                className="relative py-7 inline-flex items-center gap-1.5 hover:text-[#b87414] text-[#6b6b6b] transition-colors"
               >
-                <Truck className="w-3.5 h-3.5 text-[#d99026]" />
+                <Truck className="w-3.5 h-3.5 text-[#b87414]" />
                 <span>Tracking</span>
               </Link>
             </nav>
           </div>
 
           {/* Right Action Icons & Search */}
-          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0 relative z-20">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0 relative z-20">
             
-            {/* Search Trigger / Bar */}
+            {/* Search Trigger / Full Bar (Wider, 44px height matching other elements) */}
             <div className="relative">
               {searchOpen ? (
                 <form onSubmit={handleSearchSubmit} className="relative flex items-center">
@@ -249,83 +252,80 @@ export function Header() {
                     placeholder="Search velvet, silk, pret..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-40 sm:w-72 pl-9 pr-8 py-2 text-xs bg-[#f7f5f2] border border-[#d99026] rounded-full focus:outline-none focus:ring-1 focus:ring-[#d99026] text-[#141414] placeholder-[#6b6b6b]"
+                    className="h-11 w-52 sm:w-80 lg:w-72 xl:w-80 pl-11 pr-10 text-xs bg-[#f7f5f2] border border-[#d99026] rounded-full focus:outline-none focus:ring-1 focus:ring-[#d99026] text-[#141414] placeholder-[#6b6b6b]"
                   />
-                  <Search className="w-3.5 h-3.5 text-[#d99026] absolute left-3 top-3" />
+                  <Search className="w-4 h-4 text-[#d99026] absolute left-4 top-1/2 -translate-y-1/2" />
                   <button
                     type="button"
                     onClick={() => setSearchOpen(false)}
-                    className="p-1 text-[#6b6b6b] hover:text-[#141414] absolute right-2.5 top-2"
+                    className="p-1.5 text-[#6b6b6b] hover:text-[#141414] absolute right-3 top-1/2 -translate-y-1/2"
+                    aria-label="Close search"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
                 </form>
               ) : (
                 <button
                   onClick={() => setSearchOpen(true)}
-                  className="p-2 sm:p-2.5 rounded-full text-[#141414] hover:bg-[#f7f5f2] active:bg-[#eae7e2] transition flex items-center gap-2 text-xs touch-manipulation cursor-pointer"
+                  className="h-11 px-3 sm:px-3.5 rounded-full text-[#141414] hover:bg-[#f7f5f2] active:bg-[#eae7e2] transition-colors flex items-center gap-2 text-xs touch-manipulation cursor-pointer border border-transparent hover:border-[#eae7e2]"
                   aria-label="Search Collection"
                 >
-                  <Search className="w-4 h-4 text-[#141414]" />
+                  <Search className="w-[18px] h-[18px] text-[#141414]" />
                   <span className="hidden xl:inline text-[#6b6b6b] text-xs font-sans">Search collection...</span>
                 </button>
               )}
             </div>
 
-            {/* Compare Pill */}
-            <Link
-              href="/compare"
-              className="hidden md:inline-flex p-2.5 rounded-full text-[#141414] hover:bg-[#f7f5f2] transition"
-              title="Compare Suits"
-            >
-              <Layers className="w-4 h-4" />
-            </Link>
+            {/* Right Action Icons Cluster (Consistent 16-20px spacing & equal visual weight) */}
+            <div className="flex items-center gap-1 sm:gap-3">
+              {/* Compare Pill */}
+              <Link
+                href="/compare"
+                className="hidden md:flex w-10 h-10 sm:w-11 sm:h-11 items-center justify-center rounded-full text-[#141414] hover:bg-[#f7f5f2] transition-colors"
+                title="Compare Suits"
+                aria-label="Compare Products"
+              >
+                <Layers className="w-5 h-5 text-[#141414]" />
+              </Link>
 
-            {/* Wishlist Icon with Glowing Badge */}
-            <Link
-              href="/wishlist"
-              className="relative p-2 sm:p-2.5 rounded-full text-[#141414] hover:text-rose-600 hover:bg-[#f7f5f2] active:bg-[#eae7e2] transition touch-manipulation group"
-              aria-label="Wishlist"
-            >
-              <Heart className="w-4 h-4 transition-transform group-hover:scale-110" />
-              {mounted && wishlistCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 min-w-[17px] h-[17px] rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center px-1">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
+              {/* Wishlist Icon with Refined Badge */}
+              <Link
+                href="/wishlist"
+                className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-full text-[#141414] hover:text-[#b87414] hover:bg-[#f7f5f2] active:bg-[#eae7e2] transition-colors touch-manipulation group"
+                aria-label="Wishlist"
+              >
+                <Heart className="w-5 h-5 transition-transform group-hover:scale-108" />
+                {mounted && wishlistCount > 0 && (
+                  <span className="absolute top-1 right-1 min-w-[17px] h-[17px] rounded-full bg-[#141414] text-white text-[9px] font-bold flex items-center justify-center px-1 shadow-sm">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
 
-            {/* Shopping Bag with Gold Badge */}
-            <Link
-              href="/cart"
-              className="relative p-2 sm:p-2.5 rounded-full text-[#141414] hover:text-[#b87414] hover:bg-[#f7f5f2] active:bg-[#eae7e2] transition touch-manipulation group"
-              aria-label="Shopping Bag"
-            >
-              <ShoppingBag className="w-4 h-4 transition-transform group-hover:scale-110" />
-              {mounted && itemCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 min-w-[17px] h-[17px] rounded-full bg-[#d99026] text-[#141414] text-[9px] font-black flex items-center justify-center px-1 shadow-sm">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
+              {/* Shopping Bag with Gold Badge */}
+              <Link
+                href="/cart"
+                className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-full text-[#141414] hover:text-[#b87414] hover:bg-[#f7f5f2] active:bg-[#eae7e2] transition-colors touch-manipulation group"
+                aria-label="Shopping Bag"
+              >
+                <ShoppingBag className="w-5 h-5 transition-transform group-hover:scale-108" />
+                {mounted && itemCount > 0 && (
+                  <span className="absolute top-1 right-1 min-w-[17px] h-[17px] rounded-full bg-[#b87414] text-white text-[9px] font-black flex items-center justify-center px-1 shadow-sm">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
 
-            {/* Customer Account Icon (available in mobile drawer too) */}
-            <Link
-              href="/account"
-              className="hidden sm:inline-flex p-2.5 rounded-full text-[#141414] hover:bg-[#f7f5f2] transition"
-              aria-label="My Account"
-            >
-              <User className="w-4 h-4" />
-            </Link>
+              {/* Customer Account Icon (No Admin button in storefront!) */}
+              <Link
+                href="/account"
+                className="hidden sm:flex w-10 h-10 sm:w-11 sm:h-11 items-center justify-center rounded-full text-[#141414] hover:bg-[#f7f5f2] transition-colors"
+                aria-label="My Account"
+              >
+                <User className="w-5 h-5" />
+              </Link>
+            </div>
 
-            {/* Admin Console Shortcut */}
-            <Link
-              href="/admin"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#141414] hover:bg-[#262626] text-white shadow-sm transition"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Admin</span>
-            </Link>
           </div>
 
         </div>
@@ -341,7 +341,7 @@ export function Header() {
           <div className="max-w-7xl mx-auto px-6 py-8">
             <div className="flex items-center justify-between pb-4 mb-6 border-b border-[#eae7e2]">
               <div className="flex items-center gap-3">
-                <Compass className="w-4 h-4 text-[#d99026]" />
+                <Compass className="w-4 h-4 text-[#b87414]" />
                 <span className="text-xs uppercase font-bold tracking-[0.25em] text-[#6b6b6b]">
                   Curated Haute Couture Collections 2026
                 </span>
@@ -360,7 +360,7 @@ export function Header() {
                 <Link
                   key={cat.slug}
                   href={`/products?category=${cat.slug}`}
-                  className="group relative flex flex-col rounded-2xl overflow-hidden bg-[#f7f5f2] border border-[#eae7e2] hover:border-[#d99026] hover:shadow-xl transition-all duration-300"
+                  className="group relative flex flex-col rounded-2xl overflow-hidden bg-[#f7f5f2] border border-[#eae7e2] hover:border-[#b87414] hover:shadow-xl transition-all duration-300"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-200">
                     <ExternalImage
@@ -390,7 +390,7 @@ export function Header() {
         </div>
       )}
 
-      {/* Modern Luxury Mobile Slide-Over Drawer */}
+      {/* Modern Luxury Mobile Slide-Over Drawer (Clean, No Admin Leakage) */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[100] lg:hidden flex">
           {/* Backdrop */}
@@ -407,9 +407,14 @@ export function Header() {
             <div className="space-y-6">
               {/* Header inside drawer */}
               <div className="flex items-center justify-between pb-4 border-b border-[#eae7e2]">
-                <span className="font-display text-lg font-bold tracking-wider text-[#141414] uppercase">
-                  MFE BRAND
-                </span>
+                <div className="flex flex-col">
+                  <span className="font-display text-lg font-bold tracking-[0.2em] text-[#141414] uppercase leading-none">
+                    MFE BRAND
+                  </span>
+                  <span className="text-[7.5px] tracking-[0.3em] font-sans font-medium text-[#b87414] uppercase mt-1">
+                    HAUTE COUTURE • EST. 2026
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
@@ -427,9 +432,9 @@ export function Header() {
                   placeholder="Search luxury suits, pret..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-xs bg-[#f7f5f2] border border-[#eae7e2] rounded-full focus:outline-none focus:ring-1 focus:ring-[#d99026] text-[#141414] placeholder-[#6b6b6b]"
+                  className="w-full pl-10 pr-4 py-3 text-xs bg-[#f7f5f2] border border-[#eae7e2] rounded-full focus:outline-none focus:ring-1 focus:ring-[#b87414] text-[#141414] placeholder-[#6b6b6b]"
                 />
-                <Search className="w-3.5 h-3.5 text-[#d99026] absolute left-3 top-3.5" />
+                <Search className="w-4 h-4 text-[#b87414] absolute left-3.5 top-1/2 -translate-y-1/2" />
               </form>
 
               {/* Navigation List */}
@@ -437,7 +442,7 @@ export function Header() {
                 <Link
                   href="/products"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl text-[#141414] hover:bg-[#f7f5f2] hover:text-[#b87414] transition"
+                  className="flex items-center justify-between p-2.5 rounded-xl text-[#141414] hover:bg-[#f7f5f2] hover:text-[#b87414] transition-colors"
                 >
                   <span>All Collections</span>
                   <ArrowRight className="w-3.5 h-3.5 text-[#6b6b6b]" />
@@ -452,7 +457,7 @@ export function Header() {
                     key={cat.slug}
                     href={`/products?category=${cat.slug}`}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between p-2 rounded-xl text-[#141414] hover:bg-[#f7f5f2] hover:text-[#b87414] text-xs transition"
+                    className="flex items-center justify-between p-2 rounded-xl text-[#141414] hover:bg-[#f7f5f2] hover:text-[#b87414] text-xs transition-colors"
                   >
                     <span>{cat.name}</span>
                     <span className="text-[9px] uppercase px-2 py-0.5 rounded-full bg-[#f7f5f2] text-[#b87414] border border-[#eae7e2] font-semibold">
@@ -465,23 +470,23 @@ export function Header() {
                   <Link
                     href="/products?isBestDeal=true"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 text-rose-600 font-semibold text-xs p-2 rounded-xl hover:bg-rose-50 transition"
+                    className="flex items-center gap-2 text-[#b87414] font-semibold text-xs p-2.5 rounded-xl hover:bg-[#f7f5f2] transition-colors"
                   >
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#b87414]" />
                     <span>Best Deals & Specials</span>
                   </Link>
                   <Link
                     href="/track-order"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 text-[#141414] text-xs p-2 rounded-xl hover:bg-[#f7f5f2] transition"
+                    className="flex items-center gap-2 text-[#141414] text-xs p-2.5 rounded-xl hover:bg-[#f7f5f2] transition-colors"
                   >
-                    <Truck className="w-3.5 h-3.5 text-[#d99026]" />
+                    <Truck className="w-3.5 h-3.5 text-[#b87414]" />
                     <span>Track Your Order</span>
                   </Link>
                   <Link
                     href="/compare"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 text-[#141414] text-xs p-2 rounded-xl hover:bg-[#f7f5f2] transition"
+                    className="flex items-center gap-2 text-[#141414] text-xs p-2.5 rounded-xl hover:bg-[#f7f5f2] transition-colors"
                   >
                     <Layers className="w-3.5 h-3.5 text-[#6b6b6b]" />
                     <span>Compare Products</span>
@@ -489,27 +494,35 @@ export function Header() {
                   <Link
                     href="/wishlist"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 text-[#141414] text-xs p-2 rounded-xl hover:bg-[#f7f5f2] transition"
+                    className="flex items-center gap-2 text-[#141414] text-xs p-2.5 rounded-xl hover:bg-[#f7f5f2] transition-colors"
                   >
-                    <Heart className="w-3.5 h-3.5 text-rose-500" />
+                    <Heart className="w-3.5 h-3.5 text-[#b87414]" />
                     <span>My Wishlist ({mounted ? wishlistCount : 0})</span>
+                  </Link>
+                  <Link
+                    href="/account"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 text-[#141414] text-xs p-2.5 rounded-xl hover:bg-[#f7f5f2] transition-colors"
+                  >
+                    <User className="w-3.5 h-3.5 text-[#6b6b6b]" />
+                    <span>My Customer Account</span>
                   </Link>
                 </div>
               </nav>
             </div>
 
-            {/* Bottom Drawer info */}
-            <div className="pt-6 border-t border-[#eae7e2] text-xs space-y-3">
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
+            {/* Bottom Drawer info (Strictly customer concierge, zero admin leakage) */}
+            <div className="pt-6 border-t border-[#eae7e2] text-xs space-y-2">
+              <a
+                href="https://wa.me/923001234567"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full py-3 text-center font-bold text-xs uppercase tracking-wider rounded-xl bg-[#141414] hover:bg-[#262626] text-white shadow-md flex items-center justify-center gap-2 transition"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Admin Dashboard</span>
-              </Link>
-              <p className="text-[11px] text-[#6b6b6b] text-center">
-                Concierge WhatsApp: +92 300 1234567
+                <span>Concierge: +92 300 1234567</span>
+              </a>
+              <p className="text-[10px] text-[#6b6b6b] text-center uppercase tracking-widest pt-1">
+                MFE Atelier • All Rights Reserved
               </p>
             </div>
           </div>

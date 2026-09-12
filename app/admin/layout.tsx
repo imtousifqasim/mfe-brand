@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   LayoutDashboard, ShoppingBag, Package, Tag, 
   MessageSquare, Truck, Sliders, Users, Settings, 
   BarChart3, Database, ShieldAlert, History, Menu, X, 
-  ExternalLink, Layers, Sparkles
+  ExternalLink, Layers, Sparkles, LogOut
 } from 'lucide-react';
 
 const ADMIN_NAV_GROUPS = [
@@ -48,7 +48,25 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  // If on login page, render clean page without admin shell
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch('/api/admin/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore
+    }
+    router.replace('/admin/login');
+    router.refresh();
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
@@ -79,7 +97,7 @@ export default function AdminLayout({
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/"
             target="_blank"
@@ -93,10 +111,20 @@ export default function AdminLayout({
             <div className="w-7 h-7 rounded-full bg-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center">
               A
             </div>
-            <span className="text-xs font-bold text-slate-300 hidden sm:inline">
+            <span className="text-xs font-bold text-slate-300 hidden md:inline">
               Super Administrator
             </span>
           </div>
+
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-950/60 hover:bg-rose-900 border border-rose-800/80 text-rose-300 transition cursor-pointer disabled:opacity-50"
+            title="Terminate Administrative Session"
+          >
+            <LogOut className="w-3.5 h-3.5 text-rose-400" />
+            <span className="hidden sm:inline">{loggingOut ? 'Logging out...' : 'Sign Out'}</span>
+          </button>
         </div>
       </header>
 

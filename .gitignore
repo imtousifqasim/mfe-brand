@@ -45,3 +45,6 @@ scratch-*.mjs
 
 # local db and seed scripts
 /scripts/
+
+.vercel
+.env*
