@@ -151,7 +151,7 @@ export const SEED_ADVANTAGES: Advantage[] = [
 
 export const SEED_ANNOUNCEMENT: Announcement = {
   id: 'ann-1',
-  message: 'Elevate Your Style: Get 10% OFF Your First Order — Use Code MFE10 at checkout!',
+  message: 'Complimentary Express Nationwide Delivery on orders over PKR 5,000',
   coupon_code: 'MFE10',
   link_url: '/products',
   is_active: true,
