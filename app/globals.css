@@ -272,3 +272,26 @@ button, input, select, textarea {
 .pause-marquee-on-hover:active .animate-marquee-reviews {
   animation-play-state: paused !important;
 }
+
+/* Luxury Announcement Bar Scrolling Ticker */
+@keyframes announcementTicker {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-announcement-ticker {
+  display: flex;
+  width: max-content;
+  animation: announcementTicker 35s linear infinite;
+  will-change: transform;
+}
+
+.animate-announcement-ticker:hover,
+.announcement-ticker-container:hover .animate-announcement-ticker {
+  animation-play-state: paused;
+}
+

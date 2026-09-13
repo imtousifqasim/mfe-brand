@@ -62,13 +62,40 @@ export class SettingsRepository {
     return this.mockAnnouncement;
   }
 
-  static async updateAnnouncement(message: string, couponCode?: string): Promise<Announcement> {
-    this.mockAnnouncement.message = message;
-    this.mockAnnouncement.coupon_code = couponCode || null;
+  static async updateAnnouncement(params: {
+    message?: string;
+    couponCode?: string | null;
+    whatsappNumber?: string | null;
+    tickerMessages?: string[] | null;
+    isActive?: boolean;
+  }): Promise<Announcement> {
+    if (params.message !== undefined) this.mockAnnouncement.message = params.message;
+    if (params.couponCode !== undefined) this.mockAnnouncement.coupon_code = params.couponCode;
+    if (params.whatsappNumber !== undefined) this.mockAnnouncement.whatsapp_number = params.whatsappNumber;
+    if (params.tickerMessages !== undefined) this.mockAnnouncement.ticker_messages = params.tickerMessages;
+    if (params.isActive !== undefined) this.mockAnnouncement.is_active = params.isActive;
     return this.mockAnnouncement;
   }
 
   static async getPaymentMethods(): Promise<PaymentMethodConfig[]> {
+    return this.mockPaymentMethods;
+  }
+
+  static async getActivePaymentMethods(): Promise<PaymentMethodConfig[]> {
+    return this.mockPaymentMethods.filter(pm => pm.is_active).sort((a, b) => a.sort_order - b.sort_order);
+  }
+
+  static async updatePaymentMethod(id: string, updates: Partial<PaymentMethodConfig>): Promise<PaymentMethodConfig | null> {
+    const index = this.mockPaymentMethods.findIndex(p => p.id === id || p.code === id);
+    if (index !== -1) {
+      this.mockPaymentMethods[index] = { ...this.mockPaymentMethods[index], ...updates };
+      return this.mockPaymentMethods[index];
+    }
+    return null;
+  }
+
+  static async updatePaymentMethods(methods: PaymentMethodConfig[]): Promise<PaymentMethodConfig[]> {
+    this.mockPaymentMethods = methods;
     return this.mockPaymentMethods;
   }
 

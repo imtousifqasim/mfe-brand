@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/lib/utils';
 import { SEED_PAYMENT_METHODS } from '@/lib/data/seed-data';
-import { PaymentMethodCode, Order } from '@/types/database';
-import { CheckCircle2, ShieldCheck, ArrowRight, Truck, AlertCircle } from 'lucide-react';
+import { PaymentMethodCode, PaymentMethodConfig, Order } from '@/types/database';
+import { 
+  CheckCircle2, ShieldCheck, ArrowRight, Truck, AlertCircle, 
+  Copy, Check, CreditCard, Building2, Sparkles, Smartphone 
+} from 'lucide-react';
 
 export default function CheckoutPage() {
   const { items, subtotal, shipping, grandTotal, couponCode, couponDiscount, clearCart } = useCart();
@@ -21,10 +24,45 @@ export default function CheckoutPage() {
   const [postalCode, setPostalCode] = useState('54000');
   const [notes, setNotes] = useState('');
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethodCode>('cod');
+  const [transactionId, setTransactionId] = useState('');
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethodConfig[]>(SEED_PAYMENT_METHODS);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
+
+  // Fetch live active payment methods from backend
+  useEffect(() => {
+    async function fetchGateways() {
+      try {
+        const res = await fetch('/api/payment-methods');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) {
+            setPaymentMethods(data.paymentMethods);
+            // If current selectedPayment is not in active methods, select the first one
+            if (!data.paymentMethods.some((pm: PaymentMethodConfig) => pm.code === selectedPayment)) {
+              setSelectedPayment(data.paymentMethods[0].code);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load dynamic payment methods', err);
+      }
+    }
+    fetchGateways();
+  }, [selectedPayment]);
+
+  const activePaymentConfig = paymentMethods.find(pm => pm.code === selectedPayment);
+
+  const handleCopy = (text: string, field: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
+    }
+  };
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +76,11 @@ export default function CheckoutPage() {
     }
 
     try {
+      const finalNotes = [
+        notes.trim(),
+        transactionId.trim() ? `[Payment TID / Ref: ${transactionId.trim()}]` : ''
+      ].filter(Boolean).join(' | ');
+
       const payload = {
         customerName: fullName,
         customerEmail: email,
@@ -60,7 +103,7 @@ export default function CheckoutPage() {
           postal_code: postalCode,
           country: 'Pakistan',
         },
-        orderNotes: notes || undefined,
+        orderNotes: finalNotes || undefined,
       };
 
       const res = await fetch('/api/orders', {
@@ -297,38 +340,200 @@ export default function CheckoutPage() {
             </div>
           </div>
 
+          {/* 3. Payment Method */}
           <div className="bg-[#f7f5f2] border border-[#eae7e2] rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-            <h2 className="font-serif text-xl font-bold text-[#141414] pb-3 border-b border-[#eae7e2]">
-              3. Payment Method
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {SEED_PAYMENT_METHODS.map((pm) => (
-                <label
-                  key={pm.code}
-                  className={`p-5 rounded-2xl border cursor-pointer transition flex flex-col justify-between gap-3 ${
-                    selectedPayment === pm.code
-                      ? 'border-[#d99026] bg-[#d99026]/10 shadow-sm'
-                      : 'border-[#eae7e2] bg-white hover:border-neutral-400'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs uppercase tracking-wider text-[#141414]">
-                      {pm.name}
-                    </span>
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={selectedPayment === pm.code}
-                      onChange={() => setSelectedPayment(pm.code as PaymentMethodCode)}
-                      className="accent-[#d99026]"
-                    />
-                  </div>
-                  <p className="text-[11px] text-[#6b6b6b] leading-relaxed">
-                    {pm.instructions}
-                  </p>
-                </label>
-              ))}
+            <div className="flex items-center justify-between pb-3 border-b border-[#eae7e2]">
+              <h2 className="font-serif text-xl font-bold text-[#141414]">
+                3. Payment Method
+              </h2>
+              <span className="text-[11px] font-bold text-[#b87414] bg-[#d99026]/10 px-3 py-1 rounded-full border border-[#d99026]/20">
+                100% Secure Checkout
+              </span>
             </div>
+
+            {/* Payment Methods Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {paymentMethods.map((pm) => {
+                const isSelected = selectedPayment === pm.code;
+                return (
+                  <label
+                    key={pm.code}
+                    className={`relative p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between gap-3 ${
+                      isSelected
+                        ? 'border-[#b87414] bg-white ring-2 ring-[#d99026]/30 shadow-md scale-[1.01]'
+                        : 'border-[#eae7e2] bg-white hover:border-[#b87414]/50 hover:bg-[#faf9f6]'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        {pm.logo_url ? (
+                          <div className="w-10 h-10 rounded-xl bg-[#f7f5f2] border border-[#eae7e2] p-1.5 flex items-center justify-center shrink-0">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={pm.logo_url}
+                              alt={pm.name}
+                              className="max-w-full max-h-full object-contain"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-[#f7f5f2] border border-[#eae7e2] flex items-center justify-center shrink-0 text-[#b87414]">
+                            <CreditCard className="w-5 h-5" />
+                          </div>
+                        )}
+                        <div>
+                          <span className="font-bold text-xs uppercase tracking-wider text-[#141414] block">
+                            {pm.name}
+                          </span>
+                          {pm.badge && (
+                            <span className="inline-block mt-0.5 text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#d99026]/15 text-[#b87414]">
+                              {pm.badge}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <input
+                        type="radio"
+                        name="payment"
+                        checked={isSelected}
+                        onChange={() => setSelectedPayment(pm.code as PaymentMethodCode)}
+                        className="accent-[#b87414] w-4 h-4 mt-1"
+                      />
+                    </div>
+
+                    <p className="text-[11px] text-[#6b6b6b] leading-relaxed">
+                      {pm.instructions}
+                    </p>
+                  </label>
+                );
+              })}
+            </div>
+
+            {/* Selected Method Details & Credentials (for JazzCash, Easypaisa, Bank Transfer, SadaPay, NayaPay) */}
+            {activePaymentConfig && (activePaymentConfig.account_title || activePaymentConfig.till_id || activePaymentConfig.account_number || activePaymentConfig.iban) && (
+              <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#1c1c1f] to-[#121214] text-white border border-[#333338] shadow-lg space-y-4 animate-in fade-in-50 duration-200">
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    {activePaymentConfig.logo_url ? (
+                      <div className="w-7 h-7 rounded-lg bg-white p-1 flex items-center justify-center shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={activePaymentConfig.logo_url} alt={activePaymentConfig.name} className="max-w-full max-h-full object-contain" />
+                      </div>
+                    ) : (
+                      <Building2 className="w-5 h-5 text-amber-400" />
+                    )}
+                    <div>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+                        {activePaymentConfig.name} — Payment Credentials
+                      </h4>
+                      <p className="text-[10px] text-slate-400">Transfer total order amount to complete verification</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-full border border-amber-400/20">
+                    Official Business Gateway
+                  </span>
+                </div>
+
+                {/* Account Details Box */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {activePaymentConfig.account_title && (
+                    <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Account Title / Owner</span>
+                        <span className="font-mono text-xs font-bold text-amber-300">{activePaymentConfig.account_title}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(activePaymentConfig.account_title!, 'title')}
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition"
+                        title="Copy Account Title"
+                      >
+                        {copiedField === 'title' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  )}
+
+                  {activePaymentConfig.till_id && (
+                    <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-amber-400 block">Merchant Till ID</span>
+                        <span className="font-mono text-sm font-black tracking-widest text-white">{activePaymentConfig.till_id}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(activePaymentConfig.till_id!, 'till')}
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition"
+                        title="Copy Till ID"
+                      >
+                        {copiedField === 'till' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  )}
+
+                  {activePaymentConfig.account_number && (
+                    <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Account / Mobile Number</span>
+                        <span className="font-mono text-xs font-bold text-white tracking-wider">{activePaymentConfig.account_number}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(activePaymentConfig.account_number!, 'acc')}
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition"
+                        title="Copy Account Number"
+                      >
+                        {copiedField === 'acc' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  )}
+
+                  {activePaymentConfig.bank_name && (
+                    <div className="bg-white/5 border border-white/10 p-3 rounded-xl sm:col-span-2">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Bank Name</span>
+                      <span className="text-xs font-bold text-white">{activePaymentConfig.bank_name}</span>
+                    </div>
+                  )}
+
+                  {activePaymentConfig.iban && (
+                    <div className="bg-white/5 border border-white/10 p-3 rounded-xl sm:col-span-2 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">IBAN (International / 1-Link)</span>
+                        <span className="font-mono text-xs font-bold text-amber-300 tracking-wider break-all">{activePaymentConfig.iban}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(activePaymentConfig.iban!, 'iban')}
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition shrink-0 ml-2"
+                        title="Copy IBAN"
+                      >
+                        {copiedField === 'iban' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Customer Transaction Reference Input (TID) */}
+                <div className="pt-2 border-t border-white/10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Transaction ID (TID) / Reference Number</span>
+                    </label>
+                    <span className="text-[10px] text-slate-400">Required for instant dispatch</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={transactionId}
+                    onChange={(e) => setTransactionId(e.target.value)}
+                    placeholder="e.g. 12-digit JazzCash/Easypaisa TID (129038472910)"
+                    className="w-full text-xs p-3.5 rounded-xl bg-black/40 border border-white/20 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono"
+                  />
+                  <p className="text-[10px] text-slate-400 leading-tight">
+                    * Once you transfer {formatPrice(grandTotal)} via your app, paste the transaction reference ID from your SMS receipt above.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
         </div>

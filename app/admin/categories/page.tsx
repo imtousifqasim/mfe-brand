@@ -4,10 +4,16 @@ import React, { useState } from 'react';
 import { SEED_CATEGORIES } from '@/lib/data/seed-data';
 import { Category } from '@/types/database';
 import { ExternalImage } from '@/components/media/ExternalImage';
-import { Layers, Plus, CheckCircle2 } from 'lucide-react';
+import { Layers, Plus, CheckCircle2, Trash2 } from 'lucide-react';
+import { AdminConfirmModal } from '@/components/admin/AdminConfirmModal';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>(SEED_CATEGORIES);
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; catId: string; name: string }>({
+    isOpen: false,
+    catId: '',
+    name: '',
+  });
   const [showAdd, setShowAdd] = useState(false);
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -138,14 +144,40 @@ export default function AdminCategoriesPage() {
             <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
               <ExternalImage src={cat.image_url} alt={cat.name} fill className="object-cover" />
             </div>
-            <div>
-              <h3 className="font-bold text-base text-white">{cat.name}</h3>
-              <p className="text-[11px] font-mono text-slate-500">/{cat.slug}</p>
-              <p className="text-xs text-slate-400 mt-1 line-clamp-2">{cat.description}</p>
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h3 className="font-bold text-base text-white">{cat.name}</h3>
+                <p className="text-[11px] font-mono text-slate-500">/{cat.slug}</p>
+                <p className="text-xs text-slate-400 mt-1 line-clamp-2">{cat.description}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeleteModal({ isOpen: true, catId: cat.id, name: cat.name })}
+                className="p-1.5 text-slate-500 hover:text-rose-400 transition cursor-pointer shrink-0"
+                title="Delete Category"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Modern Confirmation Modal */}
+      <AdminConfirmModal
+        isOpen={deleteModal.isOpen}
+        title="Delete Store Category"
+        message={`Are you sure you want to delete category "${deleteModal.name}"? Products under this category will need reassignment.`}
+        confirmText="Delete Category"
+        cancelText="Cancel"
+        variant="danger"
+        iconType="delete"
+        onConfirm={() => {
+          setCategories(categories.filter(c => c.id !== deleteModal.catId));
+          setDeleteModal({ isOpen: false, catId: '', name: '' });
+        }}
+        onClose={() => setDeleteModal({ isOpen: false, catId: '', name: '' })}
+      />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import {
   LayoutDashboard, ShoppingBag, Package, Tag, 
   MessageSquare, Truck, Sliders, Users, Settings, 
   BarChart3, Database, ShieldAlert, History, Menu, X, 
-  ExternalLink, Layers, Sparkles, LogOut
+  ExternalLink, Layers, Sparkles, LogOut, Mail, CreditCard
 } from 'lucide-react';
 
 const ADMIN_NAV_GROUPS = [
@@ -24,11 +24,12 @@ const ADMIN_NAV_GROUPS = [
   {
     group: 'Marketing & Customers',
     items: [
+      { href: '/admin/subscribers', label: 'VIP Subscribers & SMTP', icon: Mail },
       { href: '/admin/customers', label: 'Customers Directory', icon: Users },
       { href: '/admin/coupons', label: 'Coupons & Promos', icon: Tag },
       { href: '/admin/reviews', label: 'Reviews Moderation', icon: MessageSquare },
       { href: '/admin/shipments', label: 'Couriers & Shipments', icon: Truck },
-      { href: '/admin/homepage', label: 'Homepage CMS (Hero)', icon: Sliders },
+      { href: '/admin/homepage', label: 'Announcement & Hero CMS', icon: Sliders },
     ]
   },
   {
@@ -37,6 +38,7 @@ const ADMIN_NAV_GROUPS = [
       { href: '/admin/analytics', label: 'Sales Analytics', icon: BarChart3 },
       { href: '/admin/database', label: 'Database Monitoring', icon: Database },
       { href: '/admin/audit-logs', label: 'Audit Activity Logs', icon: History },
+      { href: '/admin/payment-methods', label: 'Payment Gateways & Tills', icon: CreditCard },
       { href: '/admin/settings', label: 'Store & Gateways', icon: Settings },
       { href: '/admin/profile', label: 'Security & Profile (2FA)', icon: ShieldAlert },
     ]

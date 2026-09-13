@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { CouponRepository } from '@/repositories/coupon.repository';
 import { Coupon } from '@/types/database';
 import { formatPrice } from '@/lib/utils';
-import { Tag, Plus, CheckCircle2 } from 'lucide-react';
+import { Tag, Plus, CheckCircle2, Trash2 } from 'lucide-react';
+import { AdminConfirmModal } from '@/components/admin/AdminConfirmModal';
 
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([
@@ -56,8 +57,19 @@ export default function AdminCouponsPage() {
     setDesc('');
   };
 
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; couponId: string; code: string }>({
+    isOpen: false,
+    couponId: '',
+    code: '',
+  });
+
+  const confirmDelete = () => {
+    setCoupons(coupons.filter(c => c.id !== deleteModal.couponId));
+    setDeleteModal({ isOpen: false, couponId: '', code: '' });
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-white">
@@ -173,9 +185,19 @@ export default function AdminCouponsPage() {
               <span className="font-mono text-base font-black text-amber-400 tracking-wider">
                 {c.code}
               </span>
-              <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
-                Active
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
+                  Active
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setDeleteModal({ isOpen: true, couponId: c.id, code: c.code })}
+                  className="p-1.5 text-slate-500 hover:text-rose-400 transition cursor-pointer"
+                  title="Delete Coupon"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             <p className="text-xs text-slate-300">{c.description}</p>
@@ -190,6 +212,19 @@ export default function AdminCouponsPage() {
           </div>
         ))}
       </div>
+
+      {/* Modern Confirmation Modal (No browser alert/confirm!) */}
+      <AdminConfirmModal
+        isOpen={deleteModal.isOpen}
+        title="Delete Promotional Coupon"
+        message={`Are you sure you want to delete coupon code "${deleteModal.code}"? Customers will no longer be able to redeem this promo code at checkout.`}
+        confirmText="Delete Coupon"
+        cancelText="Keep Coupon"
+        variant="danger"
+        iconType="delete"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteModal({ isOpen: false, couponId: '', code: '' })}
+      />
     </div>
   );
 }

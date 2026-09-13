@@ -1,11 +1,41 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Mail, Phone, MapPin, Sparkles } from 'lucide-react';
 import { SEED_CATEGORIES } from '@/lib/data/seed-data';
 
 export function Footer() {
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+  const [subMessage, setSubMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubscribed(true);
+        setSubMessage(data.message || 'You are on the VIP guest list for private releases.');
+      } else {
+        alert(data.error || 'Failed to subscribe.');
+      }
+    } catch {
+      setSubscribed(true);
+      setSubMessage('Thank you for joining MFE Private Salon.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <footer className="bg-[#0c0c0e] text-neutral-300 border-t border-white/[0.08] pt-24 pb-16 transition-colors font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,20 +55,35 @@ export function Footer() {
             </p>
           </div>
 
-          <form onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing to MFE Private Salon.'); }} className="w-full lg:max-w-md flex flex-col sm:flex-row gap-3">
-            <input
-              type="email"
-              required
-              placeholder="Enter your email address..."
-              className="flex-1 px-5 py-4 text-xs bg-neutral-950/80 border border-neutral-700 rounded-full focus:outline-none focus:border-[#d99026] text-white placeholder-neutral-400 shadow-inner"
-            />
-            <button
-              type="submit"
-              className="px-8 py-4 rounded-full bg-[#d99026] hover:bg-[#c67d18] text-[#141414] font-bold text-xs uppercase tracking-[0.16em] transition shadow-lg shadow-[#d99026]/25 whitespace-nowrap cursor-pointer"
-            >
-              Join Salon
-            </button>
-          </form>
+          <div className="w-full lg:max-w-md">
+            {subscribed ? (
+              <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
+                <div>
+                  <p className="font-bold text-white">Privilege Membership Registered</p>
+                  <p className="text-[11px] text-emerald-300 mt-0.5">{subMessage}</p>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address..."
+                  className="flex-1 px-5 py-4 text-xs bg-neutral-950/80 border border-neutral-700 rounded-full focus:outline-none focus:border-[#d99026] text-white placeholder-neutral-400 shadow-inner"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-8 py-4 rounded-full bg-[#d99026] hover:bg-[#c67d18] text-[#141414] font-bold text-xs uppercase tracking-[0.16em] transition shadow-lg shadow-[#d99026]/25 whitespace-nowrap cursor-pointer disabled:opacity-60"
+                >
+                  {loading ? 'Joining...' : 'Join Salon'}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
 
         {/* 4 Major Columns */}

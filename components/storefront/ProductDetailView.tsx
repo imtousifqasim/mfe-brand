@@ -14,7 +14,7 @@ import {
   Star, ShoppingBag, Heart, Layers, ShieldCheck, 
   Truck, RefreshCw, CheckCircle2, ChevronRight, ChevronLeft,
   Sparkles, Check, Ruler, X, AlertTriangle, Camera,
-  ArrowLeft, Scissors
+  ArrowLeft, Scissors, Loader2
 } from 'lucide-react';
 
 interface ProductDetailViewProps {
@@ -69,6 +69,7 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
   const [activeTab, setActiveTab] = useState<'details' | 'fabric' | 'shipping' | 'reviews'>('details');
   const [sizeModalOpen, setSizeModalOpen] = useState(false);
   const [addedNotice, setAddedNotice] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   // Sticky mobile bottom bar state
   const [showStickyBar, setShowStickyBar] = useState(false);
@@ -177,21 +178,28 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
   };
 
   const handleAddToCart = () => {
-    addToCart(product, quantity, {
-      size: selectedSize,
-      color: selectedColor.name,
-      price: currentPrice,
-    });
-    setAddedNotice(true);
-    setTimeout(() => setAddedNotice(false), 2200);
+    if (isAdding) return;
+    setIsAdding(true);
+    // Circular loader effect on button before smoothly sliding out cart drawer
+    setTimeout(() => {
+      addToCart(product, quantity, {
+        size: selectedSize,
+        color: selectedColor.name,
+        price: currentPrice,
+      }, true);
+      setIsAdding(false);
+      setAddedNotice(true);
+      setTimeout(() => setAddedNotice(false), 2200);
+    }, 450);
   };
 
   const handleBuyNow = () => {
+    // Navigate directly to checkout without opening the side cart drawer
     addToCart(product, quantity, {
       size: selectedSize,
       color: selectedColor.name,
       price: currentPrice,
-    });
+    }, false);
     router.push('/checkout');
   };
 
@@ -656,10 +664,16 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
               {/* Primary CTA: Add to Bag */}
               <button
                 type="button"
+                disabled={isAdding}
                 onClick={handleAddToCart}
-                className="flex-1 bg-[#d99026] hover:bg-[#c67d18] active:bg-[#b87414] text-[#141414] font-bold text-xs uppercase tracking-[0.14em] py-3.5 px-4 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer touch-manipulation"
+                className="flex-1 bg-[#d99026] hover:bg-[#c67d18] active:bg-[#b87414] text-[#141414] font-bold text-xs uppercase tracking-[0.14em] py-3.5 px-4 rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer touch-manipulation disabled:opacity-85"
               >
-                {addedNotice ? (
+                {isAdding ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-[#141414]" />
+                    <span>Adding to Bag...</span>
+                  </>
+                ) : addedNotice ? (
                   <>
                     <Check className="w-4 h-4 text-emerald-950" />
                     <span>Added to Bag</span>
@@ -1090,11 +1104,16 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
+              disabled={isAdding}
               onClick={handleAddToCart}
-              className="bg-[#f7f5f2] hover:bg-[#eae7e2] active:bg-[#e4e0d8] text-[#141414] font-bold text-xs uppercase tracking-wider py-2.5 px-3 rounded-xl border border-[#eae7e2] flex items-center gap-1 shadow-2xs cursor-pointer touch-manipulation transition-colors"
+              className="bg-[#f7f5f2] hover:bg-[#eae7e2] active:bg-[#e4e0d8] text-[#141414] font-bold text-xs uppercase tracking-wider py-2.5 px-3 rounded-xl border border-[#eae7e2] flex items-center gap-1.5 shadow-2xs cursor-pointer touch-manipulation transition-colors disabled:opacity-85"
             >
-              <ShoppingBag className="w-3.5 h-3.5 text-[#b87414]" />
-              <span>Bag</span>
+              {isAdding ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#b87414]" />
+              ) : (
+                <ShoppingBag className="w-3.5 h-3.5 text-[#b87414]" />
+              )}
+              <span>{isAdding ? 'Adding...' : 'Bag'}</span>
             </button>
             <button
               type="button"

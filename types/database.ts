@@ -262,6 +262,8 @@ export interface Announcement {
   coupon_code?: string | null;
   link_url?: string | null;
   is_active: boolean;
+  whatsapp_number?: string | null;
+  ticker_messages?: string[] | null;
 }
 
 export interface PaymentMethodConfig {
@@ -270,7 +272,14 @@ export interface PaymentMethodConfig {
   name: string;
   instructions?: string | null;
   account_details?: string | null;
+  account_title?: string | null;
+  account_number?: string | null;
+  till_id?: string | null;
+  bank_name?: string | null;
+  iban?: string | null;
   logo_url?: string | null;
+  badge?: string | null;
+  requires_reference?: boolean;
   is_active: boolean;
   sort_order: number;
 }
