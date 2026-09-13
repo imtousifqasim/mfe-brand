@@ -8,7 +8,8 @@ import { SEED_PAYMENT_METHODS } from '@/lib/data/seed-data';
 import { PaymentMethodCode, PaymentMethodConfig, Order } from '@/types/database';
 import { 
   CheckCircle2, ShieldCheck, ArrowRight, Truck, AlertCircle, 
-  Copy, Check, CreditCard, Building2, Sparkles, Smartphone 
+  Copy, Check, CreditCard, Building2, Sparkles, Smartphone,
+  Lock, User, Eye, EyeOff
 } from 'lucide-react';
 
 export default function CheckoutPage() {
@@ -27,6 +28,13 @@ export default function CheckoutPage() {
   const [transactionId, setTransactionId] = useState('');
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodConfig[]>(SEED_PAYMENT_METHODS);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  // Account creation at checkout
+  const [createAccount, setCreateAccount] = useState(false);
+  const [accountUsername, setAccountUsername] = useState('');
+  const [accountPassword, setAccountPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -75,6 +83,19 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (createAccount) {
+      if (!accountPassword || accountPassword.length < 6) {
+        setErrorMessage('Atelier account password must be at least 6 characters long.');
+        setIsSubmitting(false);
+        return;
+      }
+      if (accountPassword !== confirmPassword) {
+        setErrorMessage('Passwords do not match. Please verify your chosen password.');
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     try {
       const finalNotes = [
         notes.trim(),
@@ -85,6 +106,9 @@ export default function CheckoutPage() {
         customerName: fullName,
         customerEmail: email,
         customerPhone: phone,
+        createAccount,
+        password: createAccount ? accountPassword : undefined,
+        username: createAccount ? (accountUsername.trim() || undefined) : undefined,
         items: items.map(i => ({
           productId: i.product.id,
           quantity: i.quantity,
@@ -251,6 +275,103 @@ export default function CheckoutPage() {
                     className="w-full text-xs p-3.5 rounded-xl bg-white border border-[#eae7e2] text-[#141414] placeholder-[#6b6b6b] focus:outline-none focus:border-[#d99026]"
                   />
                 </div>
+              </div>
+
+              {/* Atelier Account Creation Section */}
+              <div className="pt-4 border-t border-[#eae7e2]">
+                <label className="flex items-start gap-3 cursor-pointer p-4 rounded-2xl bg-white border border-[#eae7e2] hover:border-[#d99026]/40 transition group">
+                  <input
+                    type="checkbox"
+                    checked={createAccount}
+                    onChange={(e) => setCreateAccount(e.target.checked)}
+                    className="accent-[#b87414] w-4 h-4 mt-0.5 rounded cursor-pointer"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-serif font-bold text-xs sm:text-sm text-[#141414] group-hover:text-[#b87414] transition">
+                        Create an Atelier Patron Account
+                      </span>
+                      <span className="text-[9px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full bg-[#d99026]/15 text-[#b87414]">
+                        VIP Privileges
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#6b6b6b] mt-0.5 leading-relaxed">
+                      Receive immediate login credentials via email for live courier tracking, order invoices, and VIP Salon previews.
+                    </p>
+                  </div>
+                </label>
+
+                {createAccount && (
+                  <div className="mt-3.5 p-4 sm:p-5 rounded-2xl bg-[#faf8f5] border border-[#e8dfd2] space-y-3.5 animate-in fade-in-50 duration-200">
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#b87414]">
+                      <Sparkles className="w-4 h-4" />
+                      <span>Set Up Your Patron Credentials</span>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-[#141414] mb-1">
+                        Patron Username (Optional)
+                      </label>
+                      <div className="relative">
+                        <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8c827a]" />
+                        <input
+                          type="text"
+                          value={accountUsername}
+                          onChange={(e) => setAccountUsername(e.target.value)}
+                          placeholder={email || "e.g. ayesha.couture"}
+                          className="w-full text-xs pl-10 pr-3.5 py-3 rounded-xl bg-white border border-[#eae7e2] text-[#141414] placeholder-[#8c827a] focus:outline-none focus:border-[#d99026]"
+                        />
+                      </div>
+                      <span className="text-[10px] text-[#8c827a] mt-1 block">If left empty, your email will be your account login.</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-[#141414] mb-1">
+                          Choose Password *
+                        </label>
+                        <div className="relative">
+                          <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8c827a]" />
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={accountPassword}
+                            onChange={(e) => setAccountPassword(e.target.value)}
+                            placeholder="Min 6 characters"
+                            className="w-full text-xs pl-10 pr-10 py-3 rounded-xl bg-white border border-[#eae7e2] text-[#141414] placeholder-[#8c827a] focus:outline-none focus:border-[#d99026]"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8c827a] hover:text-[#141414]"
+                          >
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-[#141414] mb-1">
+                          Confirm Password *
+                        </label>
+                        <div className="relative">
+                          <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8c827a]" />
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Re-type password"
+                            className="w-full text-xs pl-10 pr-3.5 py-3 rounded-xl bg-white border border-[#eae7e2] text-[#141414] placeholder-[#8c827a] focus:outline-none focus:border-[#d99026]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white border border-[#e8dfd2] text-[11px] text-[#6b6b6b] flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Your account will be created instantly and login credentials sent to <strong>{email || 'your email'}</strong>.</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -13,7 +13,10 @@ import {
   ShieldCheck, 
   Sparkles,
   Lock,
-  Radio
+  Radio,
+  Eye,
+  Layers,
+  FileText
 } from 'lucide-react';
 import { Subscriber, SmtpConfig } from '@/repositories/newsletter.repository';
 import { AdminConfirmModal } from '@/components/admin/AdminConfirmModal';
@@ -33,6 +36,9 @@ export default function AdminSubscribersPage() {
 
   const [loading, setLoading] = useState(true);
   const [bannerMsg, setBannerMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Email template live preview
+  const [previewTemplate, setPreviewTemplate] = useState<'order-confirmation' | 'account-welcome' | 'order-shipped' | 'newsletter'>('order-confirmation');
 
   // Broadcast email state
   const [subject, setSubject] = useState('');
@@ -511,7 +517,83 @@ export default function AdminSubscribersPage() {
         </div>
       </div>
 
-      {/* Section 3: VIP Subscribers Directory Table */}
+      {/* Section 3: Haute Couture Email Templates & Live Previewer */}
+      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-5 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2.5">
+            <Layers className="w-4 h-4 text-amber-500" />
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-wider text-white">
+                Haute Couture Email Templates & Live Preview
+              </h2>
+              <p className="text-[11px] text-slate-400">
+                All 4 bespoke transactional & marketing HTML templates sent automatically by the atelier
+              </p>
+            </div>
+          </div>
+
+          <a
+            href={`/api/admin/email-preview?template=${previewTemplate}&format=raw`}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition self-start sm:self-auto"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Open in Full Tab ↗</span>
+          </a>
+        </div>
+
+        {/* Template Selector Tabs */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { id: 'order-confirmation', label: '1. Order Confirmation', icon: FileText, desc: 'Ensemble booking & invoice' },
+            { id: 'account-welcome', label: '2. Welcome & Credentials', icon: Sparkles, desc: 'Password & patron lounge ID' },
+            { id: 'order-shipped', label: '3. Order Dispatched', icon: Send, desc: 'Courier ID & tracking link' },
+            { id: 'newsletter', label: '4. VIP Salon Gazette', icon: Mail, desc: 'Editorial capsule announcement' },
+          ].map((t) => {
+            const isSelected = previewTemplate === t.id;
+            const IconComponent = t.icon;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setPreviewTemplate(t.id as any)}
+                className={`p-3 rounded-xl border text-left transition flex flex-col justify-between gap-1 cursor-pointer ${
+                  isSelected
+                    ? 'border-amber-500 bg-amber-500/10 text-white shadow-md'
+                    : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-400' : 'text-slate-500'}`} />
+                  <span className="text-xs font-bold">{t.label}</span>
+                </div>
+                <span className="text-[10px] text-slate-500 truncate">{t.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Live Template Iframe Preview */}
+        <div className="rounded-2xl border border-slate-800 overflow-hidden bg-[#faf8f5] shadow-xl">
+          <div className="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-xs">
+            <span className="text-[11px] font-mono text-slate-400">
+              Template: <strong className="text-amber-400">{previewTemplate}.html</strong>
+            </span>
+            <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+              Live Responsive HTML
+            </span>
+          </div>
+          <iframe
+            key={previewTemplate}
+            src={`/api/admin/email-preview?template=${previewTemplate}&format=raw`}
+            className="w-full h-[650px] border-0"
+            title="Email Template Live Preview"
+          />
+        </div>
+      </div>
+
+      {/* Section 4: VIP Subscribers Directory Table */}
       <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
