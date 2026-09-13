@@ -127,6 +127,7 @@ export class ProductRepository {
 
   static async getProductBySlug(slug: string): Promise<Product | null> {
     try {
+      const cleanSlug = slug.trim();
       const { data: foundProduct } = await findAcrossAllShards<Product>(async (supabase) => {
         const { data, error } = await supabase
           .from('products')
@@ -136,8 +137,8 @@ export class ProductRepository {
             brand:brands(*),
             images:product_images(*)
           `)
-          .eq('slug', slug)
-          .single();
+          .eq('slug', cleanSlug)
+          .maybeSingle();
 
         if (!error && data) return data as Product;
         return null;
@@ -148,34 +149,39 @@ export class ProductRepository {
       // Fallback
     }
 
-    const p = this.mockProducts.find(item => item.slug === slug);
+    const p = this.mockProducts.find(item => item.slug === slug || item.id === slug);
     return p || null;
   }
 
   static async getProductById(id: string): Promise<Product | null> {
     try {
-      const { data: foundProduct } = await findAcrossAllShards<Product>(async (supabase) => {
-        const { data, error } = await supabase
-          .from('products')
-          .select(`
-            *,
-            category:categories(*),
-            brand:brands(*),
-            images:product_images(*)
-          `)
-          .eq('id', id)
-          .single();
+      const cleanId = id.trim();
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanId);
+      
+      if (isUuid) {
+        const { data: foundProduct } = await findAcrossAllShards<Product>(async (supabase) => {
+          const { data, error } = await supabase
+            .from('products')
+            .select(`
+              *,
+              category:categories(*),
+              brand:brands(*),
+              images:product_images(*)
+            `)
+            .eq('id', cleanId)
+            .maybeSingle();
 
-        if (!error && data) return data as Product;
-        return null;
-      });
+          if (!error && data) return data as Product;
+          return null;
+        });
 
-      if (foundProduct) return foundProduct;
+        if (foundProduct) return foundProduct;
+      }
     } catch {
       // Fallback
     }
 
-    return this.mockProducts.find(item => item.id === id) || null;
+    return this.mockProducts.find(item => item.id === id || item.slug === id || item.sku === id) || null;
   }
 
 

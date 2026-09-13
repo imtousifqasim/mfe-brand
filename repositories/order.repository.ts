@@ -9,6 +9,36 @@ import {
 import { Order, OrderItem, OrderAddress, OrderStatus } from '@/types/database';
 import { SEED_COURIERS } from '@/lib/data/seed-data';
 
+function generateDirectCourierTrackingUrl(courierCodeOrName: string = '', trackingId?: string | null): string {
+  if (!trackingId || !trackingId.trim()) return '';
+  const cleanId = trackingId.trim();
+  const c = courierCodeOrName.toLowerCase();
+
+  if (c.includes('tcs')) {
+    return `https://www.tcsexpress.com/tracking?track=${encodeURIComponent(cleanId)}`;
+  }
+  if (c.includes('leopard')) {
+    return `https://leopardscourier.com/leopard-tracking/?track_numbers=${encodeURIComponent(cleanId)}`;
+  }
+  if (c.includes('call') || c.includes('cc')) {
+    return `https://callcourier.com.pk/tracking/?tc=${encodeURIComponent(cleanId)}`;
+  }
+  if (c.includes('postex')) {
+    return `https://postex.pk/tracking?order=${encodeURIComponent(cleanId)}`;
+  }
+  if (c.includes('trax') || c.includes('sonic')) {
+    return `https://sonic.pk/tracking?tracking_number=${encodeURIComponent(cleanId)}`;
+  }
+  if (c.includes('m&p') || c.includes('mnp') || c.includes('m and p') || c.includes('mulphilog')) {
+    return `https://mulphilog.com/tracking?consignmentNo=${encodeURIComponent(cleanId)}`;
+  }
+  if (c.includes('pakpost') || c.includes('post')) {
+    return `https://ep.gov.pk/track.asp?art_id=${encodeURIComponent(cleanId)}`;
+  }
+
+  return `https://www.google.com/search?q=${encodeURIComponent(`${courierCodeOrName} tracking ${cleanId}`)}`;
+}
+
 export class OrderRepository {
   private static mockOrders: Order[] = [];
 
@@ -46,10 +76,13 @@ export class OrderRepository {
     notes?: string;
   }): Promise<Order> {
     const orderNumber = this.generateOrderNumber();
+    const isCustomerIdUuid = orderData.customerId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderData.customerId);
+    const validCustomerId = isCustomerIdUuid ? orderData.customerId : null;
+
     const newOrder: Order = {
       id: `ord-${Date.now()}`,
       order_number: orderNumber,
-      customer_id: orderData.customerId || null,
+      customer_id: validCustomerId,
       customer_email: orderData.customerEmail,
       customer_phone: orderData.customerPhone,
       customer_name: orderData.customerName,
@@ -88,12 +121,12 @@ export class OrderRepository {
     };
 
     try {
-      const supabase = createAdminClient();
-      const { data: dbOrder, error } = await supabase
+      const writeClient = getActiveWriteAdmin();
+      const { data: dbOrder, error } = await writeClient
         .from('orders')
         .insert({
           order_number: newOrder.order_number,
-          customer_id: newOrder.customer_id,
+          customer_id: validCustomerId,
           customer_email: newOrder.customer_email,
           customer_phone: newOrder.customer_phone,
           customer_name: newOrder.customer_name,
@@ -122,18 +155,58 @@ export class OrderRepository {
           subtotal: it.subtotal,
           image_url: it.image_url,
         }));
-        await supabase.from('order_items').insert(itemInserts);
+        await writeClient.from('order_items').insert(itemInserts);
 
         // Insert addresses
-        await supabase.from('order_addresses').insert([
-          { ...orderData.shippingAddress, order_id: dbOrder.id, address_type: 'shipping' as const },
-          { ...(orderData.billingAddress || orderData.shippingAddress), order_id: dbOrder.id, address_type: 'billing' as const },
+        await writeClient.from('order_addresses').insert([
+          { ...orderData.shippingAddress, order_id: dbOrder.id, address_type: 'shipping' },
+          { ...(orderData.billingAddress || orderData.shippingAddress), order_id: dbOrder.id, address_type: 'billing' },
         ]);
 
-        return dbOrder as Order;
+        // Insert status history
+        await writeClient.from('order_status_history').insert({
+          order_id: dbOrder.id,
+          new_status: 'pending',
+          notes: 'Order placed successfully.',
+        });
+
+        // Also replicate base order row to other shards for high availability read access
+        const shards = getAllAdminClients();
+        for (const { client, id: shardIdNum } of shards) {
+          if (shardIdNum !== getActiveWriteShardId()) {
+            await client.from('orders').upsert({
+              id: dbOrder.id,
+              order_number: dbOrder.order_number,
+              customer_id: validCustomerId,
+              customer_email: dbOrder.customer_email,
+              customer_phone: dbOrder.customer_phone,
+              customer_name: dbOrder.customer_name,
+              subtotal: dbOrder.subtotal,
+              discount_amount: dbOrder.discount_amount,
+              shipping_amount: dbOrder.shipping_amount,
+              grand_total: dbOrder.grand_total,
+              coupon_code: dbOrder.coupon_code,
+              status: dbOrder.status,
+              payment_method: dbOrder.payment_method,
+              payment_status: dbOrder.payment_status,
+              notes: dbOrder.notes,
+              created_at: dbOrder.created_at,
+              updated_at: dbOrder.updated_at,
+            }, { onConflict: 'id' });
+          }
+        }
+
+        return {
+          ...newOrder,
+          id: dbOrder.id,
+          created_at: dbOrder.created_at,
+          updated_at: dbOrder.updated_at,
+        } as Order;
+      } else if (error) {
+        console.error('Failed to insert order into active shard:', error);
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.error('Exception during order creation:', err);
     }
 
     this.mockOrders.unshift(newOrder);
@@ -147,7 +220,8 @@ export class OrderRepository {
           .from('orders')
           .select(`
             *,
-            items:order_items(*)
+            items:order_items(*),
+            addresses:order_addresses(*)
           `)
           .order('created_at', { ascending: false });
 
@@ -157,12 +231,20 @@ export class OrderRepository {
 
         const { data, error } = await query;
         if (error || !data) return [];
-        return data.map(ord => ({
-          ...ord,
-          courier: SEED_COURIERS.find(c => c.id === ord.courier_id || c.code === ord.courier_id) || null
-        })) as Order[];
+
+        return data.map(ord => {
+          const courier = SEED_COURIERS.find(c => c.id === ord.courier_id || c.code === ord.courier_id) || (ord.courier_id ? { id: ord.courier_id, name: ord.courier_id.toUpperCase(), code: ord.courier_id, is_active: true } : null);
+          const shippingAddress = ord.addresses?.find((a: any) => a.address_type === 'shipping') || null;
+          const billingAddress = ord.addresses?.find((a: any) => a.address_type === 'billing') || shippingAddress;
+
+          return {
+            ...ord,
+            courier,
+            shipping_address: shippingAddress,
+            billing_address: billingAddress,
+          };
+        }) as Order[];
       }, (items) => {
-        // Deduplicate orders by order_number and sort newest first
         const map = new Map<string, Order>();
         items.forEach(o => map.set(o.order_number, o));
         return Array.from(map.values()).sort(
@@ -170,9 +252,9 @@ export class OrderRepository {
         );
       });
 
-      if (shardOrders) return shardOrders;
-    } catch {
-      // Fallback
+      if (shardOrders && shardOrders.length > 0) return shardOrders;
+    } catch (e) {
+      console.error('Error fetching orders across shards:', e);
     }
 
     let list = [...this.mockOrders];
@@ -182,24 +264,38 @@ export class OrderRepository {
     return list;
   }
 
-  static async getOrderByNumber(orderNumber: string): Promise<Order | null> {
+  static async getOrderById(idOrNumber: string): Promise<Order | null> {
     try {
-      const cleanNum = orderNumber.trim();
+      const clean = idOrNumber.trim();
       const { data: foundOrder } = await findAcrossAllShards<Order>(async (supabase) => {
-        const { data, error } = await supabase
+        let q = supabase
           .from('orders')
           .select(`
             *,
-            items:order_items(*)
-          `)
-          .ilike('order_number', cleanNum)
-          .maybeSingle();
+            items:order_items(*),
+            addresses:order_addresses(*),
+            status_history:order_status_history(*)
+          `);
+
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clean);
+        if (isUuid) {
+          q = q.or(`id.eq.${clean},order_number.ilike.${clean}`);
+        } else {
+          q = q.ilike('order_number', clean);
+        }
+
+        const { data, error } = await q.maybeSingle();
 
         if (!error && data) {
-          const courier = SEED_COURIERS.find(c => c.id === data.courier_id || c.code === data.courier_id) || null;
+          const courier = SEED_COURIERS.find(c => c.id === data.courier_id || c.code === data.courier_id) || (data.courier_id ? { id: data.courier_id, name: data.courier_id.toUpperCase(), code: data.courier_id, is_active: true } : null);
+          const shippingAddress = data.addresses?.find((a: any) => a.address_type === 'shipping') || null;
+          const billingAddress = data.addresses?.find((a: any) => a.address_type === 'billing') || shippingAddress;
+
           return {
             ...data,
             courier,
+            shipping_address: shippingAddress,
+            billing_address: billingAddress,
           } as Order;
         }
         return null;
@@ -207,35 +303,52 @@ export class OrderRepository {
 
       if (foundOrder) return foundOrder;
     } catch (e) {
-      console.error('Error in getOrderByNumber:', e);
+      console.error('Error in getOrderById:', e);
     }
 
-    return this.mockOrders.find(o => o.order_number.toLowerCase() === orderNumber.trim().toLowerCase()) || null;
+    return this.mockOrders.find(o => o.id === idOrNumber || o.order_number.toLowerCase() === idOrNumber.toLowerCase()) || null;
+  }
+
+  static async getOrderByNumber(orderNumber: string): Promise<Order | null> {
+    return this.getOrderById(orderNumber);
   }
 
   static async updateOrderStatus(orderId: string, newStatus: OrderStatus, notes?: string): Promise<boolean> {
     try {
       const shards = getAllAdminClients();
-      for (const { client } of shards) {
-        const { error } = await client
-          .from('orders')
-          .update({ status: newStatus, updated_at: new Date().toISOString() })
-          .eq('id', orderId);
+      let updatedAny = false;
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId);
 
-        if (!error) {
+      for (const { client } of shards) {
+        let q = client.from('orders').update({
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        });
+
+        if (isUuid) {
+          q = q.or(`id.eq.${orderId},order_number.eq.${orderId}`);
+        } else {
+          q = q.eq('order_number', orderId);
+        }
+
+        const { data, error } = await q.select('id').maybeSingle();
+
+        if (!error && data) {
+          updatedAny = true;
           await client.from('order_status_history').insert({
-            order_id: orderId,
+            order_id: data.id,
             new_status: newStatus,
             notes: notes || `Status updated to ${newStatus}`,
           });
-          return true;
         }
       }
-    } catch {
-      // Fallback
+
+      if (updatedAny) return true;
+    } catch (e) {
+      console.error('Error updating order status across shards:', e);
     }
 
-    const order = this.mockOrders.find(o => o.id === orderId);
+    const order = this.mockOrders.find(o => o.id === orderId || o.order_number === orderId);
     if (order) {
       order.status = newStatus;
       order.status_history = order.status_history || [];
@@ -252,35 +365,48 @@ export class OrderRepository {
 
   static async updateShipment(orderId: string, courierCode: string, trackingId: string): Promise<boolean> {
     const courier = SEED_COURIERS.find(c => c.code === courierCode) || SEED_COURIERS[0];
-    const trackingUrl = courier.tracking_url_template?.replace('{tracking_id}', encodeURIComponent(trackingId)) || '';
+    const trackingUrl = generateDirectCourierTrackingUrl(courier.name, trackingId);
 
     try {
       const shards = getAllAdminClients();
+      let updatedAny = false;
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId);
+
       for (const { client } of shards) {
-        const { error } = await client.from('orders').update({
-          courier_id: courier.id,
-          tracking_id: trackingId,
+        let q = client.from('orders').update({
+          courier_id: courierCode,
+          tracking_id: trackingId.trim(),
           tracking_url: trackingUrl,
           status: 'shipped',
           updated_at: new Date().toISOString(),
-        }).eq('id', orderId);
+        });
 
-        if (!error) {
+        if (isUuid) {
+          q = q.or(`id.eq.${orderId},order_number.eq.${orderId}`);
+        } else {
+          q = q.eq('order_number', orderId);
+        }
+
+        const { data, error } = await q.select('id').maybeSingle();
+
+        if (!error && data) {
+          updatedAny = true;
           await client.from('order_status_history').insert({
-            order_id: orderId,
+            order_id: data.id,
             new_status: 'shipped',
             notes: `Dispatched with ${courier.name}. Tracking ID: ${trackingId}`,
           });
-          return true;
         }
       }
-    } catch {
-      // Fallback
+
+      if (updatedAny) return true;
+    } catch (e) {
+      console.error('Error in updateShipment across shards:', e);
     }
 
-    const order = this.mockOrders.find(o => o.id === orderId);
+    const order = this.mockOrders.find(o => o.id === orderId || o.order_number === orderId);
     if (order) {
-      order.courier_id = courier.id;
+      order.courier_id = courierCode;
       order.courier = courier;
       order.tracking_id = trackingId;
       order.tracking_url = trackingUrl;
