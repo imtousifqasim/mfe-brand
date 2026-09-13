@@ -19,18 +19,36 @@ export default function CustomerAddressesPage() {
   const [newProvince, setNewProvince] = useState('Punjab');
   const [newPostal, setNewPostal] = useState('54000');
 
-  // Load from local storage scoped by customer id
+  // Load from local storage scoped by customer id and combine with server order addresses
   useEffect(() => {
     if (!customer) return;
     const storageKey = `mfe_addresses_${customer.id}`;
+    let localList: Address[] = [];
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
-        setAddresses(JSON.parse(saved));
+        localList = JSON.parse(saved);
       } catch {
-        setAddresses([]);
+        localList = [];
       }
     }
+
+    // Also fetch addresses derived from their live orders
+    fetch('/api/auth/customer/addresses')
+      .then((res) => res.json())
+      .then((data) => {
+        const serverAddrs: Address[] = data.addresses || [];
+        const combined = [...localList];
+        for (const s of serverAddrs) {
+          if (!combined.some(c => c.address_line1?.toLowerCase().trim() === s.address_line1?.toLowerCase().trim())) {
+            combined.push(s);
+          }
+        }
+        setAddresses(combined);
+      })
+      .catch(() => {
+        setAddresses(localList);
+      });
 
     // Default first and last name from customer full name
     const parts = (customer.full_name || '').split(' ');

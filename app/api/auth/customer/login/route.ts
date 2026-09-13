@@ -5,7 +5,7 @@ import { createCustomerSessionToken, CUSTOMER_COOKIE_NAME } from '@/lib/auth/cus
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, code: twoFactorCode } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
@@ -27,6 +27,22 @@ export async function POST(req: NextRequest) {
     const isMatch = await bcrypt.compare(password, customer.password_hash);
     if (!isMatch) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
+    }
+
+    // If 2FA is enabled on customer account, check if code was provided or request 2FA
+    if (customer.two_factor_enabled && customer.two_factor_secret) {
+      if (!twoFactorCode) {
+        return NextResponse.json({
+          require2FA: true,
+          message: 'Two-Factor Authentication is required for this patron account.',
+        });
+      }
+
+      const { verifyTOTPCode } = await import('@/lib/auth/totp');
+      const isValid2FA = verifyTOTPCode(customer.two_factor_secret, twoFactorCode);
+      if (!isValid2FA) {
+        return NextResponse.json({ error: 'Invalid 2FA code. Please check your authenticator app.' }, { status: 401 });
+      }
     }
 
     // Update last login

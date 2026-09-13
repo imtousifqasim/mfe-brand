@@ -412,39 +412,68 @@ export async function setAdminTwoFactor(
   }
 }
 
-// Generate a 6-digit or UUID password reset token stored in DB with 1-hour expiry
+// Generate a 6-digit or UUID password reset token stored in DB with 1-hour expiry across all shards
 export async function generateAdminPasswordResetToken(
   usernameOrEmail: string
 ): Promise<{ success: boolean; error?: string; resetCode?: string }> {
   try {
     const cleanInput = usernameOrEmail.trim().toLowerCase();
-    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
-    const supabase = getActiveWriteAdmin();
+    const { getAllAdminClients } = await import('@/lib/supabase/admin');
+    const shards = getAllAdminClients();
 
-    // Query admin by username or email
-    const { data: adminRecord } = await supabase
-      .from('admins')
-      .select('id, username, email')
-      .or(`username.ilike.${cleanInput},email.ilike.${cleanInput}`)
-      .maybeSingle();
+    let foundAdmin: any = null;
 
-    if (!adminRecord) {
-      // Don't leak whether user exists for security, but return generic success
-      return { success: true };
+    // Search across shards
+    for (const { client } of shards) {
+      const { data } = await client
+        .from('admins')
+        .select('id, username, email')
+        .or(`username.ilike.${cleanInput},email.ilike.${cleanInput}`)
+        .maybeSingle();
+
+      if (data) {
+        foundAdmin = data;
+        break;
+      }
+    }
+
+    // Also support default admin fallback if username matches
+    if (!foundAdmin) {
+      const defaultUsername = (process.env.ADMIN_USERNAME || 'mfe_admin').toLowerCase();
+      if (cleanInput === defaultUsername || cleanInput === 'admin@mfebrand.com') {
+        for (const { client } of shards) {
+          const { data } = await client
+            .from('admins')
+            .select('id, username, email')
+            .limit(1)
+            .maybeSingle();
+          if (data) {
+            foundAdmin = data;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!foundAdmin) {
+      return { success: false, error: 'No administrator account matching that username or email address was found.' };
     }
 
     // Generate a 6-digit numeric reset OTP
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
 
-    await supabase
-      .from('admins')
-      .update({
-        reset_token: resetCode,
-        reset_token_expires_at: expiresAt,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', adminRecord.id);
+    // Update across all shards so whichever shard serves the reset can verify it
+    for (const { client } of shards) {
+      await client
+        .from('admins')
+        .update({
+          reset_token: resetCode,
+          reset_token_expires_at: expiresAt,
+          updated_at: new Date().toISOString()
+        })
+        .or(`id.eq.${foundAdmin.id},username.ilike.${foundAdmin.username}`);
+    }
 
     return { success: true, resetCode };
   } catch (err: any) {
@@ -481,16 +510,20 @@ export async function resetAdminPasswordWithToken(
     }
 
     const newHash = await bcrypt.hash(newPassword, 10);
+    const { getAllAdminClients } = await import('@/lib/supabase/admin');
+    const shards = getAllAdminClients();
 
-    await supabase
-      .from('admins')
-      .update({
-        password_hash: newHash,
-        reset_token: null,
-        reset_token_expires_at: null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', adminRecord.id);
+    for (const { client } of shards) {
+      await client
+        .from('admins')
+        .update({
+          password_hash: newHash,
+          reset_token: null,
+          reset_token_expires_at: null,
+          updated_at: new Date().toISOString()
+        })
+        .or(`id.eq.${adminRecord.id},reset_token.eq.${cleanCode}`);
+    }
 
     return { success: true };
   } catch (err: any) {

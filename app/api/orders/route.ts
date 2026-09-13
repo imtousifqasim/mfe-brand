@@ -21,11 +21,35 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Order created successfully!',
       order: result.order,
+      customer: result.customer || null,
     });
+
+    if (result.customer) {
+      const { createCustomerSessionToken, CUSTOMER_COOKIE_NAME } = await import('@/lib/auth/customer');
+      const token = await createCustomerSessionToken({
+        id: result.customer.id,
+        email: result.customer.email,
+        full_name: result.customer.full_name,
+        phone: result.customer.phone,
+        tier: result.customer.tier || 'Patron Member',
+      });
+
+      response.cookies.set({
+        name: CUSTOMER_COOKIE_NAME,
+        value: token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60,
+      });
+    }
+
+    return response;
   } catch (error: any) {
     console.error('Orders API Error (POST):', error);
     return NextResponse.json(

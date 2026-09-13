@@ -14,8 +14,22 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ orders: [] });
     }
 
+    const cleanEmail = session.email?.toLowerCase().trim();
+    if (cleanEmail && session.id) {
+      // Opportunistically link any orders placed with this email to this customer account
+      const { getAllAdminClients } = await import('@/lib/supabase/admin');
+      const shards = getAllAdminClients();
+      for (const { client } of shards) {
+        client
+          .from('orders')
+          .update({ customer_id: session.id })
+          .ilike('customer_email', cleanEmail)
+          .then();
+      }
+    }
+
     const orders = await OrderRepository.getOrders({
-      email: session.email,
+      email: cleanEmail,
       customerId: session.id,
     });
 

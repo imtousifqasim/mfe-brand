@@ -246,8 +246,14 @@ export class OrderRepository {
           `)
           .order('created_at', { ascending: false });
 
-        if (filters.customerId) query = query.eq('customer_id', filters.customerId);
-        if (filters.email) query = query.eq('customer_email', filters.email.toLowerCase().trim());
+        if (filters.customerId && filters.email) {
+          const cleanEmail = filters.email.toLowerCase().trim();
+          query = query.or(`customer_id.eq.${filters.customerId},customer_email.ilike.${cleanEmail}`);
+        } else if (filters.customerId) {
+          query = query.eq('customer_id', filters.customerId);
+        } else if (filters.email) {
+          query = query.eq('customer_email', filters.email.toLowerCase().trim());
+        }
         if (filters.status) query = query.eq('status', filters.status);
 
         const { data, error } = await query;

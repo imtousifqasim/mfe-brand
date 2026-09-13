@@ -28,7 +28,13 @@ export interface CheckoutRequest {
 }
 
 export class CheckoutService {
-  static async processCheckout(req: CheckoutRequest): Promise<{ success: boolean; order?: Order; error?: string }> {
+  static async processCheckout(req: CheckoutRequest): Promise<{ 
+    success: boolean; 
+    order?: Order; 
+    error?: string; 
+    customerId?: string | null;
+    customer?: any;
+  }> {
     if (!req.items || req.items.length === 0) {
       return { success: false, error: 'Your cart is empty.' };
     }
@@ -95,64 +101,63 @@ export class CheckoutService {
     const shippingAmount = subtotal >= 5000 ? 0 : 250;
     const grandTotal = Math.max(0, subtotal - discountAmount + shippingAmount);
 
-    // 4. Handle Account Creation if Requested
+    // 4. Handle Account Creation or Existing Customer Detection
     let finalCustomerId = req.customerId || null;
+    let customerObj: any = null;
 
-    if (req.createAccount && req.password) {
-      try {
-        const cleanEmail = req.customerEmail.toLowerCase().trim();
-        const cleanName = req.customerName.trim();
-        const cleanPhone = (req.customerPhone || '').trim();
-        const cleanUsername = (req.username || '').trim() || cleanEmail;
-        const supabase = getActiveWriteAdmin();
+    try {
+      const cleanEmail = req.customerEmail.toLowerCase().trim();
+      const cleanName = req.customerName.trim();
+      const cleanPhone = (req.customerPhone || '').trim();
+      const cleanUsername = (req.username || '').trim() || cleanEmail;
+      const supabase = getActiveWriteAdmin();
 
-        // Check if customer already exists
-        const { data: existing } = await supabase
-          .from('customers')
-          .select('id, email, full_name, phone')
-          .eq('email', cleanEmail)
-          .maybeSingle();
+      // Check if customer exists in DB
+      const { data: existing } = await supabase
+        .from('customers')
+        .select('id, email, full_name, phone, tier')
+        .eq('email', cleanEmail)
+        .maybeSingle();
 
-        if (existing) {
-          finalCustomerId = existing.id;
-        } else {
-          const password_hash = await bcrypt.hash(req.password, 10);
-          const shards = getAllAdminClients();
-          let createdCustomer: any = null;
+      if (existing) {
+        finalCustomerId = existing.id;
+        customerObj = existing;
+      } else if (req.createAccount && req.password) {
+        const password_hash = await bcrypt.hash(req.password, 10);
+        const shards = getAllAdminClients();
 
-          for (const { client } of shards) {
-            const { data, error } = await client
-              .from('customers')
-              .insert({
-                email: cleanEmail,
-                password_hash,
-                full_name: cleanName,
-                phone: cleanPhone || null,
-                username: cleanUsername,
-                tier: 'Patron Member',
-              })
-              .select('id, email, full_name, phone, username, tier')
-              .maybeSingle();
-
-            if (!error && data) {
-              createdCustomer = data;
-            }
-          }
-
-          if (createdCustomer) {
-            finalCustomerId = createdCustomer.id;
-            // Dispatch Branded Haute Couture Welcome & Credentials Email
-            await EmailService.sendAccountCreated({
-              full_name: cleanName,
+        for (const { client } of shards) {
+          const { data, error } = await client
+            .from('customers')
+            .insert({
               email: cleanEmail,
-              phone: cleanPhone,
+              password_hash,
+              full_name: cleanName,
+              phone: cleanPhone || null,
               username: cleanUsername,
-            }, req.password);
+              tier: 'Patron Member',
+            })
+            .select('id, email, full_name, phone, username, tier')
+            .maybeSingle();
+
+          if (!error && data) {
+            customerObj = data;
+            finalCustomerId = data.id;
           }
         }
-      } catch (accErr) {
-        console.error('Error during checkout account creation:', accErr);
+
+        if (customerObj) {
+          // Dispatch Branded Haute Couture Welcome & Credentials Email
+          await EmailService.sendAccountCreated({
+            full_name: cleanName,
+            email: cleanEmail,
+            phone: cleanPhone,
+            username: cleanUsername,
+          }, req.password);
+        }
       }
+    } catch (accErr) {
+      console.error('Error during checkout customer resolution:', accErr);
     }
 
     // 5. Create Order Atomically
@@ -176,6 +181,11 @@ export class CheckoutService {
     // 6. Send Email Confirmation
     await EmailService.sendOrderConfirmation(order);
 
-    return { success: true, order };
+    return { 
+      success: true, 
+      order, 
+      customerId: finalCustomerId,
+      customer: customerObj,
+    };
   }
 }

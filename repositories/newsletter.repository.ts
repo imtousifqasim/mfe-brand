@@ -140,16 +140,34 @@ export class NewsletterRepository {
         return null;
       });
 
+      const envHost = process.env.SMTP_HOST || process.env.EMAIL_HOST;
+      const envPort = process.env.SMTP_PORT || process.env.EMAIL_PORT;
+      const envUser = process.env.SMTP_USER || process.env.SMTP_USERNAME || process.env.EMAIL_USER;
+      const envPass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD;
+      const envFromName = process.env.SMTP_FROM_NAME || 'MFE Brand Haute Couture';
+      const envFromEmail = process.env.SMTP_FROM_EMAIL || process.env.EMAIL_FROM || 'concierge@mfebrand.com';
+
       if (data) {
         return {
-          host: data.host || 'smtp.gmail.com',
-          port: data.port || 587,
+          host: data.host || envHost || 'smtp.gmail.com',
+          port: data.port || (envPort ? Number(envPort) : 587),
           secure: Boolean(data.secure),
-          user: data.username || '',
-          pass: data.password || '',
-          from_name: data.from_name || 'MFE Brand Haute Couture',
-          from_email: data.from_email || 'concierge@mfebrand.com',
+          user: data.username || envUser || '',
+          pass: data.password || envPass || '',
+          from_name: data.from_name || envFromName,
+          from_email: data.from_email || envFromEmail,
           is_connected: Boolean(data.is_connected),
+        };
+      } else if (envHost && envUser && envPass) {
+        return {
+          host: envHost,
+          port: envPort ? Number(envPort) : 587,
+          secure: Number(envPort) === 465,
+          user: envUser,
+          pass: envPass,
+          from_name: envFromName,
+          from_email: envFromEmail,
+          is_connected: true,
         };
       }
     } catch (err) {

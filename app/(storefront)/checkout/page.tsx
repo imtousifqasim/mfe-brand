@@ -11,9 +11,11 @@ import {
   Copy, Check, CreditCard, Building2, Sparkles, Smartphone,
   Lock, User, Eye, EyeOff
 } from 'lucide-react';
+import { useCustomer } from '@/components/providers/CustomerProvider';
 
 export default function CheckoutPage() {
   const { items, subtotal, shipping, grandTotal, couponCode, couponDiscount, clearCart } = useCart();
+  const { customer, refreshCustomer } = useCustomer();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -28,6 +30,15 @@ export default function CheckoutPage() {
   const [transactionId, setTransactionId] = useState('');
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodConfig[]>(SEED_PAYMENT_METHODS);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  // Auto-fill from logged in customer if available
+  useEffect(() => {
+    if (customer) {
+      if (!fullName) setFullName(customer.full_name || '');
+      if (!email) setEmail(customer.email || '');
+      if (!phone && customer.phone) setPhone(customer.phone);
+    }
+  }, [customer]);
 
   // Account creation at checkout
   const [createAccount, setCreateAccount] = useState(false);
@@ -147,6 +158,13 @@ export default function CheckoutPage() {
       // Order created successfully!
       setConfirmedOrder(data.order);
       clearCart();
+
+      // Trigger automatic session sync if customer account was created or logged in
+      try {
+        await refreshCustomer();
+      } catch {
+        // ignore
+      }
     } catch (err: any) {
       setErrorMessage('A network error occurred. Please try again.');
     } finally {
