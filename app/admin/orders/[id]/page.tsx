@@ -14,12 +14,12 @@ import {
 } from 'lucide-react';
 
 const PAKISTAN_COURIERS = [
-  { code: 'tcs', name: 'TCS Express', portal: 'https://www.tcsexpress.com/tracking?track=' },
-  { code: 'leopards', name: 'Leopards Courier', portal: 'https://leopardscourier.com/leopard-tracking/?track_numbers=' },
+  { code: 'tcs', name: 'TCS Express', portal: 'https://www.tcsexpress.com/track/' },
+  { code: 'leopards', name: 'Leopards Courier', portal: 'https://leopardscourier.com/tracking?track_no=' },
   { code: 'callcourier', name: 'Call Courier (CC)', portal: 'https://callcourier.com.pk/tracking/?tc=' },
-  { code: 'postex', name: 'PostEx Logistics', portal: 'https://postex.pk/tracking?order=' },
-  { code: 'trax', name: 'Trax Logistics', portal: 'https://sonic.pk/tracking?tracking_number=' },
-  { code: 'mnp', name: 'M&P Express Logistics', portal: 'https://mulphilog.com/tracking?consignmentNo=' },
+  { code: 'postex', name: 'PostEx Logistics', portal: 'https://postex.pk/tracking?tracking_number=' },
+  { code: 'trax', name: 'Trax Logistics', portal: 'https://trax.pk/tracking?cn=' },
+  { code: 'mnp', name: 'M&P Express Logistics', portal: 'https://mulphilog.com/tracking?track=' },
   { code: 'pakpost', name: 'Pakistan Post', portal: 'https://ep.gov.pk/track.asp?art_id=' },
 ];
 
@@ -199,7 +199,10 @@ export default function AdminOrderDetailPage() {
   };
 
   const selectedCourierObj = PAKISTAN_COURIERS.find(c => c.code === courierCode) || PAKISTAN_COURIERS[0];
-  const liveCourierUrl = trackingId.trim() ? `${selectedCourierObj.portal}${encodeURIComponent(trackingId.trim())}` : null;
+  const cleanTrackingDigits = courierCode === 'tcs' 
+    ? (trackingId.replace(/^tcs-?/i, '').replace(/[^0-9]/g, '') || trackingId.replace(/^tcs-?/i, '').trim())
+    : trackingId.replace(/^[a-z]+-?/i, '').trim();
+  const liveCourierUrl = trackingId.trim() ? `${selectedCourierObj.portal}${encodeURIComponent(cleanTrackingDigits)}` : null;
 
   if (loading) {
     return (

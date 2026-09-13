@@ -13,33 +13,56 @@ function generateDirectCourierTrackingUrl(courierNameOrCode: string = '', tracki
     return fallbackUrl || '';
   }
 
-  const cleanId = trackingId.trim();
+  const rawId = trackingId.trim();
   const c = courierNameOrCode.toLowerCase();
 
+  // TCS Express uses https://www.tcsexpress.com/track/:number with numeric consignment digits
   if (c.includes('tcs')) {
-    return `https://www.tcsexpress.com/tracking?track=${encodeURIComponent(cleanId)}`;
+    const digits = rawId.replace(/^tcs-?/i, '').replace(/[^0-9]/g, '');
+    const cleanId = digits || rawId.replace(/^tcs-?/i, '');
+    return `https://www.tcsexpress.com/track/${encodeURIComponent(cleanId)}`;
   }
-  if (c.includes('leopard')) {
-    return `https://leopardscourier.com/leopard-tracking/?track_numbers=${encodeURIComponent(cleanId)}`;
+
+  // Leopards Courier
+  if (c.includes('leopard') || c.includes('lcs')) {
+    const cleanId = rawId.replace(/^lp-?/i, '').trim();
+    return `https://leopardscourier.com/tracking?track_no=${encodeURIComponent(cleanId)}`;
   }
+
+  // Call Courier
   if (c.includes('call') || c.includes('cc')) {
+    const cleanId = rawId.replace(/^cc-?/i, '').trim();
     return `https://callcourier.com.pk/tracking/?tc=${encodeURIComponent(cleanId)}`;
   }
+
+  // PostEx
   if (c.includes('postex')) {
-    return `https://postex.pk/tracking?order=${encodeURIComponent(cleanId)}`;
+    const cleanId = rawId.replace(/^px-?/i, '').trim();
+    return `https://postex.pk/tracking?tracking_number=${encodeURIComponent(cleanId)}`;
   }
+
+  // Trax
   if (c.includes('trax') || c.includes('sonic')) {
-    return `https://sonic.pk/tracking?tracking_number=${encodeURIComponent(cleanId)}`;
+    const cleanId = rawId.replace(/^trx-?/i, '').trim();
+    return `https://trax.pk/tracking?cn=${encodeURIComponent(cleanId)}`;
   }
+
+  // M&P
   if (c.includes('m&p') || c.includes('mnp') || c.includes('m and p') || c.includes('mulphilog')) {
-    return `https://mulphilog.com/tracking?consignmentNo=${encodeURIComponent(cleanId)}`;
+    const cleanId = rawId.replace(/^mnp-?/i, '').trim();
+    return `https://mulphilog.com/tracking?track=${encodeURIComponent(cleanId)}`;
+  }
+
+  if (c.includes('pakpost') || c.includes('post')) {
+    return `https://ep.gov.pk/track.asp?art_id=${encodeURIComponent(rawId)}`;
   }
 
   if (fallbackUrl && fallbackUrl.startsWith('http')) {
     return fallbackUrl;
   }
 
-  return `https://www.google.com/search?q=${encodeURIComponent(`${courierNameOrCode || 'Courier'} tracking ${cleanId}`)}`;
+  const cleanFallback = rawId.replace(/^[a-z]+-?/i, '');
+  return `https://www.tcsexpress.com/track/${encodeURIComponent(cleanFallback)}`;
 }
 
 export async function POST(req: Request) {

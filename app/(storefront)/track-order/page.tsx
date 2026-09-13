@@ -19,29 +19,44 @@ const TIMELINE_STEPS = [
   { key: 'delivered', label: 'Safely Delivered', desc: 'Signed & received by patron' },
 ];
 
+function getCleanConsignmentId(courierCodeOrName: string, trackingId: string): string {
+  const code = (courierCodeOrName || '').toLowerCase().trim();
+  const rawId = (trackingId || '').trim();
+
+  // TCS consignment numbers must be numeric digits for their React app (<input type="number">)
+  if (code.includes('tcs')) {
+    const digitsOnly = rawId.replace(/^tcs-?/i, '').replace(/[^0-9]/g, '');
+    return digitsOnly || rawId.replace(/^tcs-?/i, '');
+  }
+
+  return rawId.replace(/^[a-z]+-?/i, '');
+}
+
 function getCourierDeepLink(courierCodeOrName: string, trackingId: string): string {
   const code = (courierCodeOrName || '').toLowerCase().trim();
-  const cleanId = encodeURIComponent(trackingId.trim());
+  const cleanId = getCleanConsignmentId(code, trackingId);
 
+  // TCS Express official React Route is https://www.tcsexpress.com/track/:number
   if (code.includes('tcs')) {
-    return `https://www.tcsexpress.com/tracking?tracking_no=${cleanId}`;
+    return `https://www.tcsexpress.com/track/${encodeURIComponent(cleanId)}`;
   }
-  if (code.includes('leopard')) {
-    return `https://leopardscourier.com/tracking?track_no=${cleanId}`;
+  if (code.includes('leopard') || code.includes('lcs')) {
+    return `https://leopardscourier.com/tracking?track_no=${encodeURIComponent(cleanId)}`;
   }
-  if (code.includes('call') || code.includes('callcourier')) {
-    return `https://callcourier.com.pk/tracking/?tc=${cleanId}`;
+  if (code.includes('call') || code.includes('callcourier') || code.includes('cc')) {
+    return `https://callcourier.com.pk/tracking/?tc=${encodeURIComponent(cleanId)}`;
   }
   if (code.includes('postex')) {
-    return `https://postex.pk/tracking?tracking_number=${cleanId}`;
+    return `https://postex.pk/tracking?tracking_number=${encodeURIComponent(cleanId)}`;
   }
-  if (code.includes('trax')) {
-    return `https://trax.pk/tracking?cn=${cleanId}`;
+  if (code.includes('trax') || code.includes('sonic')) {
+    return `https://trax.pk/tracking?cn=${encodeURIComponent(cleanId)}`;
   }
   if (code.includes('m&p') || code.includes('mnp') || code.includes('mulphilog')) {
-    return `https://mulphilog.com/tracking?track=${cleanId}`;
+    return `https://mulphilog.com/tracking?track=${encodeURIComponent(cleanId)}`;
   }
-  return `https://www.tcsexpress.com/tracking?tracking_no=${cleanId}`;
+
+  return `https://www.tcsexpress.com/track/${encodeURIComponent(cleanId)}`;
 }
 
 function TrackOrderContent() {
@@ -108,7 +123,8 @@ function TrackOrderContent() {
   const currentStepIdx = orderData ? getStepIndex(orderData.status) : 0;
   const trackingId = orderData?.tracking_id || orderData?.trackingId || '';
   const courierName = orderData?.courier?.name || orderData?.courier_name || (orderData?.courier_id ? String(orderData.courier_id).toUpperCase() : 'TCS Express');
-  const externalLink = orderData?.tracking_url || orderData?.trackingUrl || (trackingId ? getCourierDeepLink(courierName, trackingId) : '');
+  const cleanTrackingId = getCleanConsignmentId(courierName, trackingId);
+  const externalLink = trackingId ? getCourierDeepLink(courierName, trackingId) : '';
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-10 font-sans text-[#141414]">
@@ -250,27 +266,33 @@ function TrackOrderContent() {
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8c827a] block">
                   Courier Consignment Number (Tracking ID)
                 </span>
-                <div className="flex items-center gap-3 mt-1">
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
                   <span className="font-mono text-xl sm:text-2xl font-bold text-[#b87414]">
-                    {trackingId || 'Allocation in Progress'}
+                    {cleanTrackingId || trackingId || 'Allocation in Progress'}
                   </span>
+
+                  {trackingId && cleanTrackingId !== trackingId && (
+                    <span className="text-xs text-[#8c827a] font-mono">
+                      (Ref: {trackingId})
+                    </span>
+                  )}
 
                   {trackingId && (
                     <button
                       type="button"
-                      onClick={() => handleCopyTrackingId(trackingId)}
+                      onClick={() => handleCopyTrackingId(cleanTrackingId || trackingId)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#eae7e2] hover:border-[#d99026] text-xs font-bold text-[#141414] hover:text-[#b87414] transition shadow-sm cursor-pointer"
                       title="Copy Consignment ID to clipboard"
                     >
                       {copiedId ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-700">Copied!</span>
+                          <span className="text-emerald-700">Copied to Clipboard!</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5" />
-                          <span>Copy ID</span>
+                          <span>Copy Tracking ID</span>
                         </>
                       )}
                     </button>
@@ -284,13 +306,14 @@ function TrackOrderContent() {
                     href={externalLink}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => handleCopyTrackingId(cleanTrackingId || trackingId)}
                     className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#d99026] hover:bg-[#c67d18] text-[#141414] font-bold text-xs uppercase tracking-wider transition shadow-md active:scale-98"
                   >
                     <span>Track on {courierName} Portal</span>
                     <ExternalLink className="w-4 h-4" />
                   </a>
                   <span className="text-[10px] text-[#8c827a]">
-                    Opens live third-party courier dispatch status
+                    Direct route: <strong className="font-mono text-[#5a5550]">tcsexpress.com/track/{cleanTrackingId}</strong>
                   </span>
                 </div>
               ) : (
@@ -302,10 +325,10 @@ function TrackOrderContent() {
 
             {/* Helper notice for users in case third-party courier redirects */}
             {trackingId && (
-              <div className="p-3 rounded-xl bg-white border border-[#e8dfd2] text-xs text-[#6b6b6b] flex items-center gap-2">
+              <div className="p-3.5 rounded-xl bg-white border border-[#e8dfd2] text-xs text-[#6b6b6b] flex items-center gap-2.5">
                 <Sparkles className="w-4 h-4 text-[#d99026] shrink-0" />
                 <span>
-                  <strong>Patron Tip:</strong> If the courier portal redirects you to their homepage, click <strong>Copy ID</strong> above and paste it directly into their search bar.
+                  <strong>Instant Tracking:</strong> Clicking the portal button automatically copies your consignment number (<strong>{cleanTrackingId || trackingId}</strong>) to your clipboard and loads the verified courier tracking screen directly without redirecting.
                 </span>
               </div>
             )}
