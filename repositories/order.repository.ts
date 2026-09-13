@@ -147,8 +147,7 @@ export class OrderRepository {
           .from('orders')
           .select(`
             *,
-            items:order_items(*),
-            courier:couriers(*)
+            items:order_items(*)
           `)
           .order('created_at', { ascending: false });
 
@@ -158,7 +157,10 @@ export class OrderRepository {
 
         const { data, error } = await query;
         if (error || !data) return [];
-        return data as Order[];
+        return data.map(ord => ({
+          ...ord,
+          courier: SEED_COURIERS.find(c => c.id === ord.courier_id || c.code === ord.courier_id) || null
+        })) as Order[];
       }, (items) => {
         // Deduplicate orders by order_number and sort newest first
         const map = new Map<string, Order>();
@@ -182,24 +184,30 @@ export class OrderRepository {
 
   static async getOrderByNumber(orderNumber: string): Promise<Order | null> {
     try {
+      const cleanNum = orderNumber.trim();
       const { data: foundOrder } = await findAcrossAllShards<Order>(async (supabase) => {
         const { data, error } = await supabase
           .from('orders')
           .select(`
             *,
-            items:order_items(*),
-            courier:couriers(*)
+            items:order_items(*)
           `)
-          .eq('order_number', orderNumber.trim())
-          .single();
+          .ilike('order_number', cleanNum)
+          .maybeSingle();
 
-        if (!error && data) return data as Order;
+        if (!error && data) {
+          const courier = SEED_COURIERS.find(c => c.id === data.courier_id || c.code === data.courier_id) || null;
+          return {
+            ...data,
+            courier,
+          } as Order;
+        }
         return null;
       });
 
       if (foundOrder) return foundOrder;
-    } catch {
-      // Fallback
+    } catch (e) {
+      console.error('Error in getOrderByNumber:', e);
     }
 
     return this.mockOrders.find(o => o.order_number.toLowerCase() === orderNumber.trim().toLowerCase()) || null;

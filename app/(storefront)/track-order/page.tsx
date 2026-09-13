@@ -144,13 +144,13 @@ function TrackOrderContent() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/[0.08] gap-4">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-amber-400 block">Consignment Reference</span>
-              <h2 className="font-mono text-2xl font-bold text-white mt-0.5">{orderData.order_number}</h2>
-              <p className="text-xs text-neutral-400 mt-1">Booked on {formatDate(orderData.created_at)}</p>
+              <h2 className="font-mono text-2xl font-bold text-white mt-0.5">{orderData.order_number || orderData.orderNumber}</h2>
+              <p className="text-xs text-neutral-400 mt-1">Booked on {formatDate(orderData.created_at || orderData.createdAt)}</p>
             </div>
             <div className="text-left sm:text-right">
               <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-400 block">Current Status</span>
               <span className="inline-block bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mt-1">
-                {orderData.status.replace('_', ' ')}
+                {(orderData.status || 'pending').replace(/_/g, ' ')}
               </span>
             </div>
           </div>
@@ -184,16 +184,38 @@ function TrackOrderContent() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-white/[0.08] text-xs">
             <div className="space-y-2 p-5 rounded-2xl bg-neutral-900/40 border border-white/[0.06]">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 block">Destination</span>
-              <p className="font-bold text-white text-sm">{orderData.customer_name}</p>
-              <p className="text-neutral-300">{orderData.shipping_address?.address_line1}</p>
-              <p className="text-neutral-400">{orderData.shipping_address?.city}, {orderData.shipping_address?.province}</p>
+              <p className="font-bold text-white text-sm">{orderData.customer_name || orderData.customerName || 'Customer'}</p>
+              <p className="text-neutral-300">{orderData.shipping_address?.address_line1 || orderData.shippingAddress?.address_line1 || 'Address on file'}</p>
+              <p className="text-neutral-400">
+                {orderData.shipping_address?.city || orderData.shippingAddress?.city || 'Pakistan'}, {orderData.shipping_address?.province || orderData.shippingAddress?.province || ''}
+              </p>
             </div>
 
-            <div className="space-y-2 p-5 rounded-2xl bg-neutral-900/40 border border-white/[0.06]">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 block">Courier & Consignment</span>
-              <p className="font-bold text-white text-sm">{orderData.courier?.name || 'TCS Express'}</p>
-              <p className="text-amber-400 font-mono">Tracking ID: {orderData.tracking_id || 'Generating ID...'}</p>
-              <p className="text-neutral-400">Total: {formatPrice(orderData.grand_total)}</p>
+            <div className="space-y-3 p-5 rounded-2xl bg-neutral-900/40 border border-white/[0.06] flex flex-col justify-between">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 block">Courier & Consignment</span>
+                <p className="font-bold text-white text-sm">{orderData.courier?.name || orderData.courier_name || 'TCS Express'}</p>
+                <p className="text-amber-400 font-mono text-xs">
+                  Tracking ID: {orderData.tracking_id || orderData.trackingId || 'Consignment In Prep'}
+                </p>
+                <p className="text-neutral-400 text-xs">Total: {formatPrice(orderData.grand_total ?? orderData.grandTotal ?? 0)}</p>
+              </div>
+
+              {orderData.tracking_url || orderData.trackingUrl ? (
+                <a
+                  href={orderData.tracking_url || orderData.trackingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition shadow-md shadow-amber-500/10 active:scale-98 mt-2"
+                >
+                  <span>Track on Official Courier Portal</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              ) : (
+                <div className="text-[11px] text-neutral-500 italic pt-1">
+                  Online tracking link becomes active once parcel is picked up by courier.
+                </div>
+              )}
             </div>
           </div>
         </div>

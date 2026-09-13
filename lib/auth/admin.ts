@@ -240,29 +240,31 @@ export async function verifyAdmin2FACode(
 // Get admin profile details by username
 export async function getAdminProfile(username: string): Promise<AdminUserRecord | null> {
   try {
-    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
-    const supabase = getActiveWriteAdmin();
-    const { data, error } = await supabase
-      .from('admins')
-      .select('id, username, email, full_name, role, two_factor_enabled, last_login_at')
-      .eq('username', username)
-      .maybeSingle();
+    const { getAllAdminClients } = await import('@/lib/supabase/admin');
+    const shards = getAllAdminClients();
+    for (const { client } of shards) {
+      const { data, error } = await client
+        .from('admins')
+        .select('id, username, email, full_name, role, two_factor_enabled, last_login_at')
+        .eq('username', username)
+        .maybeSingle();
 
-    if (error || !data) return null;
-    return data;
+      if (!error && data) return data;
+    }
+    return null;
   } catch {
     return null;
   }
 }
 
-// Update admin profile details (full_name, email, or new username)
+// Update admin profile details (full_name, email, or new username) across all shards
 export async function updateAdminProfile(
   currentUsername: string,
   updates: { full_name?: string; email?: string; newUsername?: string }
 ): Promise<{ success: boolean; error?: string; updatedUsername?: string }> {
   try {
-    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
-    const supabase = getActiveWriteAdmin();
+    const { getAllAdminClients } = await import('@/lib/supabase/admin');
+    const shards = getAllAdminClients();
 
     const updatePayload: Record<string, any> = {
       updated_at: new Date().toISOString()
@@ -271,26 +273,40 @@ export async function updateAdminProfile(
     if (updates.full_name) updatePayload.full_name = updates.full_name.trim();
     if (updates.email) updatePayload.email = updates.email.trim();
     if (updates.newUsername && updates.newUsername !== currentUsername) {
-      // Check if username already exists
-      const { data: existing } = await supabase
-        .from('admins')
-        .select('id')
-        .eq('username', updates.newUsername.trim())
-        .maybeSingle();
+      // Check if username already exists on any shard
+      for (const { client } of shards) {
+        const { data: existing } = await client
+          .from('admins')
+          .select('id')
+          .eq('username', updates.newUsername.trim())
+          .neq('username', currentUsername)
+          .maybeSingle();
 
-      if (existing) {
-        return { success: false, error: 'Administrative username is already in use.' };
+        if (existing) {
+          return { success: false, error: 'Administrative username is already in use.' };
+        }
       }
       updatePayload.username = updates.newUsername.trim();
     }
 
-    const { error } = await supabase
-      .from('admins')
-      .update(updatePayload)
-      .eq('username', currentUsername);
+    let updatedAny = false;
+    let lastError: string | undefined;
 
-    if (error) {
-      return { success: false, error: error.message };
+    for (const { client } of shards) {
+      const { error } = await client
+        .from('admins')
+        .update(updatePayload)
+        .eq('username', currentUsername);
+
+      if (!error) {
+        updatedAny = true;
+      } else {
+        lastError = error.message;
+      }
+    }
+
+    if (!updatedAny && lastError) {
+      return { success: false, error: lastError };
     }
 
     return {
@@ -302,7 +318,7 @@ export async function updateAdminProfile(
   }
 }
 
-// Update admin password directly in DB with bcrypt hash
+// Update admin password directly in DB with bcrypt hash across all shards
 export async function updateAdminPassword(
   username: string,
   currentPassword: string,
@@ -313,36 +329,54 @@ export async function updateAdminPassword(
       return { success: false, error: 'Password must be at least 8 characters long.' };
     }
 
-    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
-    const supabase = getActiveWriteAdmin();
+    const { getAllAdminClients } = await import('@/lib/supabase/admin');
+    const shards = getAllAdminClients();
 
-    const { data: adminRecord, error: fetchErr } = await supabase
-      .from('admins')
-      .select('id, password_hash')
-      .eq('username', username)
-      .maybeSingle();
+    let matchedAdmin: any = null;
+    for (const { client } of shards) {
+      const { data: adminRecord } = await client
+        .from('admins')
+        .select('id, password_hash')
+        .eq('username', username)
+        .maybeSingle();
 
-    if (fetchErr || !adminRecord) {
+      if (adminRecord && adminRecord.password_hash) {
+        matchedAdmin = adminRecord;
+        break;
+      }
+    }
+
+    if (!matchedAdmin) {
       return { success: false, error: 'Admin record not found.' };
     }
 
-    const isCurrentValid = await bcrypt.compare(currentPassword, adminRecord.password_hash);
+    const isCurrentValid = await bcrypt.compare(currentPassword, matchedAdmin.password_hash);
     if (!isCurrentValid) {
       return { success: false, error: 'Current password does not match.' };
     }
 
     const newHash = await bcrypt.hash(newPassword, 10);
+    let updatedAny = false;
+    let lastError: string | undefined;
 
-    const { error: updateErr } = await supabase
-      .from('admins')
-      .update({
-        password_hash: newHash,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', adminRecord.id);
+    for (const { client } of shards) {
+      const { error: updateErr } = await client
+        .from('admins')
+        .update({
+          password_hash: newHash,
+          updated_at: new Date().toISOString()
+        })
+        .eq('username', username);
 
-    if (updateErr) {
-      return { success: false, error: updateErr.message };
+      if (!updateErr) {
+        updatedAny = true;
+      } else {
+        lastError = updateErr.message;
+      }
+    }
+
+    if (!updatedAny && lastError) {
+      return { success: false, error: lastError };
     }
 
     return { success: true };
@@ -351,26 +385,27 @@ export async function updateAdminPassword(
   }
 }
 
-// Enable or disable Two-Factor Authentication in database
+// Enable or disable Two-Factor Authentication in database across all shards
 export async function setAdminTwoFactor(
   username: string,
   secret: string | null,
   enabled: boolean
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { getActiveWriteAdmin } = await import('@/lib/supabase/admin');
-    const supabase = getActiveWriteAdmin();
+    const { getAllAdminClients } = await import('@/lib/supabase/admin');
+    const shards = getAllAdminClients();
 
-    const { error } = await supabase
-      .from('admins')
-      .update({
-        two_factor_enabled: enabled,
-        two_factor_secret: secret,
-        updated_at: new Date().toISOString()
-      })
-      .eq('username', username);
+    for (const { client } of shards) {
+      await client
+        .from('admins')
+        .update({
+          two_factor_enabled: enabled,
+          two_factor_secret: secret,
+          updated_at: new Date().toISOString()
+        })
+        .eq('username', username);
+    }
 
-    if (error) return { success: false, error: error.message };
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || 'Database error' };

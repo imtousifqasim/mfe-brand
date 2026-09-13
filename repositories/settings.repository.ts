@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient, getAllAdminClients, queryAcrossAllShards } from '@/lib/supabase/admin';
 import { HeroSlide, Advantage, Announcement, Courier, PaymentMethodConfig, NotificationSetting, AuditLog } from '@/types/database';
 import { SEED_HERO_SLIDES, SEED_ADVANTAGES, SEED_ANNOUNCEMENT, SEED_COURIERS, SEED_PAYMENT_METHODS } from '@/lib/data/seed-data';
 
@@ -78,14 +78,64 @@ export class SettingsRepository {
   }
 
   static async getPaymentMethods(): Promise<PaymentMethodConfig[]> {
+    try {
+      const data = await queryAcrossAllShards<PaymentMethodConfig>(async (supabase) => {
+        const { data, error } = await supabase
+          .from('payment_methods')
+          .select('*')
+          .order('sort_order', { ascending: true });
+        if (error || !data) return [];
+        return data as PaymentMethodConfig[];
+      }, (items) => {
+        const map = new Map<string, PaymentMethodConfig>();
+        items.forEach(p => map.set(p.code || p.id, p));
+        return Array.from(map.values()).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+      });
+
+      if (data && data.length > 0) {
+        this.mockPaymentMethods = data;
+        return data;
+      }
+    } catch (e) {
+      console.error('Failed to fetch payment methods from DB, using fallback:', e);
+    }
     return this.mockPaymentMethods;
   }
 
   static async getActivePaymentMethods(): Promise<PaymentMethodConfig[]> {
-    return this.mockPaymentMethods.filter(pm => pm.is_active).sort((a, b) => a.sort_order - b.sort_order);
+    const methods = await this.getPaymentMethods();
+    return methods.filter(pm => pm.is_active).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
   }
 
   static async updatePaymentMethod(id: string, updates: Partial<PaymentMethodConfig>): Promise<PaymentMethodConfig | null> {
+    try {
+      const shards = getAllAdminClients();
+      let updatedRow: PaymentMethodConfig | null = null;
+
+      for (const { client } of shards) {
+        const { data, error } = await client
+          .from('payment_methods')
+          .update(updates)
+          .or(`id.eq.${id},code.eq.${id}`)
+          .select()
+          .maybeSingle();
+
+        if (!error && data) {
+          updatedRow = data as PaymentMethodConfig;
+        }
+      }
+
+      if (updatedRow) {
+        const idx = this.mockPaymentMethods.findIndex(p => p.id === id || p.code === id);
+        if (idx !== -1) {
+          this.mockPaymentMethods[idx] = { ...this.mockPaymentMethods[idx], ...updatedRow };
+        }
+        return updatedRow;
+      }
+    } catch (e) {
+      console.error('Failed to update payment method in Supabase shards:', e);
+    }
+
     const index = this.mockPaymentMethods.findIndex(p => p.id === id || p.code === id);
     if (index !== -1) {
       this.mockPaymentMethods[index] = { ...this.mockPaymentMethods[index], ...updates };
@@ -95,6 +145,18 @@ export class SettingsRepository {
   }
 
   static async updatePaymentMethods(methods: PaymentMethodConfig[]): Promise<PaymentMethodConfig[]> {
+    try {
+      const shards = getAllAdminClients();
+      for (const method of methods) {
+        for (const { client } of shards) {
+          await client
+            .from('payment_methods')
+            .upsert(method, { onConflict: 'code' });
+        }
+      }
+    } catch (e) {
+      console.error('Failed to bulk update payment methods across shards:', e);
+    }
     this.mockPaymentMethods = methods;
     return this.mockPaymentMethods;
   }

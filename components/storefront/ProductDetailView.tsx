@@ -93,7 +93,36 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewContent, setReviewContent] = useState('');
   const [reviewName, setReviewName] = useState('');
+  const [reviewEmail, setReviewEmail] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [productReviews, setProductReviews] = useState<any[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadReviews() {
+      if (!product?.id) return;
+      try {
+        setIsLoadingReviews(true);
+        const res = await fetch(`/api/reviews?productId=${encodeURIComponent(product.id)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && data.success && Array.isArray(data.reviews)) {
+            setProductReviews(data.reviews);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load approved reviews:', err);
+      } finally {
+        if (isMounted) setIsLoadingReviews(false);
+      }
+    }
+    loadReviews();
+    return () => {
+      isMounted = false;
+    };
+  }, [product?.id]);
 
   // Ensure rich gallery with fallback images if a product has fewer than 4
   const defaultFallbackImages = [
@@ -203,13 +232,43 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
     router.push('/checkout');
   };
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reviewTitle || !reviewContent || !reviewName) {
+    if (!reviewTitle.trim() || !reviewContent.trim() || !reviewName.trim()) {
       alert('Please complete all review fields.');
       return;
     }
-    setReviewSubmitted(true);
+    setIsSubmittingReview(true);
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product.id,
+          productName: product.name,
+          customerName: reviewName.trim(),
+          customerEmail: reviewEmail.trim() || undefined,
+          rating: reviewRating,
+          title: reviewTitle.trim(),
+          content: reviewContent.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReviewSubmitted(true);
+        setReviewTitle('');
+        setReviewContent('');
+        setReviewName('');
+        setReviewEmail('');
+      } else {
+        alert(data.error || 'Failed to submit review. Please try again.');
+      }
+    } catch (err) {
+      console.error('Failed to submit review:', err);
+      alert('Unable to submit review. Please check your connection and try again.');
+    } finally {
+      setIsSubmittingReview(false);
+    }
   };
 
   // Stock status logic
@@ -771,7 +830,7 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
             }`}
           >
             <Star className="w-3.5 h-3.5 text-[#d99026]" />
-            <span>Reviews ({product.review_count || 16})</span>
+            <span>Reviews ({productReviews.length > 0 ? productReviews.length : (product.review_count || 16)})</span>
           </button>
         </div>
 
@@ -894,24 +953,92 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
               </div>
             </div>
 
+            {/* Verified Patron Reviews List */}
+            <div className="space-y-4 pt-4 border-t border-[#eae7e2]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-serif text-base sm:text-lg font-bold text-[#141414]">Patron Testimonials & Reviews</h4>
+                  <p className="text-xs text-[#6b6b6b]">Genuine feedback from verified collectors across Pakistan</p>
+                </div>
+                <span className="text-xs font-bold px-3 py-1 bg-[#f7f5f2] border border-[#eae7e2] rounded-full text-[#b87414]">
+                  {productReviews.length} Verified {productReviews.length === 1 ? 'Review' : 'Reviews'}
+                </span>
+              </div>
+
+              {isLoadingReviews ? (
+                <div className="p-8 text-center bg-[#f7f5f2] rounded-2xl border border-[#eae7e2] flex items-center justify-center gap-2 text-xs text-[#6b6b6b]">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#d99026]" />
+                  <span>Loading atelier reviews...</span>
+                </div>
+              ) : productReviews.length === 0 ? (
+                <div className="p-6 text-center bg-[#f7f5f2] rounded-2xl border border-[#eae7e2] space-y-1">
+                  <p className="text-xs font-bold text-[#141414]">No published reviews yet</p>
+                  <p className="text-xs text-[#6b6b6b]">Be the first patron to share your styling experience with this piece.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {productReviews.map((rev) => (
+                    <div key={rev.id} className="p-4 sm:p-5 rounded-2xl bg-[#f7f5f2] border border-[#eae7e2] space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-xs text-[#141414]">{rev.customer_name || 'Anonymous Patron'}</span>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                              <CheckCircle2 className="w-3 h-3" /> Verified Patron
+                            </span>
+                          </div>
+                          <div className="flex items-center text-[#d99026] my-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-3.5 h-3.5 ${
+                                  i < (rev.rating || 5) ? 'fill-current text-[#d99026]' : 'text-neutral-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <span className="text-[11px] text-[#6b6b6b]">
+                          {rev.created_at ? new Date(rev.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}
+                        </span>
+                      </div>
+                      {rev.title && (
+                        <h5 className="text-xs font-bold text-[#141414]">{rev.title}</h5>
+                      )}
+                      <p className="text-xs text-[#4a4a4a] leading-relaxed whitespace-pre-line">{rev.content}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Review Form */}
             {reviewSubmitted ? (
-              <div className="p-4 sm:p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-                Thank you for your review. Your verified patron feedback has been recorded for this couture piece.
+              <div className="p-5 sm:p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs space-y-1">
+                <div className="flex items-center gap-2 font-bold text-emerald-800">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Review Submitted for Moderation</span>
+                </div>
+                <p className="text-emerald-700">
+                  Thank you for your review. Your verified patron feedback has been recorded and will appear on this page once approved by our atelier team.
+                </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmitReview} className="p-4 sm:p-6 rounded-2xl bg-white border border-[#eae7e2] space-y-3 sm:space-y-4">
-                <h4 className="font-serif text-base sm:text-lg font-bold text-[#141414]">Share Your Review</h4>
+              <form onSubmit={handleSubmitReview} className="p-4 sm:p-6 rounded-2xl bg-white border border-[#eae7e2] space-y-3 sm:space-y-4 shadow-xs">
+                <div>
+                  <h4 className="font-serif text-base sm:text-lg font-bold text-[#141414]">Write a Patron Review</h4>
+                  <p className="text-xs text-[#6b6b6b]">Share your impressions on craftsmanship, fit, fabric texture, and courier delivery</p>
+                </div>
                 
                 {/* Rating selection */}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-[#6b6b6b] mr-2">Your Rating:</span>
+                <div className="flex items-center gap-2 pt-1">
+                  <span className="text-xs font-bold text-[#141414] mr-2">Your Rating:</span>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       type="button"
                       key={star}
                       onClick={() => setReviewRating(star)}
-                      className="cursor-pointer"
+                      className="cursor-pointer transition-transform hover:scale-110"
                     >
                       <Star
                         className={`w-5 h-5 ${
@@ -922,7 +1049,7 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
                   ))}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <input
                     type="text"
                     required
@@ -932,9 +1059,16 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
                     className="text-xs p-3 rounded-xl bg-[#f7f5f2] border border-[#eae7e2] text-[#141414] placeholder-[#6b6b6b] outline-hidden focus:border-[#d99026]"
                   />
                   <input
+                    type="email"
+                    placeholder="Email Address (Optional)"
+                    value={reviewEmail}
+                    onChange={(e) => setReviewEmail(e.target.value)}
+                    className="text-xs p-3 rounded-xl bg-[#f7f5f2] border border-[#eae7e2] text-[#141414] placeholder-[#6b6b6b] outline-hidden focus:border-[#d99026]"
+                  />
+                  <input
                     type="text"
                     required
-                    placeholder="Review Headline *"
+                    placeholder="Review Headline (e.g. Pure Luxury) *"
                     value={reviewTitle}
                     onChange={(e) => setReviewTitle(e.target.value)}
                     className="text-xs p-3 rounded-xl bg-[#f7f5f2] border border-[#eae7e2] text-[#141414] placeholder-[#6b6b6b] outline-hidden focus:border-[#d99026]"
@@ -943,16 +1077,24 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
                 <textarea
                   rows={3}
                   required
-                  placeholder="Share your experience regarding fabric feel, embroidery, and delivery..."
+                  placeholder="Share your experience regarding fabric feel, embroidery finesse, and delivery speed..."
                   value={reviewContent}
                   onChange={(e) => setReviewContent(e.target.value)}
                   className="w-full text-xs p-3 rounded-xl bg-[#f7f5f2] border border-[#eae7e2] text-[#141414] placeholder-[#6b6b6b] outline-hidden focus:border-[#d99026]"
                 />
                 <button
                   type="submit"
-                  className="bg-[#d99026] hover:bg-[#c67d18] text-[#141414] font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-full shadow-sm cursor-pointer"
+                  disabled={isSubmittingReview}
+                  className="inline-flex items-center justify-center gap-2 bg-[#d99026] hover:bg-[#c67d18] disabled:opacity-50 text-[#141414] font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-full shadow-sm cursor-pointer transition active:scale-98"
                 >
-                  Submit Patron Review
+                  {isSubmittingReview ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <span>Submit Patron Review</span>
+                  )}
                 </button>
               </form>
             )}

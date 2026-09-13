@@ -12,31 +12,6 @@ export function DualShardConsole({ initialHealth }: { initialHealth: DualShardHe
   const shard1 = health.shards[0];
   const shard2 = health.shards[1];
 
-  async function handleSimulate(mb: number) {
-    setLoading(true);
-    setMsg(null);
-    try {
-      const res = await fetch('/api/admin/shard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ simulatedShard1Mb: mb, manualOverride: null }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setHealth(data.health);
-        setMsg(
-          mb >= 490
-            ? '⚡ Simulated Shard 1 storage at 492 MB! Active write target automatically failed over to Shard 2. All previous Shard 1 data remains 100% accessible via unified reads.'
-            : '✅ Reset Shard 1 storage back to baseline (14.8 MB). Active write target returned to Primary Shard 1.'
-        );
-      }
-    } catch {
-      setMsg('Error updating shard status.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
   async function refreshMetrics() {
     setLoading(true);
     try {
@@ -213,35 +188,42 @@ export function DualShardConsole({ initialHealth }: { initialHealth: DualShardHe
         </div>
       </div>
 
-      {/* Interactive Simulation Panel */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4" />
-              <span>490 MB Failover Simulation Test Suite</span>
+      {/* Production Safety & High Availability Panel */}
+      <div className="p-6 rounded-2xl bg-slate-900 border border-emerald-500/20 space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Production Safety Lock & Dual-Shard High Availability</span>
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Simulate Shard 1 storage reaching the 490 MB threshold to test automatic routing to Shard 2 and verify that reading Shard 1 historical data still works 100%.
+            <p className="text-xs text-slate-300">
+              Safe Operation Active: Destructive simulation and wipe controls are permanently locked in production.
             </p>
           </div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Data Safe
+          </span>
         </div>
 
-        <div className="flex flex-wrap gap-3 pt-2">
-          <button
-            onClick={() => handleSimulate(492.5)}
-            disabled={loading}
-            className="px-4 py-2 text-xs font-bold rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm disabled:opacity-50"
-          >
-            Simulate Shard 1 at 492 MB (Trigger Failover to Shard 2)
-          </button>
-          <button
-            onClick={() => handleSimulate(14.8)}
-            disabled={loading}
-            className="px-4 py-2 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition disabled:opacity-50"
-          >
-            Reset Shard 1 to Baseline (14.8 MB)
-          </button>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Automatic Overflow</span>
+            <p className="text-slate-200">
+              Shard 1 writes transition seamlessly to Shard 2 when capacity approaches 490 MB threshold.
+            </p>
+          </div>
+          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Parallel Read Aggregation</span>
+            <p className="text-slate-200">
+              Storefront and admin queries query both database instances in parallel for unified data integrity.
+            </p>
+          </div>
+          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Zero-Downtime Guarantee</span>
+            <p className="text-slate-200">
+              Orders, customers, reviews, and subscriptions are safeguarded with dual-shard persistence.
+            </p>
+          </div>
         </div>
       </div>
     </div>

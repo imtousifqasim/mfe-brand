@@ -29,6 +29,39 @@ export function AnnouncementBar({
 }: AnnouncementBarProps) {
   const [copied, setCopied] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [activeCoupons, setActiveCoupons] = useState<{ code: string; discount_type: string; discount_value: number }[]>([]);
+  const [couponIndex, setCouponIndex] = useState(0);
+
+  // Fetch active promotional coupons from database
+  React.useEffect(() => {
+    async function loadCoupons() {
+      try {
+        const res = await fetch('/api/coupons/active');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.coupons) && data.coupons.length > 0) {
+            setActiveCoupons(data.coupons);
+          }
+        }
+      } catch {}
+    }
+    loadCoupons();
+  }, []);
+
+  // Rotate between multiple coupons every 4.5 seconds if more than 1 active
+  React.useEffect(() => {
+    if (activeCoupons.length <= 1) return;
+    const interval = setInterval(() => {
+      setCouponIndex(prev => (prev + 1) % activeCoupons.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [activeCoupons]);
+
+  const currentCoupon = activeCoupons.length > 0 ? activeCoupons[couponIndex] : null;
+  const currentCode = currentCoupon?.code || couponCode || 'MFE10';
+  const currentDiscountLabel = currentCoupon 
+    ? (currentCoupon.discount_type === 'percentage' ? `${currentCoupon.discount_value}% OFF` : `PKR ${currentCoupon.discount_value} OFF`)
+    : 'VIP 10% OFF';
 
   const cleanMessage =
     !message || message.toLowerCase().includes('use code') || message.length > 70
@@ -40,8 +73,8 @@ export function AnnouncementBar({
 
   const copyCode = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!couponCode) return;
-    navigator.clipboard.writeText(couponCode);
+    if (!currentCode) return;
+    navigator.clipboard.writeText(currentCode);
     setCopied(true);
     setModalOpen(true);
     setTimeout(() => setCopied(false), 2600);
@@ -51,8 +84,8 @@ export function AnnouncementBar({
     cleanMessage,
     'Haute Couture 2026: Pure Handcrafted Lawn, Silk & Chiffon Heirlooms',
     '100% Genuine Designer Fabrics & 7-Day Seamless Return Privilege',
-    couponCode 
-      ? `First Order Privilege: Unlock 10% Off with Code ${couponCode}` 
+    currentCode 
+      ? `Promotional Privilege: Unlock ${currentDiscountLabel} with Code ${currentCode}` 
       : 'Complimentary Styling Assistance Across Pakistan',
     `VIP WhatsApp Concierge: ${activeWhatsApp} (Live Support)`,
   ];
@@ -99,22 +132,28 @@ export function AnnouncementBar({
 
             {/* Dedicated Modern VIP Coupon Capsule & Official WhatsApp Concierge (No PKR/Rs, No Phone call) */}
             <div className="flex items-center gap-3 shrink-0">
-              {couponCode && (
+              {currentCode && (
                 <button
                   type="button"
                   onClick={copyCode}
                   className="group relative inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/10 via-amber-500/20 to-amber-500/10 hover:from-amber-500/25 hover:to-amber-500/25 border border-amber-500/50 hover:border-amber-400 text-neutral-200 transition-all duration-300 shadow-[0_0_15px_rgba(217,144,38,0.18)] hover:shadow-[0_0_24px_rgba(217,144,38,0.35)] cursor-pointer active:scale-95"
-                  title="Click to copy coupon code for 10% instant discount"
+                  title={`Click to copy coupon code ${currentCode} for ${currentDiscountLabel}`}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-12 transition-transform shrink-0" />
                   
                   <span className="text-[10px] font-bold tracking-wider text-white uppercase hidden lg:inline">
-                    VIP 10% OFF:
+                    {currentDiscountLabel}:
                   </span>
 
                   <span className="font-mono font-black text-amber-300 tracking-wider text-xs px-2 py-0.5 rounded bg-black/60 border border-amber-500/40 shadow-inner">
-                    {couponCode}
+                    {currentCode}
                   </span>
+
+                  {activeCoupons.length > 1 && (
+                    <span className="text-[9px] font-bold text-slate-400 bg-black/40 px-1.5 py-0.5 rounded">
+                      {couponIndex + 1}/{activeCoupons.length}
+                    </span>
+                  )}
 
                   <span className={`inline-flex items-center gap-1 text-[9.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full transition-all duration-200 ${
                     copied 
@@ -179,16 +218,16 @@ export function AnnouncementBar({
 
             {/* Mobile Actions Bar: Coupon Badge + WhatsApp Link */}
             <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/[0.06]">
-              {couponCode ? (
+              {currentCode ? (
                 <button
                   type="button"
                   onClick={copyCode}
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/40 text-neutral-200 text-[10px] active:scale-95 transition"
                 >
                   <Sparkles className="w-3 h-3 text-amber-400" />
-                  <span className="font-semibold text-white">10% OFF:</span>
+                  <span className="font-semibold text-white">{currentDiscountLabel}:</span>
                   <span className="font-mono font-bold text-amber-300 bg-black/40 px-1.5 py-0.5 rounded border border-amber-500/30">
-                    {couponCode}
+                    {currentCode}
                   </span>
                   <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
                     copied ? 'bg-emerald-500 text-black' : 'bg-amber-500 text-black'
