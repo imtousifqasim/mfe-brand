@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Mail, Phone, MapPin, Sparkles } from 'lucide-react';
+import { Mail, Phone, MapPin, Sparkles, ArrowUpRight } from 'lucide-react';
 import { SEED_CATEGORIES } from '@/lib/data/seed-data';
 
 export function Footer() {
@@ -194,9 +194,74 @@ export function Footer() {
 
         </div>
 
+        {/* Modern Developer Credit & Hire CTA Showcase */}
+        <div className="my-14 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-white/[0.04] via-white/[0.02] to-[#d99026]/[0.06] border border-white/[0.1] hover:border-[#d99026]/40 transition-all duration-500 relative overflow-hidden group shadow-2xl backdrop-blur-md">
+          {/* Subtle ambient decorative gradient */}
+          <div className="absolute -top-24 -right-24 w-60 h-60 bg-[#d99026]/10 rounded-full blur-3xl pointer-events-none group-hover:bg-[#d99026]/20 transition-all duration-700" />
+          <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-[#d99026]/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 text-center sm:text-left">
+              <a 
+                href="https://tousifqasim.dev/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#d99026] via-[#b87414] to-[#7a4805] text-black font-extrabold text-xl flex items-center justify-center shadow-lg shadow-[#d99026]/20 hover:scale-105 active:scale-95 transition-transform shrink-0 tracking-wider font-display"
+                title="Tousif Qasim - Full Stack & Modern Web Engineer"
+              >
+                TQ
+              </a>
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                  <span className="text-white font-semibold text-sm sm:text-base tracking-wide font-sans">
+                    Engineered & Designed with precision by{' '}
+                    <a
+                      href="https://tousifqasim.dev/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#d99026] hover:text-[#f3a83b] underline underline-offset-4 decoration-[#d99026]/40 hover:decoration-[#d99026] font-bold transition-colors inline-flex items-center gap-1"
+                    >
+                      Tousif Qasim
+                      <ArrowUpRight className="w-3.5 h-3.5 inline" />
+                    </a>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Available for Custom Projects
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-neutral-400 max-w-2xl leading-relaxed font-sans">
+                  Impressed by this modern e-commerce experience? Elevate your brand with a bespoke, lightning-fast web application or luxury store tailored for scale.
+                </p>
+              </div>
+            </div>
+
+            <a
+              href="https://tousifqasim.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#d99026] to-[#b87414] hover:from-[#e59b30] hover:to-[#c87e16] text-black font-bold text-xs uppercase tracking-[0.16em] transition-all duration-300 shadow-lg shadow-[#d99026]/25 hover:shadow-[#d99026]/40 hover:scale-[1.03] active:scale-[0.98] whitespace-nowrap shrink-0 group/cta"
+            >
+              <span>Build Your Website</span>
+              <ArrowUpRight className="w-4 h-4 transition-transform group-hover/cta:translate-x-0.5 group-hover/cta:-translate-y-0.5" />
+            </a>
+          </div>
+        </div>
+
         {/* Bottom Bar: Copyright & Payment Badges */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-400 font-sans">
-          <p>© {new Date().getFullYear()} MFE BRAND Haute Couture. All Rights Reserved. Crafted for Pakistan & Worldwide.</p>
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-400 font-sans">
+          <p>
+            © {new Date().getFullYear()} MFE BRAND Haute Couture. All Rights Reserved. Crafted by{' '}
+            <a
+              href="https://tousifqasim.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#d99026] hover:text-[#f3a83b] hover:underline font-medium inline-flex items-center gap-0.5 transition-colors"
+            >
+              Tousif Qasim
+              <ArrowUpRight className="w-3 h-3 inline" />
+            </a>
+          </p>
           <div className="flex items-center gap-4 text-[11px] text-neutral-300">
             <span>Cash on Delivery (COD)</span>
             <span>•</span>
