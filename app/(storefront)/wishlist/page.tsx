@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ExternalImage } from '@/components/media/ExternalImage';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/lib/utils';
@@ -132,7 +133,11 @@ export default function WishlistPage() {
             const hasSale = product.sale_price !== null && product.sale_price !== undefined && product.sale_price < product.regular_price;
             const activePrice = hasSale ? product.sale_price! : product.regular_price;
             const discountPct = hasSale ? Math.round(((product.regular_price - product.sale_price!) / product.regular_price) * 100) : 0;
-            const imageUrl = product.images?.[0]?.image_url || '/placeholder-garment.jpg';
+            const imageUrl =
+              product.images?.find((img) => img.is_primary)?.image_url ||
+              [...(product.images || [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))[0]?.image_url ||
+              product.images?.[0]?.image_url ||
+              '/placeholder-garment.jpg';
 
             return (
               <div
@@ -141,12 +146,14 @@ export default function WishlistPage() {
               >
                 {/* Product Media */}
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#f2ede6]">
-                  <Link href={`/products/${product.slug}`} className="block w-full h-full">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                  <Link href={`/products/${product.slug}`} className="relative block w-full h-full">
+                    <ExternalImage
                       src={imageUrl}
                       alt={product.name}
-                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      quality={95}
+                      className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
                     />
                   </Link>
 

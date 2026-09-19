@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const mapped = products.map((p) => {
       const primaryImage =
         p.images?.find((img) => img.is_primary)?.image_url ||
+        [...(p.images || [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))[0]?.image_url ||
         p.images?.[0]?.image_url ||
         null;
 

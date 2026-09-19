@@ -208,6 +208,7 @@ export default function CartPage() {
                 const itemTotal = price * item.quantity;
                 const primaryImage =
                   item.product.images?.find((img) => img.is_primary)?.image_url ||
+                  [...(item.product.images || [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))[0]?.image_url ||
                   item.product.images?.[0]?.image_url ||
                   null;
 
@@ -216,7 +217,14 @@ export default function CartPage() {
                     
                     {/* Thumbnail */}
                     <div className="relative w-20 h-26 sm:w-24 sm:h-32 rounded-2xl overflow-hidden bg-[#f7f5f2] shrink-0 border border-[#eae7e2]">
-                      <ExternalImage src={primaryImage} alt={item.product.name} fill className="object-cover" />
+                      <ExternalImage 
+                        src={primaryImage} 
+                        alt={item.product.name} 
+                        fill 
+                        sizes="(max-width: 640px) 96px, 120px"
+                        quality={95}
+                        className="object-cover" 
+                      />
                     </div>
 
                     {/* Info */}

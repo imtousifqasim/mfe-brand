@@ -21,7 +21,13 @@ export function ProductCard({ product }: ProductCardProps) {
   const [added, setAdded] = useState(false);
 
   const isFavorited = isInWishlist(product.id);
-  const primaryImage = product.images?.[0]?.image_url || null;
+  
+  // Select primary high-resolution product image
+  const primaryImage =
+    product.images?.find((img) => img.is_primary)?.image_url ||
+    [...(product.images || [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))[0]?.image_url ||
+    product.images?.[0]?.image_url ||
+    null;
 
   const hasDiscount = product.sale_price !== null && product.sale_price !== undefined && product.sale_price < product.regular_price;
   const discountPercent = hasDiscount
@@ -45,6 +51,8 @@ export function ProductCard({ product }: ProductCardProps) {
             src={primaryImage}
             alt={product.name}
             fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            quality={95}
             className="object-cover object-center group-hover:scale-106 transition-transform duration-700 ease-out"
           />
         </Link>

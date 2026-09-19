@@ -1,6 +1,27 @@
 import { createAdminClient, queryAcrossAllShards, findAcrossAllShards, getActiveWriteAdmin } from '@/lib/supabase/admin';
 import { Product, Category, Brand } from '@/types/database';
 import { SEED_PRODUCTS, SEED_CATEGORIES, SEED_BRANDS } from '@/lib/data/seed-data';
+import { resolveHighResImageUrl } from '@/lib/image-resolver';
+
+function normalizeProductImages(p: Product): Product {
+  if (!p) return p;
+  if (p.images && Array.isArray(p.images) && p.images.length > 0) {
+    const updatedImages = p.images.map(img => ({
+      ...img,
+      image_url: resolveHighResImageUrl(img.image_url) || img.image_url,
+    }));
+    updatedImages.sort((a, b) => {
+      if (a.is_primary && !b.is_primary) return -1;
+      if (!a.is_primary && b.is_primary) return 1;
+      return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+    });
+    return {
+      ...p,
+      images: updatedImages,
+    };
+  }
+  return p;
+}
 
 export interface ProductFilterOptions {
   categorySlug?: string;
@@ -18,7 +39,7 @@ export interface ProductFilterOptions {
 }
 
 export class ProductRepository {
-  private static mockProducts: Product[] = [...SEED_PRODUCTS];
+  private static mockProducts: Product[] = SEED_PRODUCTS.map(normalizeProductImages);
 
   static async getProducts(filters: ProductFilterOptions = {}): Promise<{ products: Product[]; total: number }> {
     try {
@@ -53,9 +74,9 @@ export class ProductRepository {
         if (error || !data) return [];
         return data as Product[];
       }, (items) => {
-        // Deduplicate across shards by slug or id
+        // Deduplicate across shards by slug or id and normalize images
         const map = new Map<string, Product>();
-        items.forEach(p => map.set(p.slug || p.id, p));
+        items.forEach(p => map.set(p.slug || p.id, normalizeProductImages(p)));
         return Array.from(map.values());
       });
 
@@ -144,13 +165,13 @@ export class ProductRepository {
         return null;
       });
 
-      if (foundProduct) return foundProduct;
+      if (foundProduct) return normalizeProductImages(foundProduct);
     } catch {
       // Fallback
     }
 
     const p = this.mockProducts.find(item => item.slug === slug || item.id === slug);
-    return p || null;
+    return p ? normalizeProductImages(p) : null;
   }
 
   static async getProductById(id: string): Promise<Product | null> {
@@ -175,13 +196,14 @@ export class ProductRepository {
           return null;
         });
 
-        if (foundProduct) return foundProduct;
+        if (foundProduct) return normalizeProductImages(foundProduct);
       }
     } catch {
       // Fallback
     }
 
-    return this.mockProducts.find(item => item.id === id || item.slug === id || item.sku === id) || null;
+    const fallbackProduct = this.mockProducts.find(item => item.id === id || item.slug === id || item.sku === id);
+    return fallbackProduct ? normalizeProductImages(fallbackProduct) : null;
   }
 
 

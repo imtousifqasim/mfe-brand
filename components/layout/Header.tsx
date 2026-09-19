@@ -409,6 +409,8 @@ export function Header() {
                               src={product.image}
                               alt={product.name}
                               fill
+                              sizes="56px"
+                              quality={95}
                               className="object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                           </div>
@@ -735,7 +737,7 @@ export function Header() {
                             className="flex items-center gap-2.5 py-2 px-1 hover:bg-[#faf8f5] transition"
                           >
                             <div className="relative w-10 h-12 rounded-lg overflow-hidden bg-neutral-100 shrink-0 border border-[#eae7e2]">
-                              <ExternalImage src={item.image} alt={item.name} fill className="object-cover" />
+                              <ExternalImage src={item.image} alt={item.name} fill sizes="48px" quality={95} className="object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-semibold text-[#141414] truncate">{item.name}</p>

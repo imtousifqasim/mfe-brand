@@ -76,7 +76,18 @@ export default function ComparePage() {
               {items.map((p) => (
                 <td key={p.id} className="p-5 align-top text-center">
                   <div className="relative w-36 h-48 mx-auto rounded-2xl overflow-hidden bg-neutral-900 border border-white/[0.08] mb-3">
-                    <ExternalImage src={p.images?.[0]?.image_url} alt={p.name} fill className="object-cover" />
+                    <ExternalImage
+                      src={
+                        p.images?.find((img) => img.is_primary)?.image_url ||
+                        [...(p.images || [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))[0]?.image_url ||
+                        p.images?.[0]?.image_url
+                      }
+                      alt={p.name}
+                      fill
+                      sizes="160px"
+                      quality={95}
+                      className="object-cover"
+                    />
                   </div>
                   <button
                     onClick={() => removeFromCompare(p.id)}

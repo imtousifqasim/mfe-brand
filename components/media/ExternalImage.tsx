@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { ImageOff } from 'lucide-react';
+import { resolveHighResImageUrl } from '@/lib/image-resolver';
 
 interface ExternalImageProps {
   src?: string | null;
@@ -14,6 +15,8 @@ interface ExternalImageProps {
   className?: string;
   priority?: boolean;
   sizes?: string;
+  quality?: number;
+  unoptimized?: boolean;
 }
 
 export function ExternalImage({
@@ -25,10 +28,13 @@ export function ExternalImage({
   className = '',
   priority = false,
   sizes,
+  quality = 90,
+  unoptimized = true,
 }: ExternalImageProps) {
-  const [hasError, setHasError] = useState(!src);
+  const resolvedSrc = resolveHighResImageUrl(src);
+  const [hasError, setHasError] = useState(!resolvedSrc);
 
-  if (hasError || !src) {
+  if (hasError || !resolvedSrc) {
     return (
       <div
         className={cn(
@@ -50,28 +56,30 @@ export function ExternalImage({
   if (fill) {
     return (
       <Image
-        src={src}
+        src={resolvedSrc}
         alt={alt}
         fill
-        sizes={sizes || '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'}
+        sizes={sizes || '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
         className={cn('object-cover transition-opacity duration-300', className)}
         priority={priority}
+        quality={quality}
         onError={() => setHasError(true)}
-        unoptimized
+        unoptimized={unoptimized}
       />
     );
   }
 
   return (
     <Image
-      src={src}
+      src={resolvedSrc}
       alt={alt}
-      width={width || 600}
-      height={height || 600}
+      width={width || 800}
+      height={height || 800}
       className={cn('object-cover rounded transition-opacity duration-300', className)}
       priority={priority}
+      quality={quality}
       onError={() => setHasError(true)}
-      unoptimized
+      unoptimized={unoptimized}
     />
   );
 }

@@ -200,6 +200,7 @@ export function CartDrawer() {
               
               const primaryImage =
                 item.product.images?.find((img) => img.is_primary)?.image_url ||
+                [...(item.product.images || [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))[0]?.image_url ||
                 item.product.images?.[0]?.image_url ||
                 null;
 
@@ -216,6 +217,8 @@ export function CartDrawer() {
                       src={primaryImage}
                       alt={item.product.name}
                       fill
+                      sizes="90px"
+                      quality={95}
                       className="object-cover"
                     />
                   </div>
