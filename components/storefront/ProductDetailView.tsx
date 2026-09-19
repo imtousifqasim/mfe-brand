@@ -399,7 +399,7 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
         </Link>
         {product.category && (
           <Link
-            href={`/products?category=${product.category.slug}`}
+            href={`/category/${product.category.slug}`}
             className="text-[11px] font-bold text-[#b87414] bg-[#d99026]/10 px-3 py-1 rounded-full border border-[#d99026]/20 truncate max-w-[170px]"
           >
             {product.category.name}
@@ -414,7 +414,7 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
         {product.category && (
           <>
             <ChevronRight className="w-3 h-3 text-neutral-400 shrink-0" />
-            <Link href={`/products?category=${product.category.slug}`} className="hover:text-[#b87414] transition shrink-0">
+            <Link href={`/category/${product.category.slug}`} className="hover:text-[#b87414] transition shrink-0">
               {product.category.name}
             </Link>
           </>

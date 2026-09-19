@@ -103,22 +103,22 @@ export default function CartPage() {
         {/* Curated Collection Shortcuts */}
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl mx-auto text-xs">
           <Link
-            href="/products?category=ready-to-wear-pret"
+            href="/category/womens-unstitched-stitched-suits"
             className="p-3 rounded-2xl bg-[#f7f5f2] hover:bg-[#eae7e2] text-[#141414] font-bold transition border border-[#eae7e2]"
           >
-            Pret Co-ords
+            Women's Suits
           </Link>
           <Link
-            href="/products?category=festive-formals"
+            href="/category/winter-wear-shawls"
             className="p-3 rounded-2xl bg-[#f7f5f2] hover:bg-[#eae7e2] text-[#141414] font-bold transition border border-[#eae7e2]"
           >
-            Festive Formals
+            Winter Shawls
           </Link>
           <Link
-            href="/products?category=unstitched-luxury"
+            href="/category/mens-clothing"
             className="p-3 rounded-2xl bg-[#f7f5f2] hover:bg-[#eae7e2] text-[#141414] font-bold transition border border-[#eae7e2]"
           >
-            Unstitched
+            Men's Wear
           </Link>
           <Link
             href="/products?isBestDeal=true"

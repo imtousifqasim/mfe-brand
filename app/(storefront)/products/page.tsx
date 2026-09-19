@@ -1,8 +1,33 @@
 import React from 'react';
+import { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { ProductRepository } from '@/repositories/product.repository';
 import { ProductCard } from '@/components/storefront/ProductCard';
 import { SlidersHorizontal, ArrowUpDown, X, Sparkles, Compass } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'All Collections & Pret Creations',
+  description:
+    'Explore the complete MFE BRAND couture catalog. Master-tailored luxury Pakistani suits, winter wool shawls, handcrafted leather wallets, and fine fragrances.',
+  alternates: {
+    canonical: 'https://mfe-brand.com/products',
+  },
+  openGraph: {
+    title: 'All Collections & Pret Creations | MFE BRAND',
+    description:
+      'Explore the complete MFE BRAND couture catalog. Master-tailored luxury Pakistani suits, winter wool shawls, handcrafted leather wallets, and fine fragrances.',
+    url: 'https://mfe-brand.com/products',
+    siteName: 'MFE BRAND',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'All Collections & Pret Creations | MFE BRAND',
+    description:
+      'Explore the complete MFE BRAND couture catalog. Master-tailored luxury Pakistani suits, winter wool shawls, and leather essentials.',
+  },
+};
 
 interface ProductsPageProps {
   searchParams: Promise<{
@@ -30,6 +55,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const sortBy = params.sortBy || 'newest';
   const isBestDeal = params.isBestDeal === 'true';
   const isNewArrival = params.isNewArrival === 'true';
+
+  // 301 Redirect to clean category URL if visiting /products?category=...
+  if (categorySlug && !search && !brandSlug && !minPrice && !maxPrice && !isBestDeal && !isNewArrival) {
+    redirect(`/category/${categorySlug}`);
+  }
 
   const [{ products, total }, categories, brands] = await Promise.all([
     ProductRepository.getProducts({
@@ -123,7 +153,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           {categories.map((cat) => (
             <Link
               key={cat.id}
-              href={`/products?category=${cat.slug}`}
+              href={`/category/${cat.slug}`}
               className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider shrink-0 transition ${
                 categorySlug === cat.slug
                   ? 'bg-[#d99026] text-[#141414] font-bold shadow-sm'
@@ -202,7 +232,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 {categories.map((cat) => (
                   <li key={cat.id}>
                     <Link
-                      href={`/products?category=${cat.slug}${brandSlug ? `&brand=${brandSlug}` : ''}`}
+                      href={`/category/${cat.slug}`}
                       className={`block py-1 hover:text-[#b87414] transition ${categorySlug === cat.slug ? 'text-[#b87414] font-bold' : 'text-[#141414]'}`}
                     >
                       {cat.name}

@@ -308,21 +308,30 @@ export function Header() {
               </div>
 
               <Link 
-                href="/products?category=ready-to-wear-pret" 
+                href="/category/womens-unstitched-stitched-suits" 
                 className={`relative py-7 transition-colors hover:text-[#b87414] whitespace-nowrap ${
-                  pathname.includes('ready-to-wear-pret') ? 'text-[#b87414] font-bold' : ''
+                  pathname.includes('womens-unstitched-stitched-suits') ? 'text-[#b87414] font-bold' : ''
                 }`}
               >
-                Pret
+                Women's Suits
               </Link>
 
               <Link 
-                href="/products?category=festive-formals" 
+                href="/category/winter-wear-shawls" 
                 className={`relative py-7 transition-colors hover:text-[#b87414] whitespace-nowrap ${
-                  pathname.includes('festive-formals') ? 'text-[#b87414] font-bold' : ''
+                  pathname.includes('winter-wear-shawls') ? 'text-[#b87414] font-bold' : ''
                 }`}
               >
-                Festive
+                Winter Shawls
+              </Link>
+
+              <Link 
+                href="/category/mens-clothing" 
+                className={`relative py-7 transition-colors hover:text-[#b87414] whitespace-nowrap ${
+                  pathname.includes('mens-clothing') ? 'text-[#b87414] font-bold' : ''
+                }`}
+              >
+                Men's Wear
               </Link>
 
               <Link 
@@ -506,7 +515,7 @@ export function Header() {
                           {MEGA_CATEGORIES.slice(0, 4).map((cat) => (
                             <Link
                               key={cat.slug}
-                              href={`/products?category=${cat.slug}`}
+                              href={`/category/${cat.slug}`}
                               onClick={() => setSearchFocused(false)}
                               className="p-2 rounded-xl bg-[#faf8f5] hover:bg-[#eae7e2] text-[#141414] font-medium flex items-center justify-between transition"
                             >
@@ -621,7 +630,7 @@ export function Header() {
               {MEGA_CATEGORIES.map((cat) => (
                 <Link
                   key={cat.slug}
-                  href={`/products?category=${cat.slug}`}
+                  href={`/category/${cat.slug}`}
                   className="group relative flex flex-col rounded-2xl overflow-hidden bg-[#f7f5f2] border border-[#eae7e2] hover:border-[#b87414] hover:shadow-xl transition-all duration-300"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-200">
@@ -784,7 +793,7 @@ export function Header() {
                     {MEGA_CATEGORIES.map((cat) => (
                       <Link
                         key={cat.slug}
-                        href={`/products?category=${cat.slug}`}
+                        href={`/category/${cat.slug}`}
                         onClick={() => setMobileMenuOpen(false)}
                         className="flex items-center justify-between p-2.5 rounded-2xl bg-white/70 hover:bg-white border border-[#eae7e2]/80 text-[#141414] hover:text-[#b87414] text-xs transition-all"
                       >

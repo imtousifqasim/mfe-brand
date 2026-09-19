@@ -155,7 +155,7 @@ export function Footer() {
             <ul className="space-y-3 text-xs text-neutral-300 font-sans">
               {SEED_CATEGORIES.map(cat => (
                 <li key={cat.id}>
-                  <Link href={`/products?category=${cat.slug}`} className="hover:text-white hover:underline transition">
+                  <Link href={`/category/${cat.slug}`} className="hover:text-white hover:underline transition">
                     {cat.name}
                   </Link>
                 </li>

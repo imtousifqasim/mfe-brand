@@ -190,7 +190,7 @@ export function CategoryShowcase({ categories }: CategoryShowcaseProps) {
               className="w-full sm:w-[calc((100%-24px)/2)] md:w-[calc((100%-48px)/3)] min-w-full sm:min-w-[calc((100%-24px)/2)] md:min-w-[calc((100%-48px)/3)] max-w-full sm:max-w-[calc((100%-24px)/2)] md:max-w-[calc((100%-48px)/3)] shrink-0 snap-start flex flex-col"
             >
               <Link
-                href={`/products?category=${cat.slug}`}
+                href={`/category/${cat.slug}`}
                 className="group relative flex flex-col rounded-3xl overflow-hidden bg-white border border-[#eae7e2] hover:border-[#d99026] shadow-sm hover:shadow-xl transition-all duration-400 h-full"
               >
                 {/* Image Container with high vibrancy and subtle zoom */}

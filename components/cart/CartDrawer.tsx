@@ -170,18 +170,18 @@ export function CartDrawer() {
               {/* Quick Collection Discovery Links */}
               <div className="w-full pt-2 grid grid-cols-2 gap-2 text-xs">
                 <Link
-                  href="/products?category=ready-to-wear-pret"
+                  href="/category/womens-unstitched-stitched-suits"
                   onClick={closeCartDrawer}
                   className="p-2.5 rounded-xl bg-[#faf8f5] hover:bg-[#eae7e2] text-[#141414] font-bold text-center transition"
                 >
-                  Pret Co-ords
+                  Women's Suits
                 </Link>
                 <Link
-                  href="/products?category=festive-formals"
+                  href="/category/winter-wear-shawls"
                   onClick={closeCartDrawer}
                   className="p-2.5 rounded-xl bg-[#faf8f5] hover:bg-[#eae7e2] text-[#141414] font-bold text-center transition"
                 >
-                  Festive Formals
+                  Winter Shawls
                 </Link>
               </div>
 
