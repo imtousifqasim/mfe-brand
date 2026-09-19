@@ -35,21 +35,149 @@ interface SizeOption {
   priceDelta: number;
 }
 
-const FABRIC_SWATCHES: VariantColor[] = [
-  { name: 'Antique Gold', hex: '#d4af37' },
-  { name: 'Royal Emerald', hex: '#0f5257' },
-  { name: 'Midnight Velvet', hex: '#1c1c24' },
-  { name: 'Ruby Crimson', hex: '#800020' },
-];
+interface RealProductOption {
+  sizeLabel?: string;
+  sizes?: { name: string; detail?: string }[];
+  colors?: { name: string; hex?: string }[];
+  colorName?: string;
+  hasSizeGuide?: boolean;
+}
 
-const SIZES: SizeOption[] = [
-  { id: 'unstitched', name: 'Unstitched', badge: '3-Piece', detail: '3.5m Fabric', priceDelta: 0 },
-  { id: 'small', name: 'Small (S)', badge: 'Stitched', detail: 'Chest 36" • Waist 30"', priceDelta: 2500 },
-  { id: 'medium', name: 'Medium (M)', badge: 'Stitched', detail: 'Chest 40" • Waist 34"', priceDelta: 2500 },
-  { id: 'large', name: 'Large (L)', badge: 'Stitched', detail: 'Chest 44" • Waist 38"', priceDelta: 2500 },
-  { id: 'xlarge', name: 'X-Large (XL)', badge: 'Stitched', detail: 'Chest 48" • Waist 42"', priceDelta: 2500 },
-  { id: 'bespoke', name: 'Custom Fit', badge: 'Bespoke', detail: 'Made-to-Measure', priceDelta: 4500 },
-];
+function getProductRealOptions(product: Product): RealProductOption {
+  const name = (product.name || '').toLowerCase();
+  const sku = (product.sku || '').toUpperCase();
+  const desc = (product.full_description || product.short_description || '').toLowerCase();
+
+  if (sku.includes('TEAL-MAJ') || name.includes('teal majestique')) {
+    return {
+      sizeLabel: 'Available Stitched Sizes:',
+      sizes: [
+        { name: 'X-Small', detail: 'Chest 18" • L 48"' },
+        { name: 'Small', detail: 'Chest 19" • L 48"' },
+        { name: 'Medium', detail: 'Chest 20" • L 48"' },
+        { name: 'Large', detail: 'Chest 22" • L 48"' },
+        { name: 'X-Large', detail: 'Chest 24" • L 48"' },
+      ],
+      colorName: 'Teal Green',
+      hasSizeGuide: true,
+    };
+  }
+
+  if (sku.includes('JCK-MEN') || name.includes('zipper jacket') || name.includes('winter jacket')) {
+    return {
+      sizeLabel: 'Select Size:',
+      sizes: [
+        { name: 'S' },
+        { name: 'M' },
+        { name: 'L' },
+        { name: 'XL' },
+        { name: 'XXL' },
+        { name: 'XXXL' },
+      ],
+      colorName: 'Charcoal Black',
+      hasSizeGuide: false,
+    };
+  }
+
+  if (sku.includes('NIGHT-WHT') || (name.includes('night suit') && name.includes('white'))) {
+    return {
+      sizeLabel: 'Select Size:',
+      sizes: [
+        { name: 'Medium', detail: 'Chest 18-20"' },
+        { name: 'Large', detail: 'Chest 21"' },
+        { name: 'X-Large', detail: 'Chest 22-23"' },
+      ],
+      colorName: 'Crisp White',
+      hasSizeGuide: true,
+    };
+  }
+
+  if (sku.includes('AC-GRY') || name.includes('ac cover') || name.includes('air conditioner')) {
+    return {
+      sizeLabel: 'Select Unit Capacity / Size:',
+      sizes: [
+        { name: '1 Ton', detail: 'Split AC' },
+        { name: '1.5 Ton', detail: 'Split AC' },
+        { name: '2 Ton', detail: 'Split AC' },
+      ],
+      colorName: 'Grey Printed Quilt',
+      hasSizeGuide: false,
+    };
+  }
+
+  if (sku.includes('WLT-DMR') || name.includes('checkered') || name.includes('lv pattern')) {
+    return {
+      colors: [
+        { name: 'Brown', hex: '#6d4c41' },
+        { name: 'Black', hex: '#212121' },
+      ],
+    };
+  }
+
+  if (sku.includes('BTF-BLK') || name.includes('butterfly')) {
+    return {
+      sizes: [
+        { name: 'Standard Size', detail: 'Relaxed Fit' },
+      ],
+      colorName: 'Midnight Black',
+      hasSizeGuide: true,
+    };
+  }
+
+  if (sku.includes('POS-BLK') || name.includes('posture corrector')) {
+    return {
+      sizes: [
+        { name: 'Adjustable Free Size', detail: 'Chest 28"-44"' },
+      ],
+      colorName: 'Black',
+      hasSizeGuide: false,
+    };
+  }
+
+  if (sku.includes('MAT-GRY') || name.includes('mattress cover')) {
+    return {
+      sizes: [
+        { name: 'Double Bed (72" x 78")', detail: 'King/Double Size' },
+      ],
+      sizeLabel: 'Bed Size:',
+      colorName: 'Grey',
+      hasSizeGuide: false,
+    };
+  }
+
+  if (sku.includes('KI-ORG') || name.includes('organza')) {
+    return { colorName: 'Festive Rose Pink' };
+  }
+  if (sku.includes('GLV-PNK') || name.includes('cleaning gloves')) {
+    return { colorName: 'Soft Pink' };
+  }
+  if (sku.includes('BB-TRQ') || name.includes('baby bath brush')) {
+    return { colorName: 'Turquoise Aqua' };
+  }
+  if (sku.includes('SCRB-BLU') || name.includes('body scrubber')) {
+    return { colorName: 'Ocean Blue' };
+  }
+  if (sku.includes('SHW-WHT') || name.includes('wool shawl')) {
+    return { colorName: 'Ivory White with Contrast Trim' };
+  }
+  if (sku.includes('BAG-BGE') || name.includes('shoulder bag')) {
+    return { colorName: 'Warm Beige' };
+  }
+  if (sku.includes('WLT-LNG')) {
+    return { colorName: 'Walnut & Noir' };
+  }
+  if (sku.includes('WLT-SNP')) {
+    return { colorName: 'Tan Brown' };
+  }
+
+  let extractedColor = undefined;
+  const colorMatch = desc.match(/color:\s*([a-zA-Z\s]+?)(•|\n|\$|<|$)/i);
+  if (colorMatch && colorMatch[1].trim().length < 25) {
+    extractedColor = colorMatch[1].trim();
+  }
+
+  return { colorName: extractedColor };
+}
 
 export function ProductDetailView({ product, relatedProducts }: ProductDetailViewProps) {
   const router = useRouter();
@@ -57,14 +185,22 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addToCompare } = useCompare();
 
+  const realOptions = getProductRealOptions(product);
+
   // Gallery state
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isZooming, setIsZooming] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
 
   // Customization state
-  const [selectedSize, setSelectedSize] = useState<string>(SIZES[0].name);
-  const [selectedColor, setSelectedColor] = useState<VariantColor>(FABRIC_SWATCHES[0]);
+  const [selectedSize, setSelectedSize] = useState<string>(
+    realOptions.sizes && realOptions.sizes.length > 0 ? realOptions.sizes[0].name : ''
+  );
+  const [selectedColor, setSelectedColor] = useState<string>(
+    realOptions.colors && realOptions.colors.length > 0
+      ? realOptions.colors[0].name
+      : (realOptions.colorName || '')
+  );
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'details' | 'fabric' | 'shipping' | 'reviews'>('details');
   const [sizeModalOpen, setSizeModalOpen] = useState(false);
@@ -75,12 +211,10 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
   const [showStickyBar, setShowStickyBar] = useState(false);
   const mainCtaRef = useRef<HTMLDivElement | null>(null);
 
-  // Dynamic pricing calculation based on selected size cut
-  const activeSizeObj = SIZES.find(s => s.name === selectedSize) || SIZES[0];
-  const delta = activeSizeObj.priceDelta || 0;
-  const currentRegularPrice = product.regular_price + delta;
+  // Real pricing calculation (exact price, NO fake delta markup!)
+  const currentRegularPrice = product.regular_price;
   const currentSalePrice = product.sale_price !== null && product.sale_price !== undefined
-    ? product.sale_price + delta
+    ? product.sale_price
     : null;
   const currentPrice = currentSalePrice ?? currentRegularPrice;
   const hasDiscount = currentSalePrice !== null && currentSalePrice < currentRegularPrice;
@@ -124,34 +258,10 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
     };
   }, [product?.id]);
 
-  // Ensure rich gallery with fallback images if a product has fewer than 4
-  const defaultFallbackImages = [
-    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=900&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=900&auto=format&fit=crop',
-  ];
-
-  let rawImages = product.images && product.images.length > 0 ? product.images : [];
-  if (rawImages.length === 1) {
-    // augment with complementary editorial angles
-    rawImages = [
-      rawImages[0],
-      { id: 'supp-1', image_url: defaultFallbackImages[1], alt_text: 'Embroidery Detail Angle', sort_order: 2, is_primary: false },
-      { id: 'supp-2', image_url: defaultFallbackImages[2], alt_text: 'Dupatta Drape Angle', sort_order: 3, is_primary: false },
-      { id: 'supp-3', image_url: defaultFallbackImages[3], alt_text: 'Editorial Lookbook Angle', sort_order: 4, is_primary: false },
-    ];
-  } else if (rawImages.length === 0) {
-    rawImages = defaultFallbackImages.map((url, idx) => ({
-      id: `fallback-${idx}`,
-      image_url: url,
-      alt_text: `${product.name} Angle ${idx + 1}`,
-      sort_order: idx + 1,
-      is_primary: idx === 0,
-    }));
-  }
-
-  const images = rawImages;
+  // Use only actual product images
+  const images = product.images && product.images.length > 0 
+    ? product.images 
+    : [{ id: 'fallback-0', image_url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop', alt_text: product.name, sort_order: 1, is_primary: true }];
   const currentImage = images[selectedImageIndex] || images[0];
 
   const isFavorited = isInWishlist(product.id);
@@ -212,8 +322,8 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
     // Circular loader effect on button before smoothly sliding out cart drawer
     setTimeout(() => {
       addToCart(product, quantity, {
-        size: selectedSize,
-        color: selectedColor.name,
+        size: selectedSize || undefined,
+        color: selectedColor || undefined,
         price: currentPrice,
       }, true);
       setIsAdding(false);
@@ -225,8 +335,8 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
   const handleBuyNow = () => {
     // Navigate directly to checkout without opening the side cart drawer
     addToCart(product, quantity, {
-      size: selectedSize,
-      color: selectedColor.name,
+      size: selectedSize || undefined,
+      color: selectedColor || undefined,
       price: currentPrice,
     }, false);
     router.push('/checkout');
@@ -546,13 +656,8 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
             <div>
               <div className="flex items-center gap-1.5 mb-1">
                 <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-[#6b6b6b]">
-                  {activeSizeObj.badge === 'Bespoke' ? 'Bespoke Cut Price' : activeSizeObj.badge === 'Stitched' ? 'Pret Stitched Price' : 'Unstitched Fabric Price'}
+                  Retail Price
                 </span>
-                {delta > 0 && (
-                  <span className="text-[9px] font-bold bg-[#d99026]/15 text-[#b87414] px-2 py-0.5 rounded-full border border-[#d99026]/30">
-                    +{formatPrice(delta)} {activeSizeObj.badge}
-                  </span>
-                )}
               </div>
               <div className="flex items-baseline gap-2 sm:gap-3">
                 <span className="font-sans text-2xl sm:text-3xl font-black text-[#141414] transition-all">
@@ -594,95 +699,104 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
             </p>
           )}
 
-          {/* Color / Fabric Swatch Selector (Sleek Circular Luxury Swatches) */}
-          <div className="space-y-2 pt-1">
-            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#141414]">
-              <span>Selected Shade: <span className="text-[#b87414] font-bold tracking-normal normal-case ml-1">{selectedColor.name}</span></span>
+          {/* Real Color / Shade Display or Variant Selection */}
+          {realOptions.colors && realOptions.colors.length > 1 ? (
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#141414]">
+                <span>Available Color: <span className="text-[#b87414] font-bold tracking-normal normal-case ml-1">{selectedColor}</span></span>
+              </div>
+              <div className="flex items-center gap-2">
+                {realOptions.colors.map((c) => {
+                  const isSelected = selectedColor === c.name;
+                  return (
+                    <button
+                      key={c.name}
+                      type="button"
+                      onClick={() => setSelectedColor(c.name)}
+                      className={`px-3 py-1.5 rounded-full border text-xs font-bold transition-all flex items-center gap-2 cursor-pointer touch-manipulation ${
+                        isSelected
+                          ? 'bg-[#141414] text-white border-[#141414] shadow-xs ring-2 ring-[#d99026]/30'
+                          : 'bg-[#f7f5f2] text-[#141414] border-[#eae7e2] hover:border-neutral-400'
+                      }`}
+                    >
+                      {c.hex && (
+                        <span
+                          className="w-3 h-3 rounded-full border border-black/20"
+                          style={{ backgroundColor: c.hex }}
+                        />
+                      )}
+                      <span>{c.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              {FABRIC_SWATCHES.map((swatch) => {
-                const isSelected = selectedColor.name === swatch.name;
-                return (
-                  <button
-                    key={swatch.name}
-                    type="button"
-                    onClick={() => setSelectedColor(swatch)}
-                    title={swatch.name}
-                    className={`relative w-10 h-10 rounded-full transition-colors cursor-pointer touch-manipulation flex items-center justify-center ${
-                      isSelected
-                        ? 'ring-2 ring-[#d99026] ring-offset-2 shadow-md'
-                        : 'border border-black/15 opacity-85 hover:opacity-100'
-                    }`}
-                    style={{ backgroundColor: swatch.hex }}
-                    aria-label={`Select color ${swatch.name}`}
-                  >
-                    {isSelected && (
-                      <Check className={`w-4 h-4 drop-shadow ${
-                        swatch.hex === '#e8e2d5' || swatch.hex === '#d4af37' ? 'text-neutral-900' : 'text-white'
-                      }`} />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Size / Silhouette Selector (Compact, High-Contrast Luxury Pills) */}
-          <div className="space-y-2 pt-1">
-            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#141414]">
-              <span>Select Silhouette / Cut:</span>
-              <button 
-                type="button"
-                onClick={() => setSizeModalOpen(true)}
-                className="text-[#b87414] hover:text-[#d99026] hover:underline inline-flex items-center gap-1 cursor-pointer font-bold normal-case tracking-normal text-xs"
-              >
-                <Ruler className="w-3.5 h-3.5" />
-                <span>Size Guide</span>
-              </button>
-            </div>
-
-            {/* Compact 3-col grid on mobile, 3-col on desktop */}
-            <div className="grid grid-cols-3 gap-2">
-              {SIZES.map((size) => {
-                const isSelected = selectedSize === size.name;
-                return (
-                  <button
-                    key={size.id}
-                    type="button"
-                    onClick={() => setSelectedSize(size.name)}
-                    className={`py-2 px-2 rounded-xl text-center border transition-colors cursor-pointer touch-manipulation flex flex-col items-center justify-center min-h-[48px] ${
-                      isSelected
-                        ? 'bg-[#141414] text-white border-[#141414] shadow-md ring-2 ring-[#d99026]/40'
-                        : 'bg-[#f7f5f2] text-[#141414] border-[#eae7e2] hover:border-neutral-400 active:bg-[#e4e0d8]'
-                    }`}
-                  >
-                    <span className="font-bold text-xs leading-tight block truncate w-full">
-                      {size.name}
-                    </span>
-                    <span className={`text-[10px] mt-0.5 block truncate w-full font-medium ${
-                      isSelected 
-                        ? 'text-[#d99026]' 
-                        : size.priceDelta > 0 
-                          ? 'text-[#b87414]' 
-                          : 'text-[#7a7a7a]'
-                    }`}>
-                      {size.priceDelta > 0 ? `+₨${size.priceDelta.toLocaleString()}` : size.badge}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Selected cut detail summary */}
-            <div className="text-[11px] text-[#6b6b6b] bg-[#f7f5f2] px-3 py-1.5 rounded-lg border border-[#eae7e2] flex items-center justify-between">
-              <span>
-                Chosen Cut: <strong className="text-[#141414]">{selectedSize}</strong>
-              </span>
-              <span className="text-[#7a7a7a] font-medium">
-                {activeSizeObj.detail}
+          ) : realOptions.colorName ? (
+            <div className="flex items-center gap-2 text-xs text-[#141414] pt-1">
+              <span className="text-[#6b6b6b] font-medium">Color:</span>
+              <span className="font-bold bg-[#f7f5f2] px-2.5 py-0.5 rounded-full border border-[#eae7e2] text-[#141414]">
+                {realOptions.colorName}
               </span>
             </div>
-          </div>
+          ) : null}
+
+          {/* Real Sizes / Dimensions / Capacity Selector (ONLY if product has sizes!) */}
+          {realOptions.sizes && realOptions.sizes.length > 0 && (
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#141414]">
+                <span>{realOptions.sizeLabel || 'Select Size:'}</span>
+                {realOptions.hasSizeGuide && (
+                  <button 
+                    type="button"
+                    onClick={() => setSizeModalOpen(true)}
+                    className="text-[#b87414] hover:text-[#d99026] hover:underline inline-flex items-center gap-1 cursor-pointer font-bold normal-case tracking-normal text-xs"
+                  >
+                    <Ruler className="w-3.5 h-3.5" />
+                    <span>Size Guide</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Real Size buttons (0 fake price delta!) */}
+              <div className="flex flex-wrap gap-2">
+                {realOptions.sizes.map((s) => {
+                  const isSelected = selectedSize === s.name;
+                  return (
+                    <button
+                      key={s.name}
+                      type="button"
+                      onClick={() => setSelectedSize(s.name)}
+                      className={`py-2 px-3.5 rounded-xl text-center border transition-all cursor-pointer touch-manipulation flex flex-col items-center justify-center min-h-[44px] ${
+                        isSelected
+                          ? 'bg-[#141414] text-white border-[#141414] shadow-md ring-2 ring-[#d99026]/40'
+                          : 'bg-[#f7f5f2] text-[#141414] border-[#eae7e2] hover:border-neutral-400 active:bg-[#e4e0d8]'
+                      }`}
+                    >
+                      <span className="font-bold text-xs leading-tight block">
+                        {s.name}
+                      </span>
+                      {s.detail && (
+                        <span className={`text-[10px] mt-0.5 block font-medium ${
+                          isSelected ? 'text-[#d99026]' : 'text-[#7a7a7a]'
+                        }`}>
+                          {s.detail}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Selected size summary */}
+              {selectedSize && (
+                <div className="text-[11px] text-[#6b6b6b] bg-[#f7f5f2] px-3 py-1.5 rounded-lg border border-[#eae7e2] flex items-center justify-between">
+                  <span>
+                    Selected Option: <strong className="text-[#141414]">{selectedSize}</strong>
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Quantity Stepper & Dual Action Buttons */}
           <div ref={mainCtaRef} className="space-y-3 pt-3 border-t border-[#eae7e2]">
@@ -836,20 +950,34 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
 
         {/* Tab Content 1: Design Details */}
         {activeTab === 'details' && (
-          <div className="space-y-4 text-xs sm:text-sm text-[#6b6b6b] leading-relaxed font-sans max-w-4xl">
-            <p className="text-[#141414]">
+          <div className="space-y-6 text-xs sm:text-sm text-[#6b6b6b] leading-relaxed font-sans max-w-4xl">
+            <div className="text-[#141414] whitespace-pre-line leading-relaxed font-sans text-xs sm:text-sm bg-[#faf9f7] p-4 sm:p-6 rounded-2xl border border-[#eae7e2]">
               {product.full_description || product.short_description || 'This ensemble represents the pinnacle of contemporary Pakistani high fashion. Designed by master artisans, every cut is sculpted to provide an effortless drape and royal silhouette.'}
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-2 text-xs font-sans">
-              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#f7f5f2] border border-[#eae7e2]">
-                <strong className="text-[#141414] block mb-1 font-bold">Fabric Composition & Weave:</strong>
-                Pure Chinese Raw Silk Shirt with Organza Embroidered Border & Pure Chiffon Dupatta with metallic tilla scalloping.
-              </div>
-              <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#f7f5f2] border border-[#eae7e2]">
-                <strong className="text-[#141414] block mb-1 font-bold">Package Contents (3-Piece):</strong>
-                Full 3.5m shirt fabric with front/back embroidery, 2.5m organza/chiffon dupatta, and 2.5m dyed raw silk trouser fabric.
-              </div>
             </div>
+
+            {/* Embedded YouTube Short Showcase if available */}
+            {product.full_description?.includes('youtube.com/shorts/') && (() => {
+              const match = product.full_description.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
+              const videoId = match ? match[1] : null;
+              if (!videoId) return null;
+              return (
+                <div className="p-5 rounded-2xl bg-neutral-950 text-white border border-neutral-800 shadow-xl">
+                  <div className="flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-wider text-[#d99026]">
+                    <Sparkles className="w-4 h-4 text-[#d99026]" />
+                    <span>Official Product Video Showcase</span>
+                  </div>
+                  <div className="aspect-[9/16] max-w-[280px] sm:max-w-[320px] mx-auto rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-black">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${videoId}?rel=0`}
+                      title={product.name}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 
@@ -1153,55 +1281,84 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
             </div>
 
             <p className="text-xs text-[#6b6b6b]">
-              All measurements are in inches. For custom bespoke tailoring inquiries, contact our master tailor on WhatsApp (+92 300 1234567).
+              All measurements are in inches. Standard Pakistani tailoring tolerances apply (±0.5 inch).
             </p>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left text-[#141414]">
-                <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b]">
-                  <tr>
-                    <th className="py-2.5 px-3 rounded-l-lg">Size</th>
-                    <th className="py-2.5 px-3">Bust</th>
-                    <th className="py-2.5 px-3">Waist</th>
-                    <th className="py-2.5 px-3">Hips</th>
-                    <th className="py-2.5 px-3">Length</th>
-                    <th className="py-2.5 px-3 rounded-r-lg">Inseam</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#eae7e2]">
-                  <tr>
-                    <td className="py-2.5 px-3 font-bold text-[#b87414]">Small (S)</td>
-                    <td className="py-2.5 px-3">36 in</td>
-                    <td className="py-2.5 px-3">30 in</td>
-                    <td className="py-2.5 px-3">39 in</td>
-                    <td className="py-2.5 px-3">42 in</td>
-                    <td className="py-2.5 px-3">37 in</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 px-3 font-bold text-[#b87414]">Medium (M)</td>
-                    <td className="py-2.5 px-3">40 in</td>
-                    <td className="py-2.5 px-3">34 in</td>
-                    <td className="py-2.5 px-3">43 in</td>
-                    <td className="py-2.5 px-3">43 in</td>
-                    <td className="py-2.5 px-3">38 in</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 px-3 font-bold text-[#b87414]">Large (L)</td>
-                    <td className="py-2.5 px-3">44 in</td>
-                    <td className="py-2.5 px-3">38 in</td>
-                    <td className="py-2.5 px-3">47 in</td>
-                    <td className="py-2.5 px-3">44 in</td>
-                    <td className="py-2.5 px-3">39 in</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 px-3 font-bold text-[#b87414]">Unstitched</td>
-                    <td className="py-2.5 px-3" colSpan={5}>
-                      Full 3.5m shirt + 2.5m dupatta + 2.5m trousers
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            {product.sku?.includes('TEAL-MAJ') || product.name?.toLowerCase().includes('teal majestique') ? (
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-bold text-xs text-[#141414] mb-2 uppercase tracking-wider">Shirt Measurements (Inches)</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left text-[#141414]">
+                      <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b]">
+                        <tr>
+                          <th className="py-2 px-2.5 rounded-l-lg">Size</th>
+                          <th className="py-2 px-2.5">Chest</th>
+                          <th className="py-2 px-2.5">Shoulders</th>
+                          <th className="py-2 px-2.5">Sleeves</th>
+                          <th className="py-2 px-2.5">Length</th>
+                          <th className="py-2 px-2.5">Hip</th>
+                          <th className="py-2 px-2.5 rounded-r-lg">Daman</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#eae7e2]">
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">XSmall</td><td className="py-2 px-2.5">18"</td><td className="py-2 px-2.5">13.5"</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">22"</td></tr>
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Small</td><td className="py-2 px-2.5">19"</td><td className="py-2 px-2.5">14"</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">22"</td></tr>
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Medium</td><td className="py-2 px-2.5">20"</td><td className="py-2 px-2.5">14.5"</td><td className="py-2 px-2.5">21.5"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">22"</td><td className="py-2 px-2.5">23"</td></tr>
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Large</td><td className="py-2 px-2.5">22"</td><td className="py-2 px-2.5">15.5"</td><td className="py-2 px-2.5">22"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">23"</td><td className="py-2 px-2.5">24"</td></tr>
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">XLarge</td><td className="py-2 px-2.5">24"</td><td className="py-2 px-2.5">16"</td><td className="py-2 px-2.5">22.5"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">24"</td><td className="py-2 px-2.5">26"</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-xs text-[#141414] mb-2 uppercase tracking-wider">Trouser Measurements (Inches)</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left text-[#141414]">
+                      <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b]">
+                        <tr>
+                          <th className="py-2 px-2.5 rounded-l-lg">Size</th>
+                          <th className="py-2 px-2.5">Length</th>
+                          <th className="py-2 px-2.5">Waist (Elastic)</th>
+                          <th className="py-2 px-2.5 rounded-r-lg">Bottom Circumference</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#eae7e2]">
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">XSmall</td><td className="py-2 px-2.5">36"</td><td className="py-2 px-2.5">26"</td><td className="py-2 px-2.5">12"</td></tr>
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Small</td><td className="py-2 px-2.5">37"</td><td className="py-2 px-2.5">26"</td><td className="py-2 px-2.5">12"</td></tr>
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Medium</td><td className="py-2 px-2.5">38"</td><td className="py-2 px-2.5">28"</td><td className="py-2 px-2.5">12"</td></tr>
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Large</td><td className="py-2 px-2.5">39"</td><td className="py-2 px-2.5">32"</td><td className="py-2 px-2.5">12"</td></tr>
+                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">XLarge</td><td className="py-2 px-2.5">40"</td><td className="py-2 px-2.5">34"</td><td className="py-2 px-2.5">12"</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            ) : product.sku?.includes('NIGHT-WHT') || product.name?.toLowerCase().includes('night suit') ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left text-[#141414]">
+                  <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b]">
+                    <tr>
+                      <th className="py-2 px-2.5 rounded-l-lg">Size</th>
+                      <th className="py-2 px-2.5">Shirt Chest</th>
+                      <th className="py-2 px-2.5">Shirt Length</th>
+                      <th className="py-2 px-2.5">Trouser Waist</th>
+                      <th className="py-2 px-2.5 rounded-r-lg">Trouser Length</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#eae7e2]">
+                    <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Medium</td><td className="py-2 px-2.5">18" – 20"</td><td className="py-2 px-2.5">26" – 27"</td><td className="py-2 px-2.5">28" – 44"</td><td className="py-2 px-2.5">38" – 39"</td></tr>
+                    <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Large</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">28"</td><td className="py-2 px-2.5">32" – 48"</td><td className="py-2 px-2.5">39"</td></tr>
+                    <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">X-Large</td><td className="py-2 px-2.5">22" – 23"</td><td className="py-2 px-2.5">30"</td><td className="py-2 px-2.5">36" – 52"</td><td className="py-2 px-2.5">40"</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-xs text-[#141414] bg-[#f7f5f2] p-4 rounded-xl border border-[#eae7e2]">
+                This item is tailored in comfortable regular fit. Refer to the product description for individual piece cutting and dimensions.
+              </p>
+            )}
 
             <div className="pt-2 flex justify-end">
               <button
@@ -1231,14 +1388,16 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
                 <span className="text-xs font-black text-[#141414]">
                   {formatPrice(currentPrice)}
                 </span>
-                <span className="text-[10px] text-[#b87414] bg-[#d99026]/15 font-bold px-1.5 py-0.5 rounded-md truncate max-w-[90px]">
-                  {selectedSize}
-                </span>
-                <span 
-                  className="w-2.5 h-2.5 rounded-full border border-black/20 shrink-0" 
-                  style={{ backgroundColor: selectedColor.hex }}
-                  title={selectedColor.name}
-                />
+                {selectedSize && (
+                  <span className="text-[10px] text-[#b87414] bg-[#d99026]/15 font-bold px-1.5 py-0.5 rounded-md truncate max-w-[90px]">
+                    {selectedSize}
+                  </span>
+                )}
+                {selectedColor && (
+                  <span className="text-[10px] text-neutral-600 bg-neutral-100 font-medium px-1.5 py-0.5 rounded-md truncate max-w-[90px]">
+                    {selectedColor}
+                  </span>
+                )}
               </div>
             </div>
           </div>

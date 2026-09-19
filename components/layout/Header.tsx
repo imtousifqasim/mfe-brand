@@ -36,39 +36,55 @@ const MEGA_CATEGORIES = [
   {
     name: 'Ready to Wear Pret',
     slug: 'ready-to-wear-pret',
-    subtitle: 'Modern Luxury Kurtas & Irish Linen Co-ords',
+    subtitle: 'Modern Luxury Kurtas & Co-ords',
     image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=600&auto=format&fit=crop',
     tag: 'Trending',
   },
   {
     name: 'Festive & Formals',
     slug: 'festive-formals',
-    subtitle: 'Handcrafted Zardozi, Tilla & Raw Silk',
+    subtitle: 'Handcrafted Sequins, Organza & Raw Silk',
     image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop',
     tag: 'Couture',
   },
   {
     name: 'Menswear Royal',
     slug: 'menswear-royal',
-    subtitle: 'Egyptian Cotton Kurtas & Tailored Waistcoats',
+    subtitle: 'Winter Jackets, Kurtas & Outerwear',
     image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=600&auto=format&fit=crop',
     tag: 'Signature',
   },
   {
-    name: 'Pashmina & Shawls',
+    name: 'Accessories & Wallets',
     slug: 'accessories-shawls',
-    subtitle: '100% Himalayan Cashmere Heirlooms',
+    subtitle: 'Leather Wallets, Bags & Shawls',
     image: 'https://images.unsplash.com/photo-1601924994987-69e26d50dc26?q=80&w=600&auto=format&fit=crop',
-    tag: 'Pure Luxury',
+    tag: 'Essentials',
+  },
+  {
+    name: 'Home & Living',
+    slug: 'home-living',
+    subtitle: 'Quilted Covers, Protectors & Utilities',
+    image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=600&auto=format&fit=crop',
+    tag: 'Lifestyle',
+  },
+  {
+    name: 'Fragrances & Scents',
+    slug: 'fragrances-perfumes',
+    subtitle: 'French Long-Lasting Maschile EDPs',
+    image: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?q=80&w=600&auto=format&fit=crop',
+    tag: 'Signature Scents',
   },
 ];
 
 const TRENDING_SEARCHES = [
-  'Royal Velvet',
-  'Ready to Wear Pret',
-  'Unstitched Lawn',
-  'Festive Organza',
-  'Pashmina Shawl',
+  'Teal Majestique',
+  'Pink Organza Suit',
+  'Winter Jacket',
+  'Leather Wallet',
+  'Citrus Woody Perfume',
+  'Wool Shawl',
+  'Double Bed Mattress Cover',
 ];
 
 interface SearchProduct {
