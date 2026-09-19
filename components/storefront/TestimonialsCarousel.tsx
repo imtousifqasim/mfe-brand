@@ -25,7 +25,7 @@ import {
 
 interface Testimonial {
   id: string;
-  category: 'festive' | 'pret' | 'unstitched' | 'shawls';
+  category: 'suits' | 'mens' | 'shawls' | 'accessories';
   categoryLabel: string;
   headline: string;
   comment: string;
@@ -43,98 +43,98 @@ interface Testimonial {
 const TESTIMONIALS: Testimonial[] = [
   {
     id: 't-1',
-    category: 'festive',
-    categoryLabel: 'Festive & Formals',
-    headline: 'Exquisite Royal Velvet with Heavy Handcrafted Tilla Work',
-    comment: "The royal velvet ensemble surpassed every expectation. The hand-done tilla and zardozi embroidery was remarkably dense and clean. The pure organza dupatta completed the majestic look flawlessly for my sister's walima in Islamabad. Worth every single rupee.",
+    category: 'suits',
+    categoryLabel: "Women's Suits",
+    headline: 'Exquisite Schiffli Boring Embroidery & Flawless Drape',
+    comment: 'The Teal Majestique stitched suit surpassed every expectation. The cutwork boring embroidery was remarkably clean and dense. The soft chiffon dupatta framed the look flawlessly. Worth every single rupee.',
     author: 'Ayesha Khan',
     initials: 'AK',
     location: 'Lahore, DHA Phase 5',
-    productOrdered: 'Royal Zardozi Velvet Festive 3-Piece',
-    productImage: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+    productOrdered: 'Teal Majestique Lawn Cotton Embroidered Dress',
+    productImage: 'https://i.postimg.cc/jtGs2hsV/Whats-App-Image-2026-09-19-at-10-11-42-PM.jpg',
     rating: 5,
     date: '2 days ago',
-    specs: 'Custom Stitched • Pure Velvet • TCS Express',
+    specs: 'Stitched Pret • Combed Lawn • TCS Express',
     initialLikes: 42,
   },
   {
     id: 't-2',
-    category: 'pret',
-    categoryLabel: 'Ready to Wear Pret',
-    headline: 'Bespoke Egyptian Giza Cotton with Clean Tailoring',
-    comment: 'Ordered via Cash on Delivery to Clifton. The parcel reached Karachi in under 36 hours via TCS. The fabric feel is exceptionally breathable, crisp, and comfortable in humid weather. The collar and cuff finishing is pure perfection.',
+    category: 'mens',
+    categoryLabel: "Men's Clothing",
+    headline: 'Premium Windproof Finish with Sleek Urban Fit',
+    comment: 'Ordered via Cash on Delivery to Clifton. The parcel reached Karachi in under 36 hours via TCS. The bomber jacket is warm, lightweight, and the metal zipper hardware is high quality.',
     author: 'Hamza Tariq',
     initials: 'HT',
     location: 'Karachi, Clifton',
-    productOrdered: 'Egyptian Giza Cotton Kurta & Shalwar',
-    productImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=900&auto=format&fit=crop',
+    productOrdered: "Men's Casual Stylish Full-Zip Winter Bomber Jacket",
+    productImage: 'https://i.postimg.cc/nZ9VJ5JK/Whats-App-Image-2026-09-19-at-11-13-37-PM.jpg',
     rating: 5,
     date: '4 days ago',
-    specs: 'Size: L • 100% Giza Cotton • COD Verified',
+    specs: 'Size: L • Thermal Poly Blend • COD Verified',
     initialLikes: 35,
   },
   {
     id: 't-3',
     category: 'shawls',
-    categoryLabel: 'Pashmina & Shawls',
-    headline: 'Authentic Kashmiri Hand-Spun Pashmina Heirloom',
-    comment: 'The cashmere weave is exquisitely light yet profoundly warm. The hand-embroidered floral border shows genuine heirloom artistry. Finding certified pashmina online in Pakistan with such luxurious unboxing is unmatched.',
+    categoryLabel: 'Winter Shawls',
+    headline: 'Authentic Soft Warm Wool 3-Yard Shawl',
+    comment: 'The wool weave is exquisitely light yet profoundly warm. The woven contrast geometric border shows genuine artistry. Generous 3-yard drape perfect for winter functions.',
     author: 'Fatima Zahra',
     initials: 'FZ',
     location: 'Islamabad, F-7 Sector',
-    productOrdered: 'Hand-Spun Kashmiri Cashmere Shawl',
-    productImage: 'https://images.unsplash.com/photo-1601924994987-69e26d50dc26?q=80&w=900&auto=format&fit=crop',
+    productOrdered: 'Premium Warm Wool Shawl with Contrast Border Trim',
+    productImage: 'https://i.postimg.cc/hcgG1rkr/Whats-App-Image-2026-09-19-at-11-42-49-PM.jpg',
     rating: 5,
     date: '6 days ago',
-    specs: 'Pure Himalayan Cashmere • Atelier Gift Box',
+    specs: '100% High-Grade Wool • 3 Yards • TCS Express',
     initialLikes: 29,
   },
   {
     id: 't-4',
-    category: 'festive',
-    categoryLabel: 'Festive & Formals',
-    headline: 'Breathtaking Karchob Embroidery & Flawless Drape',
-    comment: 'The intricate karchob handwork and real zari threadwork on the neckline and sleeves were breathtaking. Received countless compliments at the bridal dinner. Arrived securely packed with zero creases.',
+    category: 'suits',
+    categoryLabel: "Women's Suits",
+    headline: 'Breathtaking Handwork Stones, Sequins & Bead Details',
+    comment: 'The intricate handwork stones and sequins on the neckline and sleeves were breathtaking. Paired with the oil-painted organza dupatta, I received countless compliments at the family event.',
     author: 'Maham Raza',
     initials: 'MR',
     location: 'Peshawar, University Town',
-    productOrdered: 'Bridal Heritage Raw Silk Ensemble',
-    productImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
+    productOrdered: 'KI Fashion Pink Organza Handwork Sequins 3-Piece Suit',
+    productImage: 'https://i.postimg.cc/8Tj1P085/Whats-App-Image-2026-09-19-at-10-02-48-PM.jpg',
     rating: 5,
     date: '1 week ago',
-    specs: 'Pure Rawsilk 80g • Custom Tassels Included',
+    specs: '3-Piece Unstitched • Katan Silk Trouser • TCS Dispatch',
     initialLikes: 51,
   },
   {
     id: 't-5',
-    category: 'unstitched',
-    categoryLabel: 'Unstitched Luxury',
-    headline: 'Regal Lawn with Embroidered Organza Borders & Pearl Finishes',
-    comment: 'The lawn fabric is super fine Egyptian count with vibrant digital print. Extra pure silk inner slips and cutwork organza borders were included as promised. Stitching master had no trouble tailoring it.',
+    category: 'accessories',
+    categoryLabel: "Men's Accessories",
+    headline: 'Refined Slim Profile with Ample Card Organization',
+    comment: 'Superb leather craftsmanship. Currency notes lay completely flat without folding, and 10 card slots hold everything securely. Arrived in clean packaging with express dispatch.',
     author: 'Zainab Malik',
     initials: 'ZM',
     location: 'Rawalpindi, Bahria Town',
-    productOrdered: 'Luxury Embroidered Lawn 3-Piece Capsule',
-    productImage: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=900&auto=format&fit=crop',
+    productOrdered: "Men's Luxury Genuine Long Continental Leather Wallet",
+    productImage: 'https://i.postimg.cc/Zm2ZVcdY/Whats-App-Image-2026-09-19-at-11-16-46-PM-(1).jpg',
     rating: 5,
     date: '1 week ago',
-    specs: '3-Piece Unstitched • Silk Dupatta Included',
+    specs: 'Continental Long • 10 Card Slots • Verified Order',
     initialLikes: 38,
   },
   {
     id: 't-6',
-    category: 'pret',
-    categoryLabel: 'Ready to Wear Pret',
-    headline: 'Rich Jewel Tones and White-Glove Packaging',
-    comment: 'Arrived in an embossed gold-stamped atelier box with satin ribbon and cedar wardrobe sachets. The emerald shade is mesmerizing under evening lights. MFE has become my go-to couture boutique.',
+    category: 'accessories',
+    categoryLabel: 'Fragrance / Perfumes',
+    headline: 'Mesmerizing Sillage with 10+ Hours Longevity',
+    comment: 'Opens with fresh Italian bergamot and grapefruit, developing into deep cedarwood and amber. The projection easily lasts throughout the entire workday without fading.',
     author: 'Dr. Sana Mir',
     initials: 'SM',
     location: 'Faisalabad, Civil Lines',
-    productOrdered: 'Emerald Silk Flared Kurti & Dupatta',
-    productImage: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=900&auto=format&fit=crop',
+    productOrdered: 'Citrus & Woody Long-Lasting Eau de Parfum for Men (50ml)',
+    productImage: 'https://i.postimg.cc/VfYs1Lzt/Whats-App-Image-2026-09-19-at-10-48-33-PM.jpg',
     rating: 5,
     date: '2 weeks ago',
-    specs: 'Size: M • Jewel Silk • Express Dispatch',
+    specs: '50ml EDP Flacon • High Concentration • Fast Shipping',
     initialLikes: 46,
   },
 ];
@@ -146,7 +146,7 @@ export function TestimonialsCarousel() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [progressKey, setProgressKey] = useState(0);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'festive' | 'pret' | 'unstitched' | 'shawls'>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'suits' | 'mens' | 'shawls' | 'accessories'>('all');
   
   // Likes state
   const [likedReviews, setLikedReviews] = useState<Record<string, boolean>>({});
@@ -420,34 +420,24 @@ export function TestimonialsCarousel() {
             All Reviews ({TESTIMONIALS.length})
           </button>
           <button
-            onClick={() => setActiveFilter('festive')}
+            onClick={() => setActiveFilter('suits')}
             className={`px-4 py-2 rounded-full text-xs font-sans font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer whitespace-nowrap ${
-              activeFilter === 'festive'
+              activeFilter === 'suits'
                 ? 'bg-[#141414] text-white shadow-xs'
                 : 'bg-white text-[#6b6b6b] border border-[#eae7e2] hover:border-neutral-400'
             }`}
           >
-            Festive & Formals
+            Women's Suits
           </button>
           <button
-            onClick={() => setActiveFilter('pret')}
+            onClick={() => setActiveFilter('mens')}
             className={`px-4 py-2 rounded-full text-xs font-sans font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer whitespace-nowrap ${
-              activeFilter === 'pret'
+              activeFilter === 'mens'
                 ? 'bg-[#141414] text-white shadow-xs'
                 : 'bg-white text-[#6b6b6b] border border-[#eae7e2] hover:border-neutral-400'
             }`}
           >
-            Ready to Wear Pret
-          </button>
-          <button
-            onClick={() => setActiveFilter('unstitched')}
-            className={`px-4 py-2 rounded-full text-xs font-sans font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer whitespace-nowrap ${
-              activeFilter === 'unstitched'
-                ? 'bg-[#141414] text-white shadow-xs'
-                : 'bg-white text-[#6b6b6b] border border-[#eae7e2] hover:border-neutral-400'
-            }`}
-          >
-            Unstitched Luxury
+            Men's Clothing
           </button>
           <button
             onClick={() => setActiveFilter('shawls')}
@@ -457,7 +447,17 @@ export function TestimonialsCarousel() {
                 : 'bg-white text-[#6b6b6b] border border-[#eae7e2] hover:border-neutral-400'
             }`}
           >
-            Pashmina & Shawls
+            Winter Shawls
+          </button>
+          <button
+            onClick={() => setActiveFilter('accessories')}
+            className={`px-4 py-2 rounded-full text-xs font-sans font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer whitespace-nowrap ${
+              activeFilter === 'accessories'
+                ? 'bg-[#141414] text-white shadow-xs'
+                : 'bg-white text-[#6b6b6b] border border-[#eae7e2] hover:border-neutral-400'
+            }`}
+          >
+            Accessories & Scents
           </button>
         </div>
 

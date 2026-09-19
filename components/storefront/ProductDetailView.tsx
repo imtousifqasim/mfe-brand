@@ -261,7 +261,7 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
   // Use only actual product images
   const images = product.images && product.images.length > 0 
     ? product.images 
-    : [{ id: 'fallback-0', image_url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop', alt_text: product.name, sort_order: 1, is_primary: true }];
+    : [{ id: 'fallback-0', image_url: 'https://i.postimg.cc/8Tj1P085/Whats-App-Image-2026-09-19-at-10-02-48-PM.jpg', alt_text: product.name, sort_order: 1, is_primary: true }];
   const currentImage = images[selectedImageIndex] || images[0];
 
   const isFavorited = isInWishlist(product.id);
@@ -1057,32 +1057,8 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
               </div>
             </div>
 
-            {/* Customer Photos Gallery */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center gap-2">
-                <Camera className="w-4 h-4 text-[#d99026]" />
-                <h5 className="text-xs font-bold uppercase tracking-wider text-[#141414]">Patron Real Looks & Customer Photos</h5>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-                {[
-                  { src: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=400&auto=format&fit=crop', user: 'Ayesha K.', city: 'Lahore', caption: 'Wedding Reception' },
-                  { src: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=400&auto=format&fit=crop', user: 'Fatima Z.', city: 'Islamabad', caption: 'Tilla Detail' },
-                  { src: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=400&auto=format&fit=crop', user: 'Hamza T.', city: 'Karachi', caption: 'Raw Silk Finish' },
-                  { src: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=400&auto=format&fit=crop', user: 'Zainab M.', city: 'Rawalpindi', caption: 'Dupatta Scalloping' },
-                ].map((item, idx) => (
-                  <div key={idx} className="group relative aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden bg-[#f7f5f2] border border-[#eae7e2] shadow-xs">
-                    <ExternalImage src={item.src} alt={item.caption} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2.5 sm:p-3">
-                      <span className="text-[11px] font-bold text-white leading-tight">{item.user} ({item.city})</span>
-                      <span className="text-[10px] text-amber-200/90">{item.caption}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Verified Patron Reviews List */}
-            <div className="space-y-4 pt-4 border-t border-[#eae7e2]">
+            <div className="space-y-4 pt-2 border-t border-[#eae7e2]">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-serif text-base sm:text-lg font-bold text-[#141414]">Patron Testimonials & Reviews</h4>
