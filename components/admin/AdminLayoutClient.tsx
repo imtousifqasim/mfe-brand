@@ -72,29 +72,29 @@ export function AdminLayoutClient({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       
       {/* Top Admin Bar */}
-      <header className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-2xs">
         <div className="flex items-center gap-4">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white"
+            className="lg:hidden p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition"
             aria-label="Toggle Admin Menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
           <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-black text-sm shadow">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 flex items-center justify-center font-black text-sm shadow-xs">
               MFE
             </div>
             <div>
-              <span className="font-extrabold text-sm tracking-tight text-white block">
-                MFE BRAND CONTROL CENTER
+              <span className="font-extrabold text-sm tracking-tight text-slate-900 block leading-tight">
+                MFE BRAND CONTROL
               </span>
-              <span className="text-[10px] text-amber-400 font-mono block">
-                Production Administration Suite
+              <span className="text-[10px] text-amber-700 font-semibold tracking-wider uppercase block">
+                Atelier Administration Suite
               </span>
             </div>
           </Link>
@@ -104,32 +104,37 @@ export function AdminLayoutClient({
           <Link
             href="/"
             target="_blank"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 border border-slate-200/80 px-3 py-1.5 rounded-xl transition shadow-2xs"
           >
             <span>Live Storefront</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
           </Link>
 
           <Link 
             href="/admin/profile" 
-            className="flex items-center gap-2 pl-3 border-l border-slate-800 hover:opacity-80 transition group"
+            className="flex items-center gap-2 pl-3 border-l border-slate-200 hover:opacity-80 transition group"
             title="Manage Admin Profile & 2FA Security"
           >
-            <div className="w-7 h-7 rounded-full bg-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center group-hover:scale-105 transition">
+            <div className="w-7 h-7 rounded-full bg-slate-900 text-amber-400 font-bold text-xs flex items-center justify-center shadow-2xs group-hover:scale-105 transition">
               A
             </div>
-            <span className="text-xs font-bold text-slate-300 hidden md:inline group-hover:text-amber-400 transition">
-              Super Administrator
-            </span>
+            <div className="hidden md:block text-left">
+              <span className="text-xs font-bold text-slate-900 block leading-none">
+                Super Admin
+              </span>
+              <span className="text-[10px] text-emerald-600 font-semibold block leading-none mt-0.5">
+                ● Active Session
+              </span>
+            </div>
           </Link>
 
           <button
             onClick={handleLogout}
             disabled={loggingOut}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-950/60 hover:bg-rose-900 border border-rose-800/80 text-rose-300 transition cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 transition cursor-pointer disabled:opacity-50 shadow-2xs"
             title="Terminate Administrative Session"
           >
-            <LogOut className="w-3.5 h-3.5 text-rose-400" />
+            <LogOut className="w-3.5 h-3.5 text-rose-500" />
             <span className="hidden sm:inline">{loggingOut ? 'Logging out...' : 'Sign Out'}</span>
           </button>
         </div>
@@ -138,10 +143,10 @@ export function AdminLayoutClient({
       <div className="flex-1 flex overflow-hidden">
         
         {/* Desktop Sidebar (Left) */}
-        <aside className="hidden lg:block w-64 shrink-0 bg-slate-900/60 border-r border-slate-800 p-4 space-y-6 overflow-y-auto">
+        <aside className="hidden lg:block w-64 shrink-0 bg-white border-r border-slate-200/90 p-4 space-y-6 overflow-y-auto">
           {ADMIN_NAV_GROUPS.map((group, idx) => (
-            <div key={idx} className="space-y-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 block">
+            <div key={idx} className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 block">
                 {group.group}
               </span>
               {group.items.map((item) => {
@@ -154,11 +159,11 @@ export function AdminLayoutClient({
                     href={item.href}
                     className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition ${
                       isActive
-                        ? 'bg-amber-500 text-slate-950 shadow-md font-extrabold'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+                        ? 'bg-slate-900 text-white shadow-xs font-bold'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
                     }`}
                   >
-                    <Icon className="w-4 h-4 shrink-0" />
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-500'}`} />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -169,33 +174,40 @@ export function AdminLayoutClient({
 
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-40 bg-slate-950/90 backdrop-blur-md pt-16 p-6 overflow-y-auto">
-            <div className="flex justify-between items-center pb-4 border-b border-slate-800 mb-6">
-              <span className="text-sm font-bold text-amber-500">Navigation Menu</span>
-              <button onClick={() => setMobileMenuOpen(false)} className="text-slate-400 hover:text-white">
-                <X className="w-6 h-6" />
+          <div className="lg:hidden fixed inset-0 z-40 bg-white/95 backdrop-blur-md pt-16 p-6 overflow-y-auto border-r border-slate-200 shadow-xl">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-200 mb-6">
+              <span className="text-sm font-black text-slate-900">Navigation Menu</span>
+              <button onClick={() => setMobileMenuOpen(false)} className="p-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100">
+                <X className="w-5 h-5" />
               </button>
             </div>
             {ADMIN_NAV_GROUPS.map((group, idx) => (
-              <div key={idx} className="mb-6 space-y-2">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{group.group}</span>
-                {group.items.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block text-sm font-bold py-1.5 text-slate-300 hover:text-amber-400"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+              <div key={idx} className="mb-6 space-y-1.5">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">{group.group}</span>
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold transition ${
+                        isActive ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
               </div>
             ))}
           </div>
         )}
 
         {/* Admin Content Viewport */}
-        <main className="flex-1 p-6 sm:p-8 lg:p-10 overflow-y-auto bg-slate-950">
+        <main className="flex-1 p-6 sm:p-8 lg:p-10 overflow-y-auto bg-slate-50">
           <div className="max-w-7xl mx-auto space-y-8">
             {children}
           </div>

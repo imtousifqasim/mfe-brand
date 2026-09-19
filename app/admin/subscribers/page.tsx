@@ -214,11 +214,11 @@ export default function AdminSubscribersPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-white flex items-center gap-2.5">
-            <Mail className="w-6 h-6 text-amber-500" />
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2.5">
+            <Mail className="w-6 h-6 text-amber-600" />
             <span>VIP Subscribers & SMTP Email Center</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Store and manage VIP salon subscribers who join from the footer, broadcast couture announcements, and connect your SMTP mail server.
           </p>
         </div>
@@ -226,7 +226,7 @@ export default function AdminSubscribersPage() {
         <button
           type="button"
           onClick={fetchSubscribersAndSmtp}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-300 transition"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 transition shadow-2xs cursor-pointer"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>Refresh</span>
@@ -235,62 +235,63 @@ export default function AdminSubscribersPage() {
 
       {/* Global Status Banner */}
       {bannerMsg && (
-        <div className={`p-4 rounded-2xl text-xs flex items-center gap-2.5 border shadow-md animate-in fade-in duration-200 ${
+        <div className={`p-4 rounded-2xl text-xs flex items-center gap-2.5 border shadow-xs animate-in fade-in duration-200 ${
           bannerMsg.type === 'success' 
-            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-            : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-800 font-medium' 
+            : 'bg-rose-50 border-rose-200 text-rose-800 font-medium'
         }`}>
           {bannerMsg.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
           )}
           <span>{bannerMsg.text}</span>
         </div>
       )}
 
       {/* Section 1: SMTP Server Configuration (Connect real SMTP) */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-5 shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-5 shadow-xs">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2.5">
-            <Server className="w-4 h-4 text-amber-500" />
-            <h2 className="text-sm font-black uppercase tracking-wider text-white">
+            <Server className="w-4 h-4 text-amber-600" />
+            <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">
               SMTP Mail Server Configuration
             </h2>
           </div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10.5px] font-bold">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10.5px] font-bold">
             <Radio className="w-3 h-3 animate-pulse" />
+            <span>Ready</span>
           </div>
         </div>
 
         {/* Preset SMTP Providers */}
         <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
-          <span className="text-[11px] font-bold text-slate-400">Quick Presets:</span>
+          <span className="text-[11px] font-bold text-slate-500">Quick Presets:</span>
           <button
             type="button"
             onClick={() => applyPreset('gmail')}
-            className="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-[11px] font-bold text-slate-300 hover:text-amber-400 transition"
+            className="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 text-[11px] font-bold text-slate-700 hover:text-slate-900 transition shadow-2xs cursor-pointer"
           >
             Google Gmail SMTP
           </button>
           <button
             type="button"
             onClick={() => applyPreset('brevo')}
-            className="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-[11px] font-bold text-slate-300 hover:text-amber-400 transition"
+            className="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 text-[11px] font-bold text-slate-700 hover:text-slate-900 transition shadow-2xs cursor-pointer"
           >
             Brevo (Free 300/day)
           </button>
           <button
             type="button"
             onClick={() => applyPreset('resend')}
-            className="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-[11px] font-bold text-slate-300 hover:text-amber-400 transition"
+            className="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 text-[11px] font-bold text-slate-700 hover:text-slate-900 transition shadow-2xs cursor-pointer"
           >
             Resend (Free 3,000/mo)
           </button>
           <button
             type="button"
             onClick={() => applyPreset('outlook')}
-            className="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500/50 text-[11px] font-bold text-slate-300 hover:text-amber-400 transition"
+            className="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 hover:border-slate-300 text-[11px] font-bold text-slate-700 hover:text-slate-900 transition shadow-2xs cursor-pointer"
           >
             Outlook / Office 365
           </button>
@@ -299,7 +300,7 @@ export default function AdminSubscribersPage() {
         <form onSubmit={handleSaveSmtp} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-400 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 SMTP Host / Server
               </label>
               <input
@@ -308,12 +309,12 @@ export default function AdminSubscribersPage() {
                 placeholder="e.g. smtp.gmail.com or mail.mfebrand.com"
                 value={smtpConfig.host}
                 onChange={(e) => setSmtpConfig({ ...smtpConfig, host: e.target.value })}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Port (587 TLS / 465 SSL)
               </label>
               <input
@@ -321,14 +322,14 @@ export default function AdminSubscribersPage() {
                 required
                 value={smtpConfig.port}
                 onChange={(e) => setSmtpConfig({ ...smtpConfig, port: Number(e.target.value) })}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 SMTP Username / Mailbox
               </label>
               <input
@@ -336,12 +337,12 @@ export default function AdminSubscribersPage() {
                 required
                 value={smtpConfig.user}
                 onChange={(e) => setSmtpConfig({ ...smtpConfig, user: e.target.value })}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 SMTP Password / App Key
               </label>
               <input
@@ -349,14 +350,14 @@ export default function AdminSubscribersPage() {
                 required
                 value={smtpConfig.pass}
                 onChange={(e) => setSmtpConfig({ ...smtpConfig, pass: e.target.value })}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 From Name
               </label>
               <input
@@ -364,12 +365,12 @@ export default function AdminSubscribersPage() {
                 required
                 value={smtpConfig.from_name}
                 onChange={(e) => setSmtpConfig({ ...smtpConfig, from_name: e.target.value })}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 From Email Address
               </label>
               <input
@@ -377,7 +378,7 @@ export default function AdminSubscribersPage() {
                 required
                 value={smtpConfig.from_email}
                 onChange={(e) => setSmtpConfig({ ...smtpConfig, from_email: e.target.value })}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
           </div>
@@ -387,16 +388,16 @@ export default function AdminSubscribersPage() {
               type="button"
               onClick={handleTestSmtp}
               disabled={testingSmtp}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition disabled:opacity-50 cursor-pointer"
             >
-              <ShieldCheck className="w-4 h-4" />
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>{testingSmtp ? 'Testing Connection...' : 'Test SMTP Connection'}</span>
             </button>
 
             <button
               type="submit"
               disabled={savingSmtp}
-              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-6 py-2.5 rounded-xl transition shadow disabled:opacity-50"
+              className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-2.5 rounded-xl transition shadow-xs disabled:opacity-50 cursor-pointer"
             >
               {savingSmtp ? 'Saving...' : 'Save SMTP Settings'}
             </button>
@@ -405,22 +406,22 @@ export default function AdminSubscribersPage() {
       </div>
 
       {/* Section 2: Send VIP Broadcast Email to Subscribers */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-4 shadow-xs">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2.5">
-            <Send className="w-4 h-4 text-amber-500" />
-            <h2 className="text-sm font-black uppercase tracking-wider text-white">
+            <Send className="w-4 h-4 text-amber-600" />
+            <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">
               Compose & Dispatch Email Broadcast
             </h2>
           </div>
-          <span className="text-xs text-slate-400 font-mono">
+          <span className="text-xs text-slate-500 font-mono">
             Targeting {subscribers.length} Registered VIPs
           </span>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-1">
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">
               Email Subject Line *
             </label>
             <input
@@ -428,12 +429,12 @@ export default function AdminSubscribersPage() {
               placeholder="e.g. Private Salon Exclusive: Spring Lawn Unstitched 3-Piece Capsule"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white"
+              className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-1">
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">
               Email Message Content (HTML or Plaintext) *
             </label>
             <textarea
@@ -441,7 +442,7 @@ export default function AdminSubscribersPage() {
               placeholder="Write your bespoke message to VIP salon patrons..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-sans"
+              className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs font-sans"
             />
           </div>
 
@@ -449,10 +450,10 @@ export default function AdminSubscribersPage() {
             <button
               type="button"
               onClick={() => setShowPreview(!showPreview)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 hover:text-white transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>{showPreview ? 'Hide Luxury Preview' : 'Preview Luxury Brand Template'}</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <span>{showPreview ? 'Hide Preview' : 'Preview Brand Template'}</span>
             </button>
 
             <button
@@ -465,7 +466,7 @@ export default function AdminSubscribersPage() {
                 setConfirmSendModal(true);
               }}
               disabled={sendingBroadcast}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs px-6 py-3 rounded-xl shadow-lg transition disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs px-6 py-2.5 rounded-xl shadow-xs transition disabled:opacity-50 cursor-pointer"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{sendingBroadcast ? 'Dispatching...' : 'Dispatch VIP Broadcast'}</span>
@@ -474,42 +475,42 @@ export default function AdminSubscribersPage() {
 
           {/* Luxury Brand Email Live Preview */}
           {showPreview && (
-            <div className="pt-4 border-t border-slate-800/80 space-y-3 animate-in fade-in-50 duration-200">
-              <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">
+            <div className="pt-4 border-t border-slate-100 space-y-3 animate-in fade-in-50 duration-200">
+              <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wider block">
                 Patron Inbox Preview (How customers receive it)
               </span>
 
-              <div className="max-w-xl mx-auto rounded-2xl bg-[#141418] border border-slate-800 overflow-hidden shadow-2xl text-white">
-                <div className="p-6 text-center border-b border-slate-800 bg-gradient-to-b from-[#1c1c22] to-[#141418]">
-                  <h3 className="font-serif text-lg font-bold tracking-[0.24em] text-[#d99026] uppercase">
+              <div className="max-w-xl mx-auto rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-md text-slate-900">
+                <div className="p-6 text-center border-b border-slate-100 bg-slate-50">
+                  <h3 className="font-serif text-lg font-bold tracking-[0.24em] text-amber-700 uppercase">
                     MFE BRAND
                   </h3>
-                  <p className="text-[9px] tracking-[0.34em] text-slate-400 uppercase mt-1">
+                  <p className="text-[9px] tracking-[0.34em] text-slate-500 uppercase mt-1">
                     Haute Couture & Private Atelier
                   </p>
                 </div>
 
                 <div className="p-6 space-y-4">
-                  <span className="inline-block px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[9.5px] font-bold uppercase tracking-wider">
+                  <span className="inline-block px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[9.5px] font-bold uppercase tracking-wider">
                     Exclusive VIP Bulletin
                   </span>
-                  <h4 className="font-serif text-base font-bold text-white leading-snug">
+                  <h4 className="font-serif text-base font-bold text-slate-900 leading-snug">
                     {subject || 'Subject line will appear here...'}
                   </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line">
+                  <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">
                     {message || 'Your bespoke broadcast message will appear here in clean luxury typography.'}
                   </p>
                   <div className="pt-4 text-center">
-                    <span className="inline-block bg-[#d99026] text-black text-[11px] font-bold uppercase tracking-wider px-6 py-2.5 rounded-full shadow">
+                    <span className="inline-block bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wider px-6 py-2.5 rounded-full shadow-xs">
                       Explore Private Collection
                     </span>
                   </div>
                 </div>
 
-                <div className="p-4 bg-[#0f0f13] border-t border-slate-800/80 text-center text-[10px] text-slate-500 space-y-1">
-                  <p className="font-bold text-slate-400">MFE BRAND HAUTE COUTURE • VIP CONCIERGE</p>
+                <div className="p-4 bg-slate-50 border-t border-slate-100 text-center text-[10px] text-slate-500 space-y-1">
+                  <p className="font-bold text-slate-600">MFE BRAND HAUTE COUTURE • VIP CONCIERGE</p>
                   <p>Helpline / WhatsApp: +92 300 1234567 • Gulberg III, Lahore</p>
-                  <p className="text-slate-600">Unsubscribe from VIP Bulletin</p>
+                  <p className="text-slate-400">Unsubscribe from VIP Bulletin</p>
                 </div>
               </div>
             </div>
@@ -518,15 +519,15 @@ export default function AdminSubscribersPage() {
       </div>
 
       {/* Section 3: Haute Couture Email Templates & Live Previewer */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-5 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2.5">
-            <Layers className="w-4 h-4 text-amber-500" />
+            <Layers className="w-4 h-4 text-amber-600" />
             <div>
-              <h2 className="text-sm font-black uppercase tracking-wider text-white">
+              <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">
                 Haute Couture Email Templates & Live Preview
               </h2>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-500">
                 All 4 bespoke transactional & marketing HTML templates sent automatically by the atelier
               </p>
             </div>
@@ -536,9 +537,9 @@ export default function AdminSubscribersPage() {
             href={`/api/admin/email-preview?template=${previewTemplate}&format=raw`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold transition self-start sm:self-auto"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition self-start sm:self-auto"
           >
-            <Eye className="w-3.5 h-3.5" />
+            <Eye className="w-3.5 h-3.5 text-amber-600" />
             <span>Open in Full Tab ↗</span>
           </a>
         </div>
@@ -560,12 +561,12 @@ export default function AdminSubscribersPage() {
                 onClick={() => setPreviewTemplate(t.id as any)}
                 className={`p-3 rounded-xl border text-left transition flex flex-col justify-between gap-1 cursor-pointer ${
                   isSelected
-                    ? 'border-amber-500 bg-amber-500/10 text-white shadow-md'
-                    : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                    ? 'border-amber-500 bg-amber-50/70 text-slate-900 shadow-xs'
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-400' : 'text-slate-500'}`} />
+                  <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-600' : 'text-slate-400'}`} />
                   <span className="text-xs font-bold">{t.label}</span>
                 </div>
                 <span className="text-[10px] text-slate-500 truncate">{t.desc}</span>
@@ -575,12 +576,12 @@ export default function AdminSubscribersPage() {
         </div>
 
         {/* Live Template Iframe Preview */}
-        <div className="rounded-2xl border border-slate-800 overflow-hidden bg-[#faf8f5] shadow-xl">
-          <div className="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-xs">
-            <span className="text-[11px] font-mono text-slate-400">
-              Template: <strong className="text-amber-400">{previewTemplate}.html</strong>
+        <div className="rounded-2xl border border-slate-200 overflow-hidden bg-[#faf8f5] shadow-xs">
+          <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs">
+            <span className="text-[11px] font-mono text-slate-600">
+              Template: <strong className="text-amber-700">{previewTemplate}.html</strong>
             </span>
-            <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
               Live Responsive HTML
             </span>
           </div>
@@ -594,58 +595,58 @@ export default function AdminSubscribersPage() {
       </div>
 
       {/* Section 4: VIP Subscribers Directory Table */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-4 shadow-xs">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2.5">
-            <Users className="w-4 h-4 text-amber-500" />
-            <h2 className="text-sm font-black uppercase tracking-wider text-white">
+            <Users className="w-4 h-4 text-amber-600" />
+            <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">
               VIP Salon Email Subscribers ({subscribers.length})
             </h2>
           </div>
-          <span className="text-[11px] text-slate-400">
+          <span className="text-[11px] text-slate-500">
             Registered via Storefront Footer
           </span>
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-xs text-slate-500">
+          <div className="p-8 text-center text-xs text-slate-400">
             Loading VIP patrons...
           </div>
         ) : subscribers.length === 0 ? (
           <div className="p-8 text-center space-y-2">
-            <p className="text-xs text-slate-400">No VIP patrons subscribed yet.</p>
-            <p className="text-[11px] text-slate-500">Submissions from the footer join form will automatically appear here.</p>
+            <p className="text-xs text-slate-500">No VIP patrons subscribed yet.</p>
+            <p className="text-[11px] text-slate-400">Submissions from the footer join form will automatically appear here.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-800 text-slate-400 uppercase font-bold text-[10px] bg-slate-900/80">
-                  <th className="py-3 px-4">Patron Email</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Subscribed Date</th>
-                  <th className="py-3 px-4 text-right">Action</th>
+                <tr className="border-b border-slate-100 text-slate-400 uppercase font-bold text-[10px] bg-slate-50/70">
+                  <th className="py-3.5 px-4">Patron Email</th>
+                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4">Subscribed Date</th>
+                  <th className="py-3.5 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-slate-100">
                 {subscribers.map((sub) => (
-                  <tr key={sub.id} className="hover:bg-slate-800/40 transition">
-                    <td className="py-3 px-4 font-bold text-white">
+                  <tr key={sub.id} className="hover:bg-slate-50/70 transition">
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
                       {sub.email}
                     </td>
-                    <td className="py-3 px-4">
-                      <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase">
+                    <td className="py-3.5 px-4">
+                      <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase">
                         VIP Active
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-slate-400 font-mono text-[11px]">
+                    <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px]">
                       {new Date(sub.subscribed_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
                       })}
                     </td>
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3.5 px-4 text-right">
                       <button
                         type="button"
                         onClick={() => {
@@ -655,7 +656,7 @@ export default function AdminSubscribersPage() {
                             email: sub.email,
                           });
                         }}
-                        className="p-1.5 text-slate-500 hover:text-rose-400 transition cursor-pointer"
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
                         title="Delete Subscriber"
                       >
                         <Trash2 className="w-4 h-4" />

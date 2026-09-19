@@ -45,16 +45,16 @@ export default function AdminCategoriesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-white">
+          <h1 className="text-2xl font-black text-slate-900">
             Category Management ({categories.length})
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Manage product categories. All category banners are stored as external URLs only.
+          <p className="text-xs text-slate-500 mt-1">
+            Manage store product categories, banners, and taxonomy.
           </p>
         </div>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl transition shadow"
+          className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-xs cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Add New Category</span>
@@ -62,20 +62,20 @@ export default function AdminCategoriesPage() {
       </div>
 
       {saved && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 font-medium">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           <span>Category created successfully!</span>
         </div>
       )}
 
       {showAdd && (
-        <form onSubmit={handleAdd} className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-          <h3 className="text-xs font-black uppercase tracking-wider text-amber-500">
+        <form onSubmit={handleAdd} className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-4">
+          <h3 className="text-xs font-black uppercase tracking-wider text-amber-600">
             Add Store Category
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Category Name *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Category Name *</label>
               <input
                 type="text"
                 required
@@ -84,39 +84,39 @@ export default function AdminCategoriesPage() {
                   setName(e.target.value);
                   setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
                 }}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Slug *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Slug *</label>
               <input
                 type="text"
                 required
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 font-mono"
+                className="w-full text-xs p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-1">Description</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">Description</label>
             <input
               type="text"
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
-              className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white"
+              className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-1">External Banner Image URL (CDN / Hosting) *</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">External Banner Image URL (CDN / Hosting) *</label>
             <input
               type="url"
               required
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
-              className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+              className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
             />
           </div>
 
@@ -124,13 +124,13 @@ export default function AdminCategoriesPage() {
             <button
               type="button"
               onClick={() => setShowAdd(false)}
-              className="text-xs px-4 py-2 rounded-xl border border-slate-800 text-slate-400"
+              className="text-xs px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition cursor-pointer font-semibold"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-amber-500 text-slate-950 font-bold text-xs px-5 py-2 rounded-xl"
+              className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-xs transition cursor-pointer"
             >
               Save Category
             </button>
@@ -140,20 +140,20 @@ export default function AdminCategoriesPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((cat) => (
-          <div key={cat.id} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-            <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+          <div key={cat.id} className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-slate-300 transition space-y-3">
+            <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
               <ExternalImage src={cat.image_url} alt={cat.name} fill className="object-cover" />
             </div>
             <div className="flex items-start justify-between gap-2">
               <div>
-                <h3 className="font-bold text-base text-white">{cat.name}</h3>
-                <p className="text-[11px] font-mono text-slate-500">/{cat.slug}</p>
-                <p className="text-xs text-slate-400 mt-1 line-clamp-2">{cat.description}</p>
+                <h3 className="font-bold text-base text-slate-900">{cat.name}</h3>
+                <p className="text-[11px] font-mono text-slate-400">/{cat.slug}</p>
+                <p className="text-xs text-slate-600 mt-1 line-clamp-2">{cat.description}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setDeleteModal({ isOpen: true, catId: cat.id, name: cat.name })}
-                className="p-1.5 text-slate-500 hover:text-rose-400 transition cursor-pointer shrink-0"
+                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer shrink-0"
                 title="Delete Category"
               >
                 <Trash2 className="w-4 h-4" />

@@ -46,47 +46,47 @@ export default async function AdminAuditLogsPage() {
   ];
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-16">
+    <div className="space-y-6 max-w-5xl mx-auto pb-16 font-sans">
       <div>
-        <h1 className="text-2xl font-black text-white flex items-center gap-2">
-          <History className="w-6 h-6 text-amber-500" />
+        <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2.5">
+          <History className="w-6 h-6 text-amber-600" />
           <span>System Audit Activity Trail</span>
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Immutable logging of all administrative actions, status changes, and catalog updates.
         </p>
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-800 text-slate-400 uppercase font-bold text-[10px] bg-slate-900/80">
-                <th className="py-3 px-4">Timestamp</th>
-                <th className="py-3 px-4">Admin Email</th>
-                <th className="py-3 px-4">Action</th>
-                <th className="py-3 px-4">Entity</th>
-                <th className="py-3 px-4">Details</th>
+              <tr className="border-b border-slate-100 text-slate-400 uppercase font-bold text-[10px] bg-slate-50/70">
+                <th className="py-3.5 px-4">Timestamp</th>
+                <th className="py-3.5 px-4">Admin Email</th>
+                <th className="py-3.5 px-4">Action</th>
+                <th className="py-3.5 px-4">Entity</th>
+                <th className="py-3.5 px-4">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-slate-100">
               {sampleLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-slate-800/40 transition">
-                  <td className="py-3 px-4 text-slate-400 font-mono">
+                <tr key={log.id} className="hover:bg-slate-50/70 transition">
+                  <td className="py-3.5 px-4 text-slate-500 font-mono">
                     {formatDate(log.timestamp)}
                   </td>
-                  <td className="py-3 px-4 font-bold text-slate-200">
+                  <td className="py-3.5 px-4 font-bold text-slate-900">
                     {log.adminEmail}
                   </td>
-                  <td className="py-3 px-4">
-                    <span className="bg-amber-500/10 text-amber-400 border border-amber-500/30 font-mono text-[10px] font-bold px-2 py-0.5 rounded">
+                  <td className="py-3.5 px-4">
+                    <span className="bg-amber-50 text-amber-700 border border-amber-200 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full">
                       {log.action}
                     </span>
                   </td>
-                  <td className="py-3 px-4 font-mono text-slate-300">
+                  <td className="py-3.5 px-4 font-mono text-slate-700">
                     {log.entityId}
                   </td>
-                  <td className="py-3 px-4 text-slate-300 text-xs max-w-sm">
+                  <td className="py-3.5 px-4 text-slate-600 text-xs max-w-sm">
                     {log.details}
                   </td>
                 </tr>

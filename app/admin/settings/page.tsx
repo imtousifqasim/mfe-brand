@@ -87,19 +87,19 @@ export default function AdminSettingsPage() {
   const selectedGateway = paymentMethods.find(pm => pm.code === activeTabGateway) || paymentMethods[0];
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-20">
+    <div className="space-y-8 max-w-5xl mx-auto pb-20 text-slate-800">
       <div>
-        <h1 className="text-2xl font-black text-white flex items-center gap-2">
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
           <span>Store Settings & Pakistani Payment Gateways</span>
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Configure general store attributes, manage JazzCash / Easypaisa till accounts, bank credentials, logos, and email dispatch rules.
         </p>
       </div>
 
       {savedMsg && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2 animate-in fade-in-50 duration-200">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 animate-in fade-in-50 duration-200">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           <span>{savedMsg}</span>
         </div>
       )}
@@ -107,18 +107,18 @@ export default function AdminSettingsPage() {
       <form onSubmit={handleSaveAll} className="space-y-8">
         
         {/* Section 1: Pakistani Payment Gateways Manager */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-6 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
-              <h2 className="text-sm font-black uppercase tracking-wider text-amber-500 flex items-center gap-2">
-                <CreditCard className="w-4 h-4" />
+              <h2 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-amber-600" />
                 <span>Pakistani Payment Methods & Till Accounts</span>
               </h2>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-slate-500 mt-0.5">
                 Set Till IDs, account titles, logos, and instructions displayed to patrons on the checkout page.
               </p>
             </div>
-            <span className="text-[10px] font-bold bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full border border-amber-500/20 shrink-0 self-start sm:self-auto">
+            <span className="text-[10px] font-bold bg-amber-50 text-amber-800 px-3 py-1 rounded-full border border-amber-200 shrink-0 self-start sm:self-auto">
               Checkout Sync Active
             </span>
           </div>
@@ -132,20 +132,20 @@ export default function AdminSettingsPage() {
                   key={pm.code}
                   type="button"
                   onClick={() => setActiveTabGateway(pm.code)}
-                  className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap border shrink-0 ${
+                  className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap border shrink-0 cursor-pointer ${
                     isSelected
-                      ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-md'
-                      : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white'
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
                   {pm.logo_url && (
-                    <div className="w-4 h-4 rounded bg-white p-0.5 flex items-center justify-center shrink-0">
+                    <div className="w-4 h-4 rounded bg-white p-0.5 flex items-center justify-center shrink-0 border border-slate-100">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={pm.logo_url} alt={pm.name} className="max-w-full max-h-full object-contain" />
                     </div>
                   )}
                   <span>{pm.name.split(' ')[0]}</span>
-                  <span className={`w-2 h-2 rounded-full ${pm.is_active ? (isSelected ? 'bg-slate-950' : 'bg-emerald-400') : 'bg-slate-600'}`} />
+                  <span className={`w-2 h-2 rounded-full ${pm.is_active ? (isSelected ? 'bg-amber-400' : 'bg-emerald-500') : 'bg-slate-300'}`} />
                 </button>
               );
             })}
@@ -153,27 +153,27 @@ export default function AdminSettingsPage() {
 
           {/* Active Gateway Detailed Configuration Card */}
           {selectedGateway && (
-            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+            <div className="bg-slate-50/70 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
                 <div className="flex items-center gap-3">
                   {selectedGateway.logo_url ? (
-                    <div className="w-12 h-12 rounded-xl bg-white p-1.5 flex items-center justify-center border border-slate-700 shrink-0 shadow-xs">
+                    <div className="w-12 h-12 rounded-xl bg-white p-1.5 flex items-center justify-center border border-slate-200 shrink-0 shadow-2xs">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={selectedGateway.logo_url} alt={selectedGateway.name} className="max-w-full max-h-full object-contain" />
                     </div>
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-amber-400 shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-amber-600 shrink-0 shadow-2xs">
                       <CreditCard className="w-6 h-6" />
                     </div>
                   )}
                   <div>
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                       <span>{selectedGateway.name}</span>
-                      <span className="text-[10px] font-mono uppercase text-slate-400 bg-slate-900 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-mono uppercase text-slate-600 bg-slate-200/80 px-2 py-0.5 rounded">
                         {selectedGateway.code}
                       </span>
                     </h3>
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-slate-500">
                       Configure active status, merchant account credentials, and customer guidance.
                     </p>
                   </div>
@@ -183,13 +183,13 @@ export default function AdminSettingsPage() {
                 <button
                   type="button"
                   onClick={() => handleToggleActive(selectedGateway.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
                     selectedGateway.is_active
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20'
-                      : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                   }`}
                 >
-                  <span className={`w-2 h-2 rounded-full ${selectedGateway.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
+                  <span className={`w-2 h-2 rounded-full ${selectedGateway.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                   <span>{selectedGateway.is_active ? 'Active on Checkout' : 'Disabled / Hidden'}</span>
                 </button>
               </div>
@@ -197,19 +197,19 @@ export default function AdminSettingsPage() {
               {/* Input Form Fields Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Display Name (Shown to Patrons)
                   </label>
                   <input
                     type="text"
                     value={selectedGateway.name}
                     onChange={(e) => handleUpdateMethodField(selectedGateway.id, 'name', e.target.value)}
-                    className="w-full text-xs p-3 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-500"
+                    className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Logo Image URL (Direct PNG / SVG)
                   </label>
                   <div className="flex gap-2">
@@ -218,10 +218,10 @@ export default function AdminSettingsPage() {
                       value={selectedGateway.logo_url || ''}
                       onChange={(e) => handleUpdateMethodField(selectedGateway.id, 'logo_url', e.target.value)}
                       placeholder="https://.../logo.png"
-                      className="flex-1 text-xs p-3 rounded-xl bg-slate-900 border border-slate-800 text-white font-mono focus:outline-none focus:border-amber-500"
+                      className="flex-1 text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                     />
                     {selectedGateway.logo_url && (
-                      <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center border border-slate-700 shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center border border-slate-200 shrink-0 shadow-2xs">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={selectedGateway.logo_url} alt="preview" className="max-w-full max-h-full object-contain" />
                       </div>
@@ -230,7 +230,7 @@ export default function AdminSettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Account Title / Owner Full Name
                   </label>
                   <input
@@ -238,12 +238,12 @@ export default function AdminSettingsPage() {
                     value={selectedGateway.account_title || ''}
                     onChange={(e) => handleUpdateMethodField(selectedGateway.id, 'account_title', e.target.value)}
                     placeholder="e.g. MFE LUXURY ATELIER (PVT) LTD"
-                    className="w-full text-xs p-3 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-500"
+                    className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Merchant Till ID (if applicable)
                   </label>
                   <input
@@ -251,12 +251,12 @@ export default function AdminSettingsPage() {
                     value={selectedGateway.till_id || ''}
                     onChange={(e) => handleUpdateMethodField(selectedGateway.id, 'till_id', e.target.value)}
                     placeholder="e.g. 00294817"
-                    className="w-full text-xs p-3 rounded-xl bg-slate-900 border border-slate-800 text-white font-mono focus:outline-none focus:border-amber-500"
+                    className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Mobile / Account Number
                   </label>
                   <input
@@ -264,12 +264,12 @@ export default function AdminSettingsPage() {
                     value={selectedGateway.account_number || ''}
                     onChange={(e) => handleUpdateMethodField(selectedGateway.id, 'account_number', e.target.value)}
                     placeholder="e.g. 0300 1234567"
-                    className="w-full text-xs p-3 rounded-xl bg-slate-900 border border-slate-800 text-white font-mono focus:outline-none focus:border-amber-500"
+                    className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Badge Tag (Optional)
                   </label>
                   <input
@@ -277,14 +277,14 @@ export default function AdminSettingsPage() {
                     value={selectedGateway.badge || ''}
                     onChange={(e) => handleUpdateMethodField(selectedGateway.id, 'badge', e.target.value)}
                     placeholder="e.g. Instant Transfer, Zero Fee"
-                    className="w-full text-xs p-3 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-500"
+                    className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                   />
                 </div>
 
                 {selectedGateway.code === 'bank_transfer' && (
                   <>
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1">
                         Bank Name
                       </label>
                       <input
@@ -292,11 +292,11 @@ export default function AdminSettingsPage() {
                         value={selectedGateway.bank_name || ''}
                         onChange={(e) => handleUpdateMethodField(selectedGateway.id, 'bank_name', e.target.value)}
                         placeholder="e.g. Meezan Bank Ltd (Islamic Banking)"
-                        className="w-full text-xs p-3 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-500"
+                        className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1">
                         Bank IBAN (24-character)
                       </label>
                       <input
@@ -304,14 +304,14 @@ export default function AdminSettingsPage() {
                         value={selectedGateway.iban || ''}
                         onChange={(e) => handleUpdateMethodField(selectedGateway.id, 'iban', e.target.value)}
                         placeholder="e.g. PK89MEZN0002010103456789"
-                        className="w-full text-xs p-3 rounded-xl bg-slate-900 border border-slate-800 text-white font-mono focus:outline-none focus:border-amber-500"
+                        className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                       />
                     </div>
                   </>
                 )}
 
                 <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
                     Patron Transfer Instructions
                   </label>
                   <textarea
@@ -319,14 +319,14 @@ export default function AdminSettingsPage() {
                     value={selectedGateway.instructions || ''}
                     onChange={(e) => handleUpdateMethodField(selectedGateway.id, 'instructions', e.target.value)}
                     placeholder="Instructions presented to the customer on the checkout screen..."
-                    className="w-full text-xs p-3 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-500"
+                    className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                   />
                 </div>
               </div>
 
               {/* Live Checkout Customer Preview */}
-              <div className="pt-3 border-t border-slate-800/80 space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
+              <div className="pt-3 border-t border-slate-200 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
                   <Eye className="w-3.5 h-3.5" />
                   <span>Live Checkout Card Preview</span>
                 </span>
@@ -361,7 +361,7 @@ export default function AdminSettingsPage() {
                   </p>
 
                   {(selectedGateway.account_title || selectedGateway.till_id || selectedGateway.account_number) && (
-                    <div className="p-3 rounded-xl bg-[#1c1c1f] text-white text-[11px] space-y-1 font-mono">
+                    <div className="p-3 rounded-xl bg-slate-900 text-white text-[11px] space-y-1 font-mono">
                       {selectedGateway.account_title && <div><span className="text-slate-400">Title:</span> {selectedGateway.account_title}</div>}
                       {selectedGateway.till_id && <div><span className="text-amber-400">Till ID:</span> {selectedGateway.till_id}</div>}
                       {selectedGateway.account_number && <div><span className="text-slate-400">Acc/No:</span> {selectedGateway.account_number}</div>}
@@ -375,170 +375,170 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* Section 2: General Store Attributes */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-sm">
-          <h2 className="text-sm font-black uppercase tracking-wider text-amber-500 flex items-center gap-2 border-b border-slate-800 pb-3">
-            <Settings className="w-4 h-4" />
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-4 shadow-xs">
+          <h2 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+            <Settings className="w-4 h-4 text-amber-600" />
             <span>General Store Details</span>
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Store Brand Name</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Store Brand Name</label>
               <input
                 type="text"
                 required
                 value={storeName}
                 onChange={(e) => setStoreName(e.target.value)}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Currency Code</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Currency Code</label>
               <input
                 type="text"
                 required
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Official Support Email</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Official Support Email</label>
               <input
                 type="email"
                 required
                 value={storeEmail}
                 onChange={(e) => setStoreEmail(e.target.value)}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Helpline Phone Number</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Helpline Phone Number</label>
               <input
                 type="tel"
                 required
                 value={storePhone}
                 onChange={(e) => setStorePhone(e.target.value)}
-                className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-1">Store Logo URL</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">Store Logo URL</label>
             <input
               type="url"
               required
               value={logoUrl}
               onChange={(e) => setLogoUrl(e.target.value)}
-              className="w-full text-xs p-3 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+              className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
             />
           </div>
         </div>
 
         {/* Section 3: Independent Email Notification Controls */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-sm">
-          <div className="border-b border-slate-800 pb-3">
-            <h2 className="text-sm font-black uppercase tracking-wider text-amber-500 flex items-center gap-2">
-              <Bell className="w-4 h-4" />
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-4 shadow-xs">
+          <div className="border-b border-slate-100 pb-3">
+            <h2 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+              <Bell className="w-4 h-4 text-amber-600" />
               <span>Order Lifecycle Email Triggers</span>
             </h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-slate-500 mt-0.5">
               Enable or disable automated transactional email dispatch for specific order milestones.
             </p>
           </div>
 
-          <div className="space-y-3 divide-y divide-slate-800/80">
+          <div className="space-y-3 divide-y divide-slate-100">
             <div className="pt-2 flex items-center justify-between text-xs">
               <div>
-                <span className="font-bold text-white block">Order Confirmation Email</span>
-                <span className="text-slate-400 text-[11px]">Sent immediately upon successful checkout</span>
+                <span className="font-bold text-slate-900 block">Order Confirmation Email</span>
+                <span className="text-slate-500 text-[11px]">Sent immediately upon successful checkout</span>
               </div>
               <input
                 type="checkbox"
                 checked={notifConfirmation}
                 onChange={(e) => setNotifConfirmation(e.target.checked)}
-                className="rounded text-amber-500 w-4 h-4"
+                className="rounded text-amber-600 focus:ring-amber-500 w-4 h-4"
               />
             </div>
 
             <div className="pt-3 flex items-center justify-between text-xs">
               <div>
-                <span className="font-bold text-white block">Order Processing Email</span>
-                <span className="text-slate-400 text-[11px]">Sent when warehouse begins preparing parcel</span>
+                <span className="font-bold text-slate-900 block">Order Processing Email</span>
+                <span className="text-slate-500 text-[11px]">Sent when warehouse begins preparing parcel</span>
               </div>
               <input
                 type="checkbox"
                 checked={notifProcessing}
                 onChange={(e) => setNotifProcessing(e.target.checked)}
-                className="rounded text-amber-500 w-4 h-4"
+                className="rounded text-amber-600 focus:ring-amber-500 w-4 h-4"
               />
             </div>
 
             <div className="pt-3 flex items-center justify-between text-xs">
               <div>
-                <span className="font-bold text-white block">Order Shipped Email with Courier Tracking Link</span>
-                <span className="text-slate-400 text-[11px]">Sent with courier name, tracking ID, and tracking link</span>
+                <span className="font-bold text-slate-900 block">Order Shipped Email with Courier Tracking Link</span>
+                <span className="text-slate-500 text-[11px]">Sent with courier name, tracking ID, and tracking link</span>
               </div>
               <input
                 type="checkbox"
                 checked={notifShipped}
                 onChange={(e) => setNotifShipped(e.target.checked)}
-                className="rounded text-amber-500 w-4 h-4"
+                className="rounded text-amber-600 focus:ring-amber-500 w-4 h-4"
               />
             </div>
 
             <div className="pt-3 flex items-center justify-between text-xs">
               <div>
-                <span className="font-bold text-white block">Doorstep Delivery Completion Email</span>
-                <span className="text-slate-400 text-[11px]">Sent when courier marks parcel delivered</span>
+                <span className="font-bold text-slate-900 block">Doorstep Delivery Completion Email</span>
+                <span className="text-slate-500 text-[11px]">Sent when courier marks parcel delivered</span>
               </div>
               <input
                 type="checkbox"
                 checked={notifDelivered}
                 onChange={(e) => setNotifDelivered(e.target.checked)}
-                className="rounded text-amber-500 w-4 h-4"
+                className="rounded text-amber-600 focus:ring-amber-500 w-4 h-4"
               />
             </div>
 
             <div className="pt-3 flex items-center justify-between text-xs">
               <div>
-                <span className="font-bold text-white block">Order Cancellation Notice</span>
-                <span className="text-slate-400 text-[11px]">Sent if order is cancelled</span>
+                <span className="font-bold text-slate-900 block">Order Cancellation Notice</span>
+                <span className="text-slate-500 text-[11px]">Sent if order is cancelled</span>
               </div>
               <input
                 type="checkbox"
                 checked={notifCancelled}
                 onChange={(e) => setNotifCancelled(e.target.checked)}
-                className="rounded text-amber-500 w-4 h-4"
+                className="rounded text-amber-600 focus:ring-amber-500 w-4 h-4"
               />
             </div>
           </div>
         </div>
 
         {/* Floating / Sticky Save Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-800">
-          <span className="text-xs text-slate-400 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+          <span className="text-xs text-slate-500 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>All gateway modifications immediately reflect on customer checkout.</span>
           </span>
 
           <button
             type="submit"
             disabled={isSavingGateways}
-            className="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-black text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl transition shadow-md flex items-center gap-2 cursor-pointer"
+            className="bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl transition shadow-xs flex items-center gap-2 cursor-pointer"
           >
             {isSavingGateways ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
+                <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
                 <span>Saving Gateways...</span>
               </>
             ) : (
               <>
-                <Check className="w-4 h-4" />
+                <Check className="w-4 h-4 text-amber-400" />
                 <span>Save All Gateways & Settings</span>
               </>
             )}

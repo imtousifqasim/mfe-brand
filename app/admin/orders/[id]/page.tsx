@@ -232,34 +232,34 @@ export default function AdminOrderDetailPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-16">
+    <div className="space-y-8 max-w-5xl mx-auto pb-16 text-slate-800">
       
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/orders"
-            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition"
+            className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition shadow-2xs"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white font-mono">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight">
                 {order.order_number}
               </h1>
-              <span className="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase">
+              <span className="bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">
                 {order.status.replace(/_/g, ' ')}
               </span>
-              <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+              <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
                 paymentStatus === 'paid' 
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' 
-                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                  : 'bg-rose-50 text-rose-700 border border-rose-200'
               }`}>
                 {paymentStatus}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+            <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
               <span>Booked on {formatDate(order.created_at)}</span>
               <span>•</span>
               <span className="capitalize">{order.payment_method?.replace(/_/g, ' ')}</span>
@@ -271,24 +271,24 @@ export default function AdminOrderDetailPage() {
           <Link
             href={`/track-order?order=${order.order_number}&email=${encodeURIComponent(order.customer_email || '')}`}
             target="_blank"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition shadow-2xs"
           >
             <span>Patron Tracking View</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
           </Link>
         </div>
       </div>
 
       {savedMsg && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
           <span>{savedMsg}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2 animate-in fade-in">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2 animate-in fade-in">
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
           <span>{errorMsg}</span>
         </div>
       )}
@@ -299,45 +299,45 @@ export default function AdminOrderDetailPage() {
         <div className="lg:col-span-7 space-y-6">
           
           {/* Customer & Shipping Details */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 pb-2 border-b border-slate-800">
-              <User className="w-4 h-4 text-amber-500" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2 pb-2 border-b border-slate-100">
+              <User className="w-4 h-4 text-amber-600" />
               <span>Customer & Delivery Destination</span>
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Patron Details</span>
-                <p className="font-bold text-white text-sm">{order.customer_name}</p>
-                <p className="text-slate-300 flex items-center gap-1.5 pt-0.5">
-                  <Mail className="w-3 h-3 text-slate-500" /> {order.customer_email}
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Patron Details</span>
+                <p className="font-bold text-slate-900 text-sm">{order.customer_name}</p>
+                <p className="text-slate-600 flex items-center gap-1.5 pt-0.5">
+                  <Mail className="w-3 h-3 text-slate-400" /> {order.customer_email}
                 </p>
-                <p className="text-slate-300 flex items-center gap-1.5">
-                  <Phone className="w-3 h-3 text-slate-500" /> {order.customer_phone}
+                <p className="text-slate-600 flex items-center gap-1.5">
+                  <Phone className="w-3 h-3 text-slate-400" /> {order.customer_phone}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Shipping Address</span>
-                <p className="text-slate-200 font-medium">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Shipping Address</span>
+                <p className="text-slate-800 font-medium">
                   {order.shipping_address?.address_line1 || 'Main Delivery Address'}
                 </p>
                 {order.shipping_address?.address_line2 && (
-                  <p className="text-slate-400">{order.shipping_address.address_line2}</p>
+                  <p className="text-slate-500">{order.shipping_address.address_line2}</p>
                 )}
-                <p className="text-amber-400 font-bold">
+                <p className="text-amber-700 font-bold">
                   {order.shipping_address?.city || 'Pakistan'}, {order.shipping_address?.province || ''}
                 </p>
                 {order.shipping_address?.postal_code && (
-                  <p className="text-slate-500 font-mono text-[10px]">Postal Code: {order.shipping_address.postal_code}</p>
+                  <p className="text-slate-400 font-mono text-[10px]">Postal Code: {order.shipping_address.postal_code}</p>
                 )}
               </div>
             </div>
 
             {order.notes && (
-              <div className="pt-3 border-t border-slate-800/80 text-xs">
-                <span className="text-[10px] font-bold uppercase text-slate-500 block mb-1">Customer Delivery Instructions:</span>
-                <p className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl text-slate-300 italic">
+              <div className="pt-3 border-t border-slate-100 text-xs">
+                <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Customer Delivery Instructions:</span>
+                <p className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-700 italic">
                   &quot;{order.notes}&quot;
                 </p>
               </div>
@@ -345,25 +345,25 @@ export default function AdminOrderDetailPage() {
           </div>
 
           {/* Purchased Items Snapshot */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 pb-2 border-b border-slate-800">
-              <Package className="w-4 h-4 text-amber-500" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2 pb-2 border-b border-slate-100">
+              <Package className="w-4 h-4 text-amber-600" />
               <span>Purchased Ensemble Items ({order.items?.length || 1})</span>
             </h2>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {order.items && order.items.length > 0 ? (
                 order.items.map((it: any, idx: number) => (
-                  <div key={it.id || idx} className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex justify-between items-center text-xs">
+                  <div key={it.id || idx} className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 flex justify-between items-center text-xs">
                     <div>
-                      <h3 className="font-bold text-white text-sm">{it.product_name}</h3>
+                      <h3 className="font-bold text-slate-900 text-sm">{it.product_name}</h3>
                       <div className="text-[10px] font-mono text-slate-400 mt-0.5">SKU: {it.sku}</div>
-                      <div className="text-[11px] text-slate-400 mt-1">
+                      <div className="text-[11px] text-slate-500 mt-1">
                         {formatPrice(it.unit_price)} × {it.quantity} piece{it.quantity > 1 ? 's' : ''}
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-black text-amber-400 font-mono">
+                      <span className="text-sm font-black text-slate-900 font-mono">
                         {formatPrice(it.subtotal || (it.unit_price * it.quantity))}
                       </span>
                     </div>
@@ -377,34 +377,34 @@ export default function AdminOrderDetailPage() {
             </div>
 
             {/* Financial Breakdown */}
-            <div className="pt-3 border-t border-slate-800 space-y-2 text-xs">
-              <div className="flex justify-between text-slate-400">
+            <div className="pt-3 border-t border-slate-100 space-y-2 text-xs">
+              <div className="flex justify-between text-slate-600">
                 <span>Subtotal</span>
-                <span className="font-bold text-white">{formatPrice(order.subtotal || order.grand_total)}</span>
+                <span className="font-bold text-slate-900">{formatPrice(order.subtotal || order.grand_total)}</span>
               </div>
               {order.discount_amount > 0 && (
-                <div className="flex justify-between text-emerald-400 font-bold">
+                <div className="flex justify-between text-emerald-700 font-bold">
                   <span>Coupon Discount {order.coupon_code ? `(${order.coupon_code})` : ''}</span>
                   <span>-{formatPrice(order.discount_amount)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-slate-600">
                 <span>Shipping & Insurance</span>
-                <span className={order.shipping_amount > 0 ? 'font-bold text-white' : 'text-emerald-400 font-bold'}>
+                <span className={order.shipping_amount > 0 ? 'font-bold text-slate-900' : 'text-emerald-700 font-bold'}>
                   {order.shipping_amount > 0 ? formatPrice(order.shipping_amount) : 'FREE COURIER'}
                 </span>
               </div>
-              <div className="pt-2 border-t border-slate-800 flex justify-between text-base font-black text-white">
+              <div className="pt-2 border-t border-slate-100 flex justify-between text-base font-black text-slate-900">
                 <span>Grand Total</span>
-                <span className="text-amber-400 font-mono">{formatPrice(order.grand_total)}</span>
+                <span className="text-slate-900 font-mono font-black">{formatPrice(order.grand_total)}</span>
               </div>
             </div>
           </div>
 
           {/* Internal Atelier Notes */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 pb-2 border-b border-slate-800">
-              <FileText className="w-4 h-4 text-amber-500" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2 pb-2 border-b border-slate-100">
+              <FileText className="w-4 h-4 text-amber-600" />
               <span>Internal Concierge Notes & Timeline</span>
             </h2>
 
@@ -414,30 +414,30 @@ export default function AdminOrderDetailPage() {
                 placeholder="Log internal note (e.g. Fabric inspected, tailor confirmed)..."
                 value={internalNote}
                 onChange={(e) => setInternalNote(e.target.value)}
-                className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                className="flex-1 bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
               />
               <button
                 type="submit"
                 disabled={isAddingNote || !internalNote.trim()}
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition"
+                className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer"
               >
-                <Send className="w-3 h-3" /> Add
+                <Send className="w-3 h-3 text-amber-400" /> Add
               </button>
             </form>
 
             <div className="space-y-2 pt-2 text-xs">
               {notesLog.length > 0 ? (
                 notesLog.map((n, idx) => (
-                  <div key={idx} className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-1">
-                    <div className="flex justify-between items-center text-[10px] text-slate-500">
-                      <span className="font-bold text-slate-400">{n.created_by || 'Admin Concierge'}</span>
+                  <div key={idx} className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
+                    <div className="flex justify-between items-center text-[10px] text-slate-400">
+                      <span className="font-bold text-slate-700">{n.created_by || 'Admin Concierge'}</span>
                       <span>{n.created_at ? formatDate(n.created_at) : 'Just now'}</span>
                     </div>
-                    <p className="text-slate-200">{n.note || n}</p>
+                    <p className="text-slate-800">{n.note || n}</p>
                   </div>
                 ))
               ) : (
-                <div className="text-xs text-slate-500 italic">No concierge notes logged for this order yet.</div>
+                <div className="text-xs text-slate-400 italic">No concierge notes logged for this order yet.</div>
               )}
             </div>
           </div>
@@ -447,24 +447,24 @@ export default function AdminOrderDetailPage() {
         <div className="lg:col-span-5 space-y-6">
           
           {/* Action 1: Assign Pakistani Courier & Tracking */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
-              <Truck className="w-4 h-4" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+              <Truck className="w-4 h-4 text-amber-600" />
               <span>Pakistani Courier Dispatch</span>
             </h2>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500">
               Assign consignment number to automatically embed deep-link parcel tracking and mark parcel as shipped.
             </p>
 
             <form onSubmit={handleUpdateCourier} className="space-y-3 text-xs">
               <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
+                <label className="block text-[10px] font-bold uppercase text-slate-600 mb-1">
                   Select Courier Partner
                 </label>
                 <select
                   value={courierCode}
                   onChange={(e) => setCourierCode(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                 >
                   {PAKISTAN_COURIERS.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -475,7 +475,7 @@ export default function AdminOrderDetailPage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
+                <label className="block text-[10px] font-bold uppercase text-slate-600 mb-1">
                   Consignment / Tracking Number *
                 </label>
                 <input
@@ -484,18 +484,18 @@ export default function AdminOrderDetailPage() {
                   placeholder="e.g. TCS-77291048 or LEOP-991823"
                   value={trackingId}
                   onChange={(e) => setTrackingId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs font-mono uppercase text-white placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-mono uppercase text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                 />
               </div>
 
               {liveCourierUrl && (
-                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800/80 space-y-1">
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
                   <span className="text-[10px] text-slate-500 uppercase block font-bold">Deep-Link Generated:</span>
                   <a
                     href={liveCourierUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-amber-400 text-[11px] font-mono hover:underline flex items-center gap-1 truncate"
+                    className="text-amber-700 text-[11px] font-mono hover:underline flex items-center gap-1 truncate font-semibold"
                   >
                     <span>{liveCourierUrl}</span>
                     <ExternalLink className="w-3 h-3 shrink-0" />
@@ -506,11 +506,11 @@ export default function AdminOrderDetailPage() {
               <button
                 type="submit"
                 disabled={isUpdatingCourier || !trackingId.trim()}
-                className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition"
+                className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-xs cursor-pointer"
               >
                 {isUpdatingCourier ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
                     <span>Saving to Shards...</span>
                   </>
                 ) : (
@@ -521,21 +521,21 @@ export default function AdminOrderDetailPage() {
           </div>
 
           {/* Action 2: Update Lifecycle Status */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-500" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
               <span>Update Order Lifecycle</span>
             </h2>
 
             <form onSubmit={handleUpdateStatus} className="space-y-3 text-xs">
               <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
+                <label className="block text-[10px] font-bold uppercase text-slate-600 mb-1">
                   Order Status
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as OrderStatus)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
                 >
                   {ORDER_STATUSES.map((s) => (
                     <option key={s.key} value={s.key}>
@@ -548,7 +548,7 @@ export default function AdminOrderDetailPage() {
               <button
                 type="submit"
                 disabled={isUpdatingStatus}
-                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition border border-slate-700"
+                className="w-full py-2.5 rounded-xl bg-white hover:bg-slate-50 disabled:opacity-50 text-slate-800 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition border border-slate-200 shadow-2xs cursor-pointer"
               >
                 {isUpdatingStatus ? (
                   <>
@@ -563,9 +563,9 @@ export default function AdminOrderDetailPage() {
           </div>
 
           {/* Action 3: Payment Verification */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-amber-500" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-amber-600" />
               <span>Payment Status Verification</span>
             </h2>
 
@@ -574,10 +574,10 @@ export default function AdminOrderDetailPage() {
                 type="button"
                 onClick={() => handleUpdatePaymentStatus('paid')}
                 disabled={isUpdatingPayment || paymentStatus === 'paid'}
-                className={`py-2 px-3 rounded-xl font-bold border transition ${
+                className={`py-2 px-3 rounded-xl font-bold border transition cursor-pointer ${
                   paymentStatus === 'paid'
-                    ? 'bg-emerald-500 text-slate-950 border-emerald-400'
-                    : 'bg-slate-950 text-slate-300 border-slate-800 hover:bg-slate-800'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold shadow-2xs'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 ✓ Mark Paid
@@ -586,10 +586,10 @@ export default function AdminOrderDetailPage() {
                 type="button"
                 onClick={() => handleUpdatePaymentStatus('unpaid')}
                 disabled={isUpdatingPayment || paymentStatus === 'unpaid'}
-                className={`py-2 px-3 rounded-xl font-bold border transition ${
+                className={`py-2 px-3 rounded-xl font-bold border transition cursor-pointer ${
                   paymentStatus === 'unpaid'
-                    ? 'bg-rose-500 text-white border-rose-400'
-                    : 'bg-slate-950 text-slate-300 border-slate-800 hover:bg-slate-800'
+                    ? 'bg-rose-50 text-rose-800 border-rose-300 font-bold shadow-2xs'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 Mark Unpaid

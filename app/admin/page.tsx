@@ -28,19 +28,19 @@ export default async function AdminDashboardPage() {
       {/* Top Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-white">
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
             Executive Performance Overview
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Real-time store performance, fulfillment metrics, and stock alerts.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             href="/admin/products/new"
-            className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl transition shadow"
+            className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-xs"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 text-amber-400" />
             <span>Add New Product</span>
           </Link>
         </div>
@@ -49,63 +49,63 @@ export default async function AdminDashboardPage() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-md relative overflow-hidden">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Gross Revenue</span>
-            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Gross Revenue</span>
+            <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/60">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <span className="text-2xl font-black text-white block">
+          <span className="text-2xl font-black text-slate-900 block tracking-tight">
             {formatPrice(totalSales)}
           </span>
-          <span className="text-[11px] text-emerald-400 font-bold flex items-center gap-1 mt-2">
+          <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1 mt-2">
             <TrendingUp className="w-3 h-3" />
             <span>+14.2% vs last month</span>
           </span>
         </div>
 
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-md relative overflow-hidden">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Total Orders</span>
-            <div className="p-2 rounded-lg bg-sky-500/10 text-sky-500">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Orders</span>
+            <div className="p-2.5 rounded-xl bg-sky-50 text-sky-600 border border-sky-200/60">
               <ShoppingBag className="w-4 h-4" />
             </div>
           </div>
-          <span className="text-2xl font-black text-white block">
+          <span className="text-2xl font-black text-slate-900 block tracking-tight">
             {orders.length}
           </span>
-          <span className="text-[11px] text-slate-400 font-medium block mt-2">
+          <span className="text-[11px] text-slate-500 font-medium block mt-2">
             {pendingOrders} awaiting fulfillment
           </span>
         </div>
 
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-md relative overflow-hidden">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Active Catalog</span>
-            <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Active Catalog</span>
+            <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60">
               <Package className="w-4 h-4" />
             </div>
           </div>
-          <span className="text-2xl font-black text-white block">
+          <span className="text-2xl font-black text-slate-900 block tracking-tight">
             {totalProducts} SKUs
           </span>
-          <span className="text-[11px] text-slate-400 font-medium block mt-2">
+          <span className="text-[11px] text-slate-500 font-medium block mt-2">
             All stored via external URLs only
           </span>
         </div>
 
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-md relative overflow-hidden">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Stock Attention</span>
-            <div className="p-2 rounded-lg bg-rose-500/10 text-rose-500">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Stock Attention</span>
+            <div className="p-2.5 rounded-xl bg-rose-50 text-rose-600 border border-rose-200/60">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-          <span className="text-2xl font-black text-rose-400 block">
+          <span className="text-2xl font-black text-rose-600 block tracking-tight">
             {lowStockCount} Items
           </span>
-          <span className="text-[11px] text-rose-400 font-bold block mt-2">
+          <span className="text-[11px] text-rose-600 font-semibold block mt-2">
             Low stock threshold reached
           </span>
         </div>
@@ -116,17 +116,17 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Recent Orders (7 Cols) */}
-        <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
-              <h2 className="text-sm font-black uppercase tracking-wider text-white">
+              <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">
                 Recent Orders
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">Dispatches and payments awaiting review.</p>
+              <p className="text-xs text-slate-500 mt-0.5">Dispatches and payments awaiting review.</p>
             </div>
             <Link
               href="/admin/orders"
-              className="text-xs font-bold text-amber-500 hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1"
             >
               <span>Manage All</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -136,7 +136,7 @@ export default async function AdminDashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-800 text-slate-400 uppercase font-bold text-[10px]">
+                <tr className="border-b border-slate-100 text-slate-400 uppercase font-bold text-[10px]">
                   <th className="py-2.5">Order #</th>
                   <th className="py-2.5">Customer</th>
                   <th className="py-2.5">Status</th>
@@ -144,30 +144,30 @@ export default async function AdminDashboardPage() {
                   <th className="py-2.5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-slate-100">
                 {orders.slice(0, 6).map((ord) => (
-                  <tr key={ord.id} className="hover:bg-slate-800/40 transition">
-                    <td className="py-3 font-mono font-bold text-amber-400">
+                  <tr key={ord.id} className="hover:bg-slate-50/70 transition">
+                    <td className="py-3 font-mono font-bold text-slate-900">
                       {ord.order_number}
                     </td>
-                    <td className="py-3 text-slate-300">
-                      <div>{ord.customer_name}</div>
-                      <div className="text-[10px] text-slate-500">{ord.customer_phone}</div>
+                    <td className="py-3 text-slate-700">
+                      <div className="font-semibold">{ord.customer_name}</div>
+                      <div className="text-[10px] text-slate-400">{ord.customer_phone}</div>
                     </td>
                     <td className="py-3">
-                      <span className="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
+                      <span className="bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">
                         {ord.status.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="py-3 font-bold text-white">
+                    <td className="py-3 font-bold text-slate-900">
                       {formatPrice(ord.grand_total)}
                     </td>
                     <td className="py-3 text-right">
                       <Link
                         href={`/admin/orders/${ord.id}`}
-                        className="text-xs font-bold text-amber-500 hover:underline"
+                        className="text-xs font-bold text-slate-900 hover:text-amber-600 transition"
                       >
-                        Edit / Courier
+                        Edit / Courier →
                       </Link>
                     </td>
                   </tr>
@@ -179,28 +179,28 @@ export default async function AdminDashboardPage() {
 
         {/* Low Stock Alerts & System Health (5 Cols) */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-            <div className="pb-3 border-b border-slate-800">
-              <h2 className="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-rose-500" />
                 <span>Low Inventory Watch</span>
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">Restock needed to prevent overselling.</p>
+              <p className="text-xs text-slate-500 mt-0.5">Restock needed to prevent overselling.</p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {products
                 .filter(p => p.stock_quantity <= p.low_stock_threshold)
                 .slice(0, 4)
                 .map((p) => (
-                  <div key={p.id} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between text-xs">
+                  <div key={p.id} className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 flex items-center justify-between text-xs">
                     <div>
-                      <span className="font-bold text-slate-200 block truncate max-w-[200px]">{p.name}</span>
-                      <span className="text-[10px] font-mono text-slate-500">SKU: {p.sku}</span>
+                      <span className="font-bold text-slate-800 block truncate max-w-[200px]">{p.name}</span>
+                      <span className="text-[10px] font-mono text-slate-400">SKU: {p.sku}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-rose-400 font-bold block">{p.stock_quantity} in stock</span>
-                      <span className="text-[10px] text-slate-500">Alert at {p.low_stock_threshold}</span>
+                      <span className="text-rose-600 font-bold block">{p.stock_quantity} in stock</span>
+                      <span className="text-[10px] text-slate-400">Alert at {p.low_stock_threshold}</span>
                     </div>
                   </div>
                 ))}
@@ -208,11 +208,11 @@ export default async function AdminDashboardPage() {
           </div>
 
           {/* Quick Storage Policy Card */}
-          <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6 shadow-sm text-xs space-y-2">
-            <span className="text-amber-500 font-bold uppercase tracking-wider block">
+          <div className="bg-amber-50/50 border border-amber-200/70 rounded-2xl p-6 shadow-xs text-xs space-y-2">
+            <span className="text-amber-800 font-bold uppercase tracking-wider block">
               🛡️ Zero Supabase Storage Policy Active
             </span>
-            <p className="text-slate-400 leading-relaxed">
+            <p className="text-slate-600 leading-relaxed">
               Product images, category banners, and hero slides store only external HTTPS URLs in PostgreSQL. Database storage footprint remains ultra-low.
             </p>
           </div>
