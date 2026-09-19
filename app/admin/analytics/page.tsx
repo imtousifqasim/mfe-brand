@@ -1,25 +1,36 @@
 import React from 'react';
 import { formatPrice } from '@/lib/utils';
-import { BarChart3, TrendingUp, DollarSign, ShoppingBag, Award, PackageCheck } from 'lucide-react';
+import { OrderRepository } from '@/repositories/order.repository';
+import { BarChart3, TrendingUp, DollarSign, ShoppingBag, Award, PackageCheck, AlertCircle } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminAnalyticsPage() {
-  const analyticsData = {
-    grossRevenue: 148500,
-    totalOrders: 9,
-    aov: 16500,
-    topCategories: [
-      { name: 'Festive & Formals', sales: 68000, percent: 45 },
-      { name: 'Unstitched Luxury', sales: 42000, percent: 28 },
-      { name: 'Accessories & Shawls', sales: 38500, percent: 27 },
-    ],
-    bestSellers: [
-      { name: 'Royal Velvet Embroidered 3-Piece Suit', sold: 5, revenue: 99995 },
-      { name: 'Pure Kashmir Hand-Embroidered Pashmina Shawl', sold: 2, revenue: 65000 },
-      { name: 'Artisanal Jacquard Unstitched 3-Piece', sold: 4, revenue: 37996 },
-    ]
-  };
+  const orders = await OrderRepository.getOrders();
+  const validOrders = orders.filter(o => o.status !== 'cancelled');
+  const grossRevenue = validOrders.reduce((sum, o) => sum + (Number(o.grand_total) || 0), 0);
+  const totalOrders = orders.length;
+  const aov = validOrders.length > 0 ? Math.round(grossRevenue / validOrders.length) : 0;
+  const deliveredCount = orders.filter(o => o.status === 'delivered' || o.status === 'completed').length;
+  const fulfillmentRate = orders.length > 0 
+    ? Math.round((deliveredCount / orders.length) * 100) 
+    : 100;
+
+  // Aggregate item sales from real orders
+  const productSalesMap = new Map<string, { name: string; sold: number; revenue: number }>();
+  orders.forEach(ord => {
+    (ord.items || []).forEach((it: any) => {
+      const name = it.product_name || 'Product';
+      const existing = productSalesMap.get(name) || { name, sold: 0, revenue: 0 };
+      existing.sold += (it.quantity || 1);
+      existing.revenue += (it.subtotal || (it.unit_price || 0) * (it.quantity || 1));
+      productSalesMap.set(name, existing);
+    });
+  });
+
+  const bestSellers = Array.from(productSalesMap.values())
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto pb-16">
@@ -40,11 +51,10 @@ export default async function AdminAnalyticsPage() {
             Total Gross Volume
           </span>
           <span className="text-3xl font-black text-slate-900 block tracking-tight">
-            {formatPrice(analyticsData.grossRevenue)}
+            {formatPrice(grossRevenue)}
           </span>
-          <span className="text-xs text-emerald-700 font-bold flex items-center gap-1 mt-2">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-            <span>+18.4% this quarter</span>
+          <span className="text-xs text-slate-500 font-medium block mt-2">
+            {totalOrders === 0 ? 'No customer orders recorded' : `${validOrders.length} confirmed orders in database`}
           </span>
         </div>
 
@@ -53,10 +63,10 @@ export default async function AdminAnalyticsPage() {
             Average Order Value (AOV)
           </span>
           <span className="text-3xl font-black text-amber-600 block tracking-tight">
-            {formatPrice(analyticsData.aov)}
+            {formatPrice(aov)}
           </span>
           <span className="text-xs text-slate-500 block mt-2">
-            High-tier luxury apparel purchases
+            {totalOrders === 0 ? 'Calculated on live checkout data' : `Based on ${validOrders.length} processed order(s)`}
           </span>
         </div>
 
@@ -65,34 +75,11 @@ export default async function AdminAnalyticsPage() {
             Fulfillment Rate
           </span>
           <span className="text-3xl font-black text-emerald-700 block tracking-tight">
-            98.5%
+            {fulfillmentRate}%
           </span>
           <span className="text-xs text-slate-500 block mt-2">
-            Average 2-day delivery in Pakistan
+            {deliveredCount} delivered out of {totalOrders} total
           </span>
-        </div>
-      </div>
-
-      {/* Category Contribution Breakdown */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-4 shadow-xs">
-        <h2 className="text-sm font-black uppercase tracking-wider text-slate-900">
-          Category Revenue Contribution
-        </h2>
-        <div className="space-y-3">
-          {analyticsData.topCategories.map((c, i) => (
-            <div key={i} className="space-y-1">
-              <div className="flex justify-between text-xs font-bold">
-                <span className="text-slate-800">{c.name}</span>
-                <span className="text-amber-700">{formatPrice(c.sales)} ({c.percent}%)</span>
-              </div>
-              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                <div 
-                  className="h-full bg-amber-500 rounded-full"
-                  style={{ width: `${c.percent}%` }}
-                />
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 
@@ -103,30 +90,36 @@ export default async function AdminAnalyticsPage() {
           <span>Top Revenue-Generating SKUs</span>
         </h2>
 
-        <table className="w-full text-left text-xs">
-          <thead>
-            <tr className="border-b border-slate-100 text-slate-400 uppercase font-bold text-[10px]">
-              <th className="py-2.5">Product</th>
-              <th className="py-2.5">Units Sold</th>
-              <th className="py-2.5 text-right">Revenue Generated</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {analyticsData.bestSellers.map((item, idx) => (
-              <tr key={idx} className="hover:bg-slate-50/70 transition">
-                <td className="py-3 font-bold text-slate-900">
-                  {item.name}
-                </td>
-                <td className="py-3 text-slate-600 font-mono">
-                  {item.sold} units
-                </td>
-                <td className="py-3 text-right font-black text-amber-700">
-                  {formatPrice(item.revenue)}
-                </td>
+        {bestSellers.length === 0 ? (
+          <div className="py-12 text-center text-slate-500 text-xs">
+            No product sales recorded yet. Real top-selling items will display here automatically as customer orders are placed.
+          </div>
+        ) : (
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-slate-100 text-slate-400 uppercase font-bold text-[10px]">
+                <th className="py-2.5">Product</th>
+                <th className="py-2.5">Units Sold</th>
+                <th className="py-2.5 text-right">Revenue Generated</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {bestSellers.map((item, idx) => (
+                <tr key={idx} className="hover:bg-slate-50/70 transition">
+                  <td className="py-3 font-bold text-slate-900">
+                    {item.name}
+                  </td>
+                  <td className="py-3 text-slate-600 font-mono">
+                    {item.sold} units
+                  </td>
+                  <td className="py-3 text-right font-black text-amber-700">
+                    {formatPrice(item.revenue)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
     </div>

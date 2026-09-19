@@ -7,6 +7,7 @@ import {
   ShoppingBag, Eye, Truck, CheckCircle2, Clock, 
   XCircle, ExternalLink, Search, RefreshCw, Package 
 } from 'lucide-react';
+import { OrderRowActions } from '@/components/admin/OrderRowActions';
 
 interface AdminOrdersPageProps {
   searchParams: Promise<{
@@ -180,13 +181,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
                       {formatPrice(ord.grand_total)}
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <Link
-                        href={`/admin/orders/${ord.id}`}
-                        className="inline-flex items-center gap-1.5 text-xs bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-700 font-bold px-3 py-1.5 rounded-xl border border-slate-200 transition shadow-2xs"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Manage Order</span>
-                      </Link>
+                      <OrderRowActions orderId={ord.id} orderNumber={ord.order_number} />
                     </td>
                   </tr>
                 ))

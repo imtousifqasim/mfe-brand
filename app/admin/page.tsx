@@ -59,9 +59,8 @@ export default async function AdminDashboardPage() {
           <span className="text-2xl font-black text-slate-900 block tracking-tight">
             {formatPrice(totalSales)}
           </span>
-          <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1 mt-2">
-            <TrendingUp className="w-3 h-3" />
-            <span>+14.2% vs last month</span>
+          <span className="text-[11px] text-slate-500 font-medium block mt-2">
+            {orders.length === 0 ? 'No customer orders yet' : `Calculated across ${orders.length} real order${orders.length !== 1 ? 's' : ''}`}
           </span>
         </div>
 
@@ -145,33 +144,41 @@ export default async function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {orders.slice(0, 6).map((ord) => (
-                  <tr key={ord.id} className="hover:bg-slate-50/70 transition">
-                    <td className="py-3 font-mono font-bold text-slate-900">
-                      {ord.order_number}
-                    </td>
-                    <td className="py-3 text-slate-700">
-                      <div className="font-semibold">{ord.customer_name}</div>
-                      <div className="text-[10px] text-slate-400">{ord.customer_phone}</div>
-                    </td>
-                    <td className="py-3">
-                      <span className="bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">
-                        {ord.status.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td className="py-3 font-bold text-slate-900">
-                      {formatPrice(ord.grand_total)}
-                    </td>
-                    <td className="py-3 text-right">
-                      <Link
-                        href={`/admin/orders/${ord.id}`}
-                        className="text-xs font-bold text-slate-900 hover:text-amber-600 transition"
-                      >
-                        Edit / Courier →
-                      </Link>
+                {orders.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-10 text-center text-slate-500 text-xs">
+                      No customer orders placed yet. New real orders will appear here automatically.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  orders.slice(0, 6).map((ord) => (
+                    <tr key={ord.id} className="hover:bg-slate-50/70 transition">
+                      <td className="py-3 font-mono font-bold text-slate-900">
+                        {ord.order_number}
+                      </td>
+                      <td className="py-3 text-slate-700">
+                        <div className="font-semibold">{ord.customer_name}</div>
+                        <div className="text-[10px] text-slate-400">{ord.customer_phone}</div>
+                      </td>
+                      <td className="py-3">
+                        <span className="bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                          {ord.status.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="py-3 font-bold text-slate-900">
+                        {formatPrice(ord.grand_total)}
+                      </td>
+                      <td className="py-3 text-right">
+                        <Link
+                          href={`/admin/orders/${ord.id}`}
+                          className="text-xs font-bold text-slate-900 hover:text-amber-600 transition"
+                        >
+                          Edit / Courier →
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

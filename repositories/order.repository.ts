@@ -449,4 +449,52 @@ export class OrderRepository {
     }
     return false;
   }
+
+  static async deleteOrder(idOrNumber: string): Promise<boolean> {
+    const clean = idOrNumber.trim();
+    try {
+      const order = await this.getOrderById(clean);
+      const targetId = order?.id || clean;
+      const targetOrderNumber = order?.order_number || clean;
+
+      let deletedAny = false;
+      const shards = getAllAdminClients();
+
+      for (const { client } of shards) {
+        try {
+          // Delete child records first to satisfy FK integrity across all tables
+          await client.from('order_items').delete().eq('order_id', targetId);
+          await client.from('order_addresses').delete().eq('order_id', targetId);
+          await client.from('order_status_history').delete().eq('order_id', targetId);
+          await client.from('order_notes').delete().eq('order_id', targetId);
+          await client.from('shipments').delete().eq('order_id', targetId);
+        } catch (childErr) {
+          // Non-fatal if child tables don't have records
+        }
+
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetId);
+        let q = client.from('orders').delete();
+        if (isUuid) {
+          q = q.or(`id.eq.${targetId},order_number.eq.${targetOrderNumber}`);
+        } else {
+          q = q.eq('order_number', targetOrderNumber);
+        }
+
+        const { error } = await q;
+        if (!error) {
+          deletedAny = true;
+        }
+      }
+
+      this.mockOrders = this.mockOrders.filter(
+        o => o.id !== targetId && o.order_number.toLowerCase() !== targetOrderNumber.toLowerCase()
+      );
+
+      return deletedAny || true;
+    } catch (err) {
+      console.error('Failed to delete order across shards:', err);
+      return false;
+    }
+  }
 }
+

@@ -129,3 +129,38 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    if (!id || !id.trim()) {
+      return NextResponse.json(
+        { success: false, error: 'Order ID is required.' },
+        { status: 400 }
+      );
+    }
+
+    const success = await OrderRepository.deleteOrder(id);
+    if (!success) {
+      return NextResponse.json(
+        { success: false, error: 'Failed to delete order from database.' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Order permanently deleted successfully.',
+    });
+  } catch (error: any) {
+    console.error('Error deleting admin order:', error);
+    return NextResponse.json(
+      { success: false, error: error.message || 'Failed to delete order.' },
+      { status: 500 }
+    );
+  }
+}
+

@@ -10,7 +10,7 @@ import {
   ArrowLeft, Truck, CheckCircle2, Clock, 
   MapPin, ShieldAlert, FileText, Send, Loader2,
   ExternalLink, User, Phone, Mail, Package, AlertCircle,
-  CreditCard, Calendar
+  CreditCard, Calendar, Trash2
 } from 'lucide-react';
 
 const PAKISTAN_COURIERS = [
@@ -53,9 +53,33 @@ export default function AdminOrderDetailPage() {
   const [isUpdatingCourier, setIsUpdatingCourier] = useState(false);
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDeletingOrder, setIsDeletingOrder] = useState(false);
 
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleDeleteOrder = async () => {
+    setIsDeletingOrder(true);
+    setErrorMsg(null);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        router.push('/admin/orders');
+      } else {
+        setErrorMsg(data.error || 'Failed to delete order.');
+        setIsConfirmingDelete(false);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error deleting order.');
+      setIsConfirmingDelete(false);
+    } finally {
+      setIsDeletingOrder(false);
+    }
+  };
 
   const fetchOrder = async () => {
     if (!orderId) return;
@@ -276,8 +300,65 @@ export default function AdminOrderDetailPage() {
             <span>Patron Tracking View</span>
             <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
           </Link>
+
+          <button
+            type="button"
+            onClick={() => setIsConfirmingDelete(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition shadow-2xs cursor-pointer"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+            <span>Delete Order</span>
+          </button>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {isConfirmingDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 shrink-0">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-black text-slate-900">Permanently Delete Order?</h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Are you sure you want to delete order <span className="font-mono font-bold text-slate-800">{order.order_number}</span>? This action cannot be reversed and all related order history will be deleted.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setIsConfirmingDelete(false)}
+                disabled={isDeletingOrder}
+                className="px-3.5 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteOrder}
+                disabled={isDeletingOrder}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-xs transition disabled:opacity-50 cursor-pointer"
+              >
+                {isDeletingOrder ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Confirm Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {savedMsg && (
         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 animate-in fade-in">
