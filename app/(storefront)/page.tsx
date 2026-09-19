@@ -57,10 +57,10 @@ export default async function HomePage() {
             </p>
             <div className="pt-3">
               <Link
-                href="/products?category=festive-formals"
+                href="/products?category=womens-unstitched-stitched-suits"
                 className="inline-flex items-center gap-2.5 bg-[#d99026] hover:bg-[#c67d18] text-[#141414] font-bold px-8 py-4 rounded-full text-xs uppercase tracking-[0.16em] shadow-xl shadow-[#d99026]/20 transition transform hover:-translate-y-0.5"
               >
-                <span>Discover Formals Atelier</span>
+                <span>Discover Suits Collection</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
