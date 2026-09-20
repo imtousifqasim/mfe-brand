@@ -79,13 +79,24 @@ function getProductRealOptions(product: Product): RealProductOption {
     };
   }
 
+  // 1. Dynamic product sizes if configured in database/admin
+  if (product.has_sizes && Array.isArray(product.available_sizes) && product.available_sizes.length > 0) {
+    return {
+      sizeLabel: 'Select Size:',
+      sizes: product.available_sizes.map((s: string) => ({ name: s })),
+      colorName: (sku.includes('NIGHT-WHT') || name.includes('white')) ? 'Crisp White' : undefined,
+      hasSizeGuide: Boolean(product.size_chart && (product.size_chart.trouser || product.size_chart.shirt || Object.keys(product.size_chart).length > 0)),
+    };
+  }
+
   if (sku.includes('NIGHT-WHT') || (name.includes('night suit') && name.includes('white'))) {
     return {
       sizeLabel: 'Select Size:',
       sizes: [
-        { name: 'Medium', detail: 'Chest 18-20"' },
-        { name: 'Large', detail: 'Chest 21"' },
-        { name: 'X-Large', detail: 'Chest 22-23"' },
+        { name: 'S' },
+        { name: 'M' },
+        { name: 'L' },
+        { name: 'XL' },
       ],
       colorName: 'Crisp White',
       hasSizeGuide: true,
@@ -179,6 +190,122 @@ function getProductRealOptions(product: Product): RealProductOption {
   return { colorName: extractedColor };
 }
 
+function renderSizeChartTables(product: Product) {
+  const chart = product.size_chart;
+  const isTeal = product.sku?.includes('TEAL-MAJ') || product.name?.toLowerCase().includes('teal majestique');
+
+  if (isTeal) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h4 className="font-bold text-xs text-[#141414] mb-2 uppercase tracking-wider flex items-center gap-1.5">
+            <Scissors className="w-3.5 h-3.5 text-[#b87414]" />
+            <span>Shirt Measurements (Inches)</span>
+          </h4>
+          <div className="overflow-x-auto rounded-xl border border-[#eae7e2]">
+            <table className="w-full text-xs text-left text-[#141414]">
+              <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b]">
+                <tr>
+                  <th className="py-2.5 px-3">Size</th>
+                  <th className="py-2.5 px-3">Chest</th>
+                  <th className="py-2.5 px-3">Shoulders</th>
+                  <th className="py-2.5 px-3">Sleeves</th>
+                  <th className="py-2.5 px-3">Length</th>
+                  <th className="py-2.5 px-3">Hip</th>
+                  <th className="py-2.5 px-3">Daman</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#eae7e2] bg-white">
+                <tr><td className="py-2 px-3 font-bold text-[#b87414]">XSmall</td><td className="py-2 px-3">18&quot;</td><td className="py-2 px-3">13.5&quot;</td><td className="py-2 px-3">21&quot;</td><td className="py-2 px-3">48&quot;</td><td className="py-2 px-3">21&quot;</td><td className="py-2 px-3">22&quot;</td></tr>
+                <tr><td className="py-2 px-3 font-bold text-[#b87414]">Small</td><td className="py-2 px-3">19&quot;</td><td className="py-2 px-3">14&quot;</td><td className="py-2 px-3">21&quot;</td><td className="py-2 px-3">48&quot;</td><td className="py-2 px-3">21&quot;</td><td className="py-2 px-3">22&quot;</td></tr>
+                <tr><td className="py-2 px-3 font-bold text-[#b87414]">Medium</td><td className="py-2 px-3">20&quot;</td><td className="py-2 px-3">14.5&quot;</td><td className="py-2 px-3">21.5&quot;</td><td className="py-2 px-3">48&quot;</td><td className="py-2 px-3">22&quot;</td><td className="py-2 px-3">23&quot;</td></tr>
+                <tr><td className="py-2 px-3 font-bold text-[#b87414]">Large</td><td className="py-2 px-3">22&quot;</td><td className="py-2 px-3">15.5&quot;</td><td className="py-2 px-3">22&quot;</td><td className="py-2 px-3">48&quot;</td><td className="py-2 px-3">23&quot;</td><td className="py-2 px-3">24&quot;</td></tr>
+                <tr><td className="py-2 px-3 font-bold text-[#b87414]">XLarge</td><td className="py-2 px-3">24&quot;</td><td className="py-2 px-3">16&quot;</td><td className="py-2 px-3">22.5&quot;</td><td className="py-2 px-3">48&quot;</td><td className="py-2 px-3">24&quot;</td><td className="py-2 px-3">26&quot;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const trouserRows = chart?.trouser || [
+    { size: 'S', waist: '26-30', length: '39' },
+    { size: 'M', waist: '28-44', length: '39' },
+    { size: 'L', waist: '32-48', length: '39' },
+    { size: 'XL', waist: '36-52', length: '40' },
+  ];
+
+  const shirtRows = chart?.shirt || [
+    { size: 'S', chest: '19', sleeves: '20.5', length: '25.5' },
+    { size: 'M', chest: '20', sleeves: '20.5', length: '27' },
+    { size: 'L', chest: '21', sleeves: '21.5', length: '28' },
+    { size: 'XL', chest: '22', sleeves: '22', length: '30' },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Trouser Measurements */}
+      <div>
+        <h4 className="font-bold text-xs text-[#141414] mb-2 uppercase tracking-wider flex items-center gap-1.5">
+          <Scissors className="w-3.5 h-3.5 text-[#b87414]" />
+          <span>Trouser Measurements (Inches)</span>
+        </h4>
+        <div className="overflow-x-auto rounded-xl border border-[#eae7e2]">
+          <table className="w-full text-xs text-left text-[#141414]">
+            <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b] border-b border-[#eae7e2]">
+              <tr>
+                <th className="py-2.5 px-3 font-bold">Size</th>
+                <th className="py-2.5 px-3">Waist (Inches)</th>
+                <th className="py-2.5 px-3">Length (Inches)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#eae7e2] bg-white">
+              {trouserRows.map((r: any) => (
+                <tr key={r.size} className="hover:bg-[#faf9f7] transition-colors">
+                  <td className="py-2.5 px-3 font-black text-[#b87414]">{r.size}</td>
+                  <td className="py-2.5 px-3 font-mono">{r.waist}&quot;</td>
+                  <td className="py-2.5 px-3 font-mono">{r.length}&quot;</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* T-Shirt Measurements */}
+      <div>
+        <h4 className="font-bold text-xs text-[#141414] mb-2 uppercase tracking-wider flex items-center gap-1.5">
+          <Ruler className="w-3.5 h-3.5 text-[#b87414]" />
+          <span>T-Shirt Measurements (Inches)</span>
+        </h4>
+        <div className="overflow-x-auto rounded-xl border border-[#eae7e2]">
+          <table className="w-full text-xs text-left text-[#141414]">
+            <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b] border-b border-[#eae7e2]">
+              <tr>
+                <th className="py-2.5 px-3 font-bold">Size</th>
+                <th className="py-2.5 px-3">Chest (Inches)</th>
+                <th className="py-2.5 px-3">Sleeves (Inches)</th>
+                <th className="py-2.5 px-3">Length (Inches)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#eae7e2] bg-white">
+              {shirtRows.map((r: any) => (
+                <tr key={r.size} className="hover:bg-[#faf9f7] transition-colors">
+                  <td className="py-2.5 px-3 font-black text-[#b87414]">{r.size}</td>
+                  <td className="py-2.5 px-3 font-mono">{r.chest}&quot;</td>
+                  <td className="py-2.5 px-3 font-mono">{r.sleeves}&quot;</td>
+                  <td className="py-2.5 px-3 font-mono">{r.length}&quot;</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ProductDetailView({ product, relatedProducts }: ProductDetailViewProps) {
   const router = useRouter();
   const { addToCart } = useCart();
@@ -187,22 +314,29 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
 
   const realOptions = getProductRealOptions(product);
 
+  const requiresSizeSelection = Boolean(
+    product.has_sizes || 
+    (product.available_sizes && product.available_sizes.length > 0) ||
+    (realOptions.sizes && realOptions.sizes.length > 0)
+  );
+
   // Gallery state
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isZooming, setIsZooming] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
 
-  // Customization state
-  const [selectedSize, setSelectedSize] = useState<string>(
-    realOptions.sizes && realOptions.sizes.length > 0 ? realOptions.sizes[0].name : ''
-  );
+  // Customization state: Must NOT pre-select when size selection is required!
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [sizeError, setSizeError] = useState<string | null>(null);
+  const sizeSelectorRef = useRef<HTMLDivElement | null>(null);
+
   const [selectedColor, setSelectedColor] = useState<string>(
     realOptions.colors && realOptions.colors.length > 0
       ? realOptions.colors[0].name
       : (realOptions.colorName || '')
   );
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<'details' | 'fabric' | 'shipping' | 'reviews'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'fabric' | 'shipping' | 'reviews' | 'sizechart'>('details');
   const [sizeModalOpen, setSizeModalOpen] = useState(false);
   const [addedNotice, setAddedNotice] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -317,6 +451,14 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
   };
 
   const handleAddToCart = () => {
+    if (requiresSizeSelection && !selectedSize) {
+      setSizeError('Please select a size before adding to bag.');
+      if (sizeSelectorRef.current) {
+        sizeSelectorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    setSizeError(null);
     if (isAdding) return;
     setIsAdding(true);
     // Circular loader effect on button before smoothly sliding out cart drawer
@@ -333,6 +475,14 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
   };
 
   const handleBuyNow = () => {
+    if (requiresSizeSelection && !selectedSize) {
+      setSizeError('Please select a size before proceeding to checkout.');
+      if (sizeSelectorRef.current) {
+        sizeSelectorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    setSizeError(null);
     // Navigate directly to checkout without opening the side cart drawer
     addToCart(product, quantity, {
       size: selectedSize || undefined,
@@ -742,34 +892,60 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
 
           {/* Real Sizes / Dimensions / Capacity Selector (ONLY if product has sizes!) */}
           {realOptions.sizes && realOptions.sizes.length > 0 && (
-            <div className="space-y-2 pt-1">
+            <div 
+              ref={sizeSelectorRef}
+              className={`space-y-2.5 p-3 rounded-2xl transition-all ${
+                sizeError 
+                  ? 'bg-rose-50/70 border-2 border-rose-400 ring-2 ring-rose-400/20' 
+                  : 'bg-transparent border border-transparent'
+              }`}
+            >
               <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#141414]">
-                <span>{realOptions.sizeLabel || 'Select Size:'}</span>
+                <span className="flex items-center gap-1.5">
+                  <span>{realOptions.sizeLabel || 'Select Size:'}</span>
+                  {requiresSizeSelection && <span className="text-rose-600 font-bold">*</span>}
+                </span>
                 {realOptions.hasSizeGuide && (
                   <button 
                     type="button"
                     onClick={() => setSizeModalOpen(true)}
-                    className="text-[#b87414] hover:text-[#d99026] hover:underline inline-flex items-center gap-1 cursor-pointer font-bold normal-case tracking-normal text-xs"
+                    className="text-[#b87414] hover:text-[#d99026] hover:underline inline-flex items-center gap-1.5 cursor-pointer font-bold normal-case tracking-normal text-xs"
                   >
                     <Ruler className="w-3.5 h-3.5" />
-                    <span>Size Guide</span>
+                    <span>Size Chart</span>
                   </button>
                 )}
               </div>
 
-              {/* Real Size buttons (0 fake price delta!) */}
-              <div className="flex flex-wrap gap-2">
+              {/* Validation Warning Alert */}
+              {sizeError && (
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-rose-100/90 text-rose-800 text-xs font-bold border border-rose-200 animate-in fade-in">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
+                  <span>{sizeError}</span>
+                </div>
+              )}
+
+              {/* Real Size buttons */}
+              <div className="flex flex-wrap gap-2.5">
                 {realOptions.sizes.map((s) => {
                   const isSelected = selectedSize === s.name;
+                  const isOutOfStock = product.size_stock && typeof product.size_stock[s.name] === 'number' && product.size_stock[s.name] <= 0;
                   return (
                     <button
                       key={s.name}
                       type="button"
-                      onClick={() => setSelectedSize(s.name)}
-                      className={`py-2 px-3.5 rounded-xl text-center border transition-all cursor-pointer touch-manipulation flex flex-col items-center justify-center min-h-[44px] ${
-                        isSelected
-                          ? 'bg-[#141414] text-white border-[#141414] shadow-md ring-2 ring-[#d99026]/40'
-                          : 'bg-[#f7f5f2] text-[#141414] border-[#eae7e2] hover:border-neutral-400 active:bg-[#e4e0d8]'
+                      disabled={isOutOfStock}
+                      onClick={() => {
+                        if (isOutOfStock) return;
+                        setSelectedSize(s.name);
+                        setSizeError(null);
+                      }}
+                      className={`py-2 px-4 rounded-xl text-center border transition-all cursor-pointer touch-manipulation flex flex-col items-center justify-center min-w-[54px] min-h-[44px] ${
+                        isOutOfStock
+                          ? 'opacity-40 cursor-not-allowed bg-slate-100 line-through border-slate-200 text-slate-400'
+                          : isSelected
+                            ? 'bg-[#141414] text-white border-[#141414] shadow-md ring-2 ring-[#d99026]/50'
+                            : 'bg-[#f7f5f2] text-[#141414] border-[#eae7e2] hover:border-neutral-400 hover:bg-white active:bg-[#e4e0d8]'
                       }`}
                     >
                       <span className="font-bold text-xs leading-tight block">
@@ -788,13 +964,20 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
               </div>
 
               {/* Selected size summary */}
-              {selectedSize && (
+              {selectedSize ? (
                 <div className="text-[11px] text-[#6b6b6b] bg-[#f7f5f2] px-3 py-1.5 rounded-lg border border-[#eae7e2] flex items-center justify-between">
                   <span>
-                    Selected Option: <strong className="text-[#141414]">{selectedSize}</strong>
+                    Selected Size: <strong className="text-[#141414] font-bold">{selectedSize}</strong>
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => setSizeModalOpen(true)}
+                    className="text-[11px] text-[#b87414] hover:underline font-bold"
+                  >
+                    View Dimensions
+                  </button>
                 </div>
-              )}
+              ) : null}
             </div>
           )}
 
@@ -946,6 +1129,20 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
             <Star className="w-3.5 h-3.5 text-[#d99026]" />
             <span>Reviews ({productReviews.length > 0 ? productReviews.length : (product.review_count || 16)})</span>
           </button>
+          {(product.has_sizes || realOptions.hasSizeGuide) && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('sizechart')}
+              className={`flex-1 min-w-[130px] sm:min-w-0 py-2.5 px-3 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer touch-manipulation ${
+                activeTab === 'sizechart'
+                  ? 'bg-[#141414] text-white shadow-sm'
+                  : 'text-[#6b6b6b] hover:text-[#141414] active:bg-[#e4e0d8]'
+              }`}
+            >
+              <Ruler className="w-3.5 h-3.5 text-[#d99026]" />
+              <span>Size Chart</span>
+            </button>
+          )}
         </div>
 
         {/* Tab Content 1: Design Details */}
@@ -1204,6 +1401,19 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
             )}
           </div>
         )}
+
+        {/* Tab Content 5: Size Chart & Dimensions Table */}
+        {activeTab === 'sizechart' && (
+          <div className="space-y-6 max-w-4xl font-sans">
+            <div>
+              <h3 className="font-serif text-lg sm:text-xl font-bold text-[#141414]">Standard Size Chart & Garment Dimensions</h3>
+              <p className="text-xs text-[#6b6b6b] mt-0.5">
+                All measurements are tailored in inches. Standard Pakistani tailoring tolerances apply (±0.5 inch).
+              </p>
+            </div>
+            {renderSizeChartTables(product)}
+          </div>
+        )}
       </div>
 
       {/* "You May Also Like" Related Creations (Responsive 2 cols on mobile) */}
@@ -1260,87 +1470,13 @@ export function ProductDetailView({ product, relatedProducts }: ProductDetailVie
               All measurements are in inches. Standard Pakistani tailoring tolerances apply (±0.5 inch).
             </p>
 
-            {product.sku?.includes('TEAL-MAJ') || product.name?.toLowerCase().includes('teal majestique') ? (
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-bold text-xs text-[#141414] mb-2 uppercase tracking-wider">Shirt Measurements (Inches)</h4>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-left text-[#141414]">
-                      <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b]">
-                        <tr>
-                          <th className="py-2 px-2.5 rounded-l-lg">Size</th>
-                          <th className="py-2 px-2.5">Chest</th>
-                          <th className="py-2 px-2.5">Shoulders</th>
-                          <th className="py-2 px-2.5">Sleeves</th>
-                          <th className="py-2 px-2.5">Length</th>
-                          <th className="py-2 px-2.5">Hip</th>
-                          <th className="py-2 px-2.5 rounded-r-lg">Daman</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#eae7e2]">
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">XSmall</td><td className="py-2 px-2.5">18"</td><td className="py-2 px-2.5">13.5"</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">22"</td></tr>
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Small</td><td className="py-2 px-2.5">19"</td><td className="py-2 px-2.5">14"</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">22"</td></tr>
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Medium</td><td className="py-2 px-2.5">20"</td><td className="py-2 px-2.5">14.5"</td><td className="py-2 px-2.5">21.5"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">22"</td><td className="py-2 px-2.5">23"</td></tr>
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Large</td><td className="py-2 px-2.5">22"</td><td className="py-2 px-2.5">15.5"</td><td className="py-2 px-2.5">22"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">23"</td><td className="py-2 px-2.5">24"</td></tr>
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">XLarge</td><td className="py-2 px-2.5">24"</td><td className="py-2 px-2.5">16"</td><td className="py-2 px-2.5">22.5"</td><td className="py-2 px-2.5">48"</td><td className="py-2 px-2.5">24"</td><td className="py-2 px-2.5">26"</td></tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-xs text-[#141414] mb-2 uppercase tracking-wider">Trouser Measurements (Inches)</h4>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-left text-[#141414]">
-                      <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b]">
-                        <tr>
-                          <th className="py-2 px-2.5 rounded-l-lg">Size</th>
-                          <th className="py-2 px-2.5">Length</th>
-                          <th className="py-2 px-2.5">Waist (Elastic)</th>
-                          <th className="py-2 px-2.5 rounded-r-lg">Bottom Circumference</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#eae7e2]">
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">XSmall</td><td className="py-2 px-2.5">36"</td><td className="py-2 px-2.5">26"</td><td className="py-2 px-2.5">12"</td></tr>
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Small</td><td className="py-2 px-2.5">37"</td><td className="py-2 px-2.5">26"</td><td className="py-2 px-2.5">12"</td></tr>
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Medium</td><td className="py-2 px-2.5">38"</td><td className="py-2 px-2.5">28"</td><td className="py-2 px-2.5">12"</td></tr>
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Large</td><td className="py-2 px-2.5">39"</td><td className="py-2 px-2.5">32"</td><td className="py-2 px-2.5">12"</td></tr>
-                        <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">XLarge</td><td className="py-2 px-2.5">40"</td><td className="py-2 px-2.5">34"</td><td className="py-2 px-2.5">12"</td></tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            ) : product.sku?.includes('NIGHT-WHT') || product.name?.toLowerCase().includes('night suit') ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left text-[#141414]">
-                  <thead className="bg-[#f7f5f2] text-[10px] uppercase tracking-wider text-[#6b6b6b]">
-                    <tr>
-                      <th className="py-2 px-2.5 rounded-l-lg">Size</th>
-                      <th className="py-2 px-2.5">Shirt Chest</th>
-                      <th className="py-2 px-2.5">Shirt Length</th>
-                      <th className="py-2 px-2.5">Trouser Waist</th>
-                      <th className="py-2 px-2.5 rounded-r-lg">Trouser Length</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#eae7e2]">
-                    <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Medium</td><td className="py-2 px-2.5">18" – 20"</td><td className="py-2 px-2.5">26" – 27"</td><td className="py-2 px-2.5">28" – 44"</td><td className="py-2 px-2.5">38" – 39"</td></tr>
-                    <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">Large</td><td className="py-2 px-2.5">21"</td><td className="py-2 px-2.5">28"</td><td className="py-2 px-2.5">32" – 48"</td><td className="py-2 px-2.5">39"</td></tr>
-                    <tr><td className="py-2 px-2.5 font-bold text-[#b87414]">X-Large</td><td className="py-2 px-2.5">22" – 23"</td><td className="py-2 px-2.5">30"</td><td className="py-2 px-2.5">36" – 52"</td><td className="py-2 px-2.5">40"</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-xs text-[#141414] bg-[#f7f5f2] p-4 rounded-xl border border-[#eae7e2]">
-                This item is tailored in comfortable regular fit. Refer to the product description for individual piece cutting and dimensions.
-              </p>
-            )}
+            {renderSizeChartTables(product)}
 
             <div className="pt-2 flex justify-end">
               <button
                 type="button"
                 onClick={() => setSizeModalOpen(false)}
-                className="bg-[#141414] hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider px-5 py-2 rounded-full"
+                className="bg-[#141414] hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full shadow-sm cursor-pointer"
               >
                 Close Guide
               </button>

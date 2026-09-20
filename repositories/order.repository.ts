@@ -91,6 +91,8 @@ export class OrderRepository {
       quantity: number;
       subtotal: number;
       imageUrl?: string | null;
+      selected_size?: string | null;
+      attributes?: any;
     }>;
     shippingAddress: OrderAddress;
     billingAddress?: OrderAddress;
@@ -128,6 +130,8 @@ export class OrderRepository {
         quantity: item.quantity,
         subtotal: item.subtotal,
         image_url: item.imageUrl || null,
+        selected_size: (item as any).selected_size || (item as any).size || null,
+        attributes: (item as any).attributes || null,
       })),
       shipping_address: orderData.shippingAddress,
       billing_address: orderData.billingAddress || orderData.shippingAddress,
@@ -175,6 +179,8 @@ export class OrderRepository {
           quantity: it.quantity,
           subtotal: it.subtotal,
           image_url: it.image_url,
+          selected_size: it.selected_size || null,
+          attributes: it.attributes || null,
         }));
         await writeClient.from('order_items').insert(itemInserts);
 

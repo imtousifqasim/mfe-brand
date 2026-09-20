@@ -103,6 +103,10 @@ export interface Product {
   seo_description?: string | null;
   created_at?: string;
   updated_at?: string;
+  has_sizes?: boolean;
+  available_sizes?: string[];
+  size_chart?: Record<string, any>;
+  size_stock?: Record<string, number>;
   // Joined relations
   category?: Category | null;
   brand?: Brand | null;
@@ -159,6 +163,8 @@ export interface OrderItem {
   quantity: number;
   subtotal: number;
   image_url?: string | null;
+  selected_size?: string | null;
+  attributes?: Record<string, any> | null;
 }
 
 export interface OrderAddress {

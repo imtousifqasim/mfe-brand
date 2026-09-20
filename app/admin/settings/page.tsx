@@ -6,7 +6,7 @@ import { PaymentMethodConfig } from '@/types/database';
 import { 
   Settings, Bell, CreditCard, CheckCircle2, ShieldCheck, 
   ExternalLink, Eye, RefreshCw, Smartphone, Building2, 
-  Sparkles, Check, AlertCircle 
+  Sparkles, Check, AlertCircle, Truck 
 } from 'lucide-react';
 
 export default function AdminSettingsPage() {
@@ -15,6 +15,13 @@ export default function AdminSettingsPage() {
   const [storePhone, setStorePhone] = useState('+92 300 1234567');
   const [logoUrl, setLogoUrl] = useState('https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=400&auto=format&fit=crop');
   const [currency, setCurrency] = useState('PKR');
+
+  // Delivery Charges State
+  const [deliveryCharge, setDeliveryCharge] = useState<number>(100);
+  const [enableFreeThreshold, setEnableFreeThreshold] = useState<boolean>(false);
+  const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState<string>('');
+  const [isSavingShipping, setIsSavingShipping] = useState<boolean>(false);
+  const [shippingSavedMsg, setShippingSavedMsg] = useState<string>('');
 
   // Independent notification email toggles
   const [notifConfirmation, setNotifConfirmation] = useState(true);
@@ -29,7 +36,7 @@ export default function AdminSettingsPage() {
   const [isSavingGateways, setIsSavingGateways] = useState(false);
   const [savedMsg, setSavedMsg] = useState('');
 
-  // Fetch live gateway configuration
+  // Fetch live gateway and shipping configuration
   useEffect(() => {
     async function loadGateways() {
       try {
@@ -44,7 +51,30 @@ export default function AdminSettingsPage() {
         console.error('Failed to load gateways', err);
       }
     }
+
+    async function loadShipping() {
+      try {
+        const res = await fetch('/api/admin/settings/shipping');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.settings) {
+            setDeliveryCharge(data.settings.deliveryCharge ?? 100);
+            if (data.settings.freeDeliveryThreshold) {
+              setEnableFreeThreshold(true);
+              setFreeDeliveryThreshold(String(data.settings.freeDeliveryThreshold));
+            } else {
+              setEnableFreeThreshold(false);
+              setFreeDeliveryThreshold('');
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load shipping settings', err);
+      }
+    }
+
     loadGateways();
+    loadShipping();
   }, []);
 
   const handleUpdateMethodField = (id: string, field: keyof PaymentMethodConfig, value: any) => {
@@ -59,22 +89,54 @@ export default function AdminSettingsPage() {
     );
   };
 
+  const handleSaveShipping = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setIsSavingShipping(true);
+    setShippingSavedMsg('');
+
+    try {
+      const res = await fetch('/api/admin/settings/shipping', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          deliveryCharge: Number(deliveryCharge),
+          freeDeliveryThreshold: enableFreeThreshold && freeDeliveryThreshold ? Number(freeDeliveryThreshold) : null,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setShippingSavedMsg('Delivery charges saved successfully! Applied across cart, checkout, and invoices site-wide.');
+      } else {
+        setShippingSavedMsg(data.error || 'Failed to update delivery charges');
+      }
+    } catch {
+      setShippingSavedMsg('Failed to update delivery charges');
+    } finally {
+      setIsSavingShipping(false);
+      setTimeout(() => setShippingSavedMsg(''), 4000);
+    }
+  };
+
   const handleSaveAll = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingGateways(true);
     setSavedMsg('');
 
     try {
-      const res = await fetch('/api/admin/payment-methods', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentMethods }),
-      });
+      const [gwRes] = await Promise.all([
+        fetch('/api/admin/payment-methods', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentMethods }),
+        }),
+        handleSaveShipping(),
+      ]);
 
-      if (res.ok) {
-        setSavedMsg('Store configuration and Pakistani payment gateways successfully synchronized!');
+      if (gwRes.ok) {
+        setSavedMsg('Store configuration, shipping fees, and payment gateways successfully synchronized!');
       } else {
-        setSavedMsg('Gateways saved locally. Server returned status: ' + res.status);
+        setSavedMsg('Settings saved locally. Server returned status: ' + gwRes.status);
       }
     } catch (err) {
       setSavedMsg('Settings saved successfully!');
@@ -372,6 +434,142 @@ export default function AdminSettingsPage() {
 
             </div>
           )}
+        </div>
+
+        {/* Section: Delivery Charges & Shipping Rates */}
+        <div id="delivery-charges" className="p-6 rounded-2xl bg-white border border-slate-200/90 space-y-6 shadow-xs scroll-mt-20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <Truck className="w-4 h-4 text-amber-600" />
+                <span>Delivery Charges & Nationwide Shipping</span>
+              </h2>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Configure the delivery fee charged to customers across Pakistan at cart, checkout, and order invoices.
+              </p>
+            </div>
+            <span className="text-[10px] font-bold bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200 shrink-0 self-start sm:self-auto">
+              Current: Rs. {deliveryCharge} Active
+            </span>
+          </div>
+
+          {shippingSavedMsg && (
+            <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 animate-in fade-in-50 duration-200">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+              <span>{shippingSavedMsg}</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-900 mb-1.5 flex items-center justify-between">
+                  <span>Standard Delivery Charge (PKR) *</span>
+                  <span className="text-[11px] font-mono text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    Live: Rs. {deliveryCharge}
+                  </span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">
+                    Rs.
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    value={deliveryCharge}
+                    onChange={(e) => setDeliveryCharge(Number(e.target.value))}
+                    className="w-full text-sm font-mono font-bold pl-11 pr-4 py-3 rounded-xl bg-slate-50/70 border border-slate-200 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
+                    placeholder="100"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
+                  This exact fee is automatically added to cart and checkout order summaries and persisted in customer invoices.
+                </p>
+              </div>
+
+              {/* Optional Free Delivery Threshold Toggle */}
+              <div className="pt-3 border-t border-slate-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 block">Optional Free Delivery Threshold</span>
+                    <span className="text-[11px] text-slate-500">Offer free shipping on orders above a specific cart value</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={enableFreeThreshold}
+                    onChange={(e) => setEnableFreeThreshold(e.target.checked)}
+                    className="rounded text-amber-600 focus:ring-amber-500 w-4 h-4 cursor-pointer"
+                  />
+                </div>
+
+                {enableFreeThreshold && (
+                  <div className="pl-4 border-l-2 border-amber-300 space-y-2 pt-1 animate-in fade-in-50">
+                    <label className="block text-[11px] font-bold text-slate-700">
+                      Minimum Order Value for Free Delivery (PKR)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rs.</span>
+                      <input
+                        type="number"
+                        min="500"
+                        step="100"
+                        value={freeDeliveryThreshold}
+                        onChange={(e) => setFreeDeliveryThreshold(e.target.value)}
+                        placeholder="e.g. 5000"
+                        className="w-full text-xs font-mono pl-9 pr-3 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-2xs"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Live Storefront Impact Card */}
+            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase tracking-wider">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>Storefront Impact & Live Preview</span>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2.5 text-xs">
+                <div className="flex justify-between text-slate-600">
+                  <span>Cart & Checkout Shipping:</span>
+                  <span className="font-mono font-bold text-slate-900">Rs. {deliveryCharge}</span>
+                </div>
+                <div className="flex justify-between text-slate-600">
+                  <span>Free Delivery Policy:</span>
+                  <span className="font-bold text-slate-700">
+                    {enableFreeThreshold && freeDeliveryThreshold ? `Orders above Rs. ${freeDeliveryThreshold}` : 'Fixed for all order values'}
+                  </span>
+                </div>
+                <div className="flex justify-between text-slate-600 pt-2 border-t border-slate-100">
+                  <span>Invoice Line Item:</span>
+                  <span className="font-mono text-emerald-700 font-bold">Nationwide Courier: Rs. {deliveryCharge}</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleSaveShipping()}
+                disabled={isSavingShipping}
+                className="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isSavingShipping ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Updating Delivery Fee...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Save Delivery Charges (Rs. {deliveryCharge})</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Section 2: General Store Attributes */}

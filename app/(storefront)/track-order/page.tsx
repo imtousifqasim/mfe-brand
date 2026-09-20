@@ -371,6 +371,10 @@ function TrackOrderContent() {
                   <span className="font-semibold">Payment Status:</span>
                   <span className="font-bold uppercase text-emerald-700">{orderData.payment_status || 'Pending'}</span>
                 </div>
+                <div className="flex justify-between items-center text-[#141414]">
+                  <span className="font-semibold">Delivery Fee:</span>
+                  <span className="font-mono font-bold text-[#141414]">{formatPrice(orderData.shipping_amount ?? 100)}</span>
+                </div>
                 <div className="flex justify-between items-center text-[#141414] pt-2 border-t border-[#eae7e2]">
                   <span className="font-bold text-sm">Grand Total:</span>
                   <span className="font-bold font-mono text-base text-[#141414]">

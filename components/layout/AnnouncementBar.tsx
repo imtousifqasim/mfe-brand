@@ -22,7 +22,7 @@ interface AnnouncementBarProps {
 }
 
 export function AnnouncementBar({
-  message = 'Complimentary Express Nationwide Delivery on orders over PKR 5,000',
+  message = 'Flat Rs. 100 Express Nationwide Delivery on all orders across Pakistan',
   couponCode = 'MFE10',
   whatsappNumber = '+92 300 1234567',
   tickerMessages,
@@ -64,8 +64,8 @@ export function AnnouncementBar({
     : 'VIP 10% OFF';
 
   const cleanMessage =
-    !message || message.toLowerCase().includes('use code') || message.length > 70
-      ? 'Complimentary Express Nationwide Delivery on orders over PKR 5,000'
+    !message || message.toLowerCase().includes('use code') || message.length > 75
+      ? 'Flat Rs. 100 Express Nationwide Delivery on all orders across Pakistan'
       : message;
 
   const activeWhatsApp = whatsappNumber || '+92 300 1234567';

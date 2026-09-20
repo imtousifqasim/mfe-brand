@@ -123,6 +123,8 @@ export default function CheckoutPage() {
         items: items.map(i => ({
           productId: i.product.id,
           quantity: i.quantity,
+          size: i.selectedSize || undefined,
+          color: i.selectedColor || undefined,
         })),
         couponCode: couponCode || undefined,
         paymentMethod: selectedPayment,
@@ -201,6 +203,67 @@ export default function CheckoutPage() {
               <span className="text-xs font-bold uppercase text-[#141414]">{confirmedOrder.payment_method}</span>
             </div>
           </div>
+
+          {/* Invoice Cost Breakdown */}
+          <div className="p-4 bg-white border border-[#eae7e2] rounded-2xl space-y-2 text-xs">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#8c827a] pb-1 border-b border-[#eae7e2]">
+              Order Invoice Summary
+            </div>
+            <div className="flex justify-between text-[#6b6b6b]">
+              <span>Merchandise Subtotal:</span>
+              <span className="font-mono font-medium text-[#141414]">
+                {formatPrice(confirmedOrder.subtotal ?? (confirmedOrder.grand_total - (confirmedOrder.shipping_amount ?? 100)))}
+              </span>
+            </div>
+            {(confirmedOrder.discount_amount ?? 0) > 0 && (
+              <div className="flex justify-between text-emerald-700">
+                <span>Promotional Discount:</span>
+                <span className="font-mono font-medium">-{formatPrice(confirmedOrder.discount_amount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-[#6b6b6b]">
+              <span>Nationwide Courier Delivery:</span>
+              <span className="font-mono font-bold text-[#141414]">
+                {formatPrice(confirmedOrder.shipping_amount ?? 100)}
+              </span>
+            </div>
+            <div className="flex justify-between pt-2 border-t border-[#eae7e2] font-bold text-[#141414] text-sm">
+              <span>Total Payable:</span>
+              <span className="font-mono text-[#b87414]">{formatPrice(confirmedOrder.grand_total)}</span>
+            </div>
+          </div>
+
+          {/* Booked Items & Selected Sizes */}
+          {confirmedOrder.items && confirmedOrder.items.length > 0 && (
+            <div className="p-4 bg-white border border-[#eae7e2] rounded-2xl space-y-2 text-xs">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#8c827a] pb-1 border-b border-[#eae7e2]">
+                Booked Pieces & Tailored Sizes ({confirmedOrder.items.length})
+              </div>
+              <div className="space-y-2 pt-1">
+                {confirmedOrder.items.map((it: any, idx: number) => {
+                  const itemSize = it.selected_size || it.size || (it.attributes && it.attributes.size);
+                  return (
+                    <div key={idx} className="flex justify-between items-center text-xs">
+                      <div>
+                        <span className="font-bold text-[#141414]">{it.product_name}</span>
+                        <div className="flex items-center gap-2 text-[#6b6b6b] text-[11px] mt-0.5">
+                          <span>Qty: {it.quantity}</span>
+                          {itemSize && (
+                            <span className="bg-amber-100 text-amber-900 border border-amber-200 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                              Size: {itemSize}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="font-mono font-bold text-[#141414]">
+                        {formatPrice(it.subtotal || (it.unit_price * it.quantity))}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="text-xs text-[#6b6b6b] space-y-1.5">
             <div><strong className="text-[#141414]">Deliver to:</strong> {confirmedOrder.customer_name} ({confirmedOrder.customer_phone})</div>
@@ -686,13 +749,26 @@ export default function CheckoutPage() {
 
             {/* Items review */}
             <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-              {items.map(({ product, quantity }) => {
-                const price = product.sale_price ?? product.regular_price;
+              {items.map((item) => {
+                const { product, quantity, selectedSize, selectedColor } = item;
+                const price = item.unitPrice ?? (product.sale_price ?? product.regular_price);
                 return (
-                  <div key={product.id} className="flex justify-between items-center text-xs gap-3">
+                  <div key={item.cartItemId || `${product.id}_${selectedSize || 'std'}`} className="flex justify-between items-center text-xs gap-3">
                     <div className="truncate">
                       <p className="font-bold text-[#141414] truncate">{product.name}</p>
-                      <p className="text-[#6b6b6b] text-[11px]">Qty: {quantity} × {formatPrice(price)}</p>
+                      <div className="flex items-center gap-2 text-[#6b6b6b] text-[11px] mt-0.5">
+                        <span>Qty: {quantity} × {formatPrice(price)}</span>
+                        {selectedSize && (
+                          <span className="bg-amber-100 text-amber-900 border border-amber-200/80 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                            Size: {selectedSize}
+                          </span>
+                        )}
+                        {selectedColor && (
+                          <span className="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[10px]">
+                            {selectedColor}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <span className="font-sans font-bold text-[#141414] shrink-0">
                       {formatPrice(price * quantity)}

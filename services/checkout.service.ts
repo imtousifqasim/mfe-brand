@@ -1,6 +1,7 @@
 import { ProductRepository } from '@/repositories/product.repository';
 import { OrderRepository } from '@/repositories/order.repository';
 import { CouponRepository } from '@/repositories/coupon.repository';
+import { SettingsRepository } from '@/repositories/settings.repository';
 import { EmailService } from '@/services/email.service';
 import { getAllAdminClients, getActiveWriteAdmin } from '@/lib/supabase/admin';
 import bcrypt from 'bcryptjs';
@@ -9,6 +10,8 @@ import { Order, OrderAddress, PaymentMethodCode } from '@/types/database';
 export interface CheckoutItemRequest {
   productId: string;
   quantity: number;
+  size?: string;
+  color?: string;
 }
 
 export interface CheckoutRequest {
@@ -68,14 +71,18 @@ export class CheckoutService {
       const itemSubtotal = activePrice * item.quantity;
       subtotal += itemSubtotal;
 
+      const sizeLabel = item.size ? ` (Size: ${item.size})` : '';
+
       validatedItems.push({
         productId: product.id,
-        productName: product.name,
-        sku: product.sku,
+        productName: `${product.name}${sizeLabel}`,
+        sku: item.size ? `${product.sku}-${item.size}` : product.sku,
         unitPrice: activePrice,
         quantity: item.quantity,
         subtotal: itemSubtotal,
         imageUrl: product.images?.[0]?.image_url || null,
+        selected_size: item.size || null,
+        attributes: item.size ? { size: item.size, ...(item.color ? { color: item.color } : {}) } : (item.color ? { color: item.color } : null),
       });
     }
 
@@ -97,8 +104,10 @@ export class CheckoutService {
       }
     }
 
-    // 3. Calculate Shipping (Free above PKR 5,000; otherwise PKR 250 standard courier delivery)
-    const shippingAmount = subtotal >= 5000 ? 0 : 250;
+    // 3. Calculate Shipping (Loaded dynamically from site settings; defaults to fixed Rs. 100)
+    const shippingSettings = await SettingsRepository.getShippingSettings();
+    const isFree = shippingSettings.freeDeliveryThreshold && subtotal >= shippingSettings.freeDeliveryThreshold;
+    const shippingAmount = isFree ? 0 : (shippingSettings.deliveryCharge ?? 100);
     const grandTotal = Math.max(0, subtotal - discountAmount + shippingAmount);
 
     // 4. Handle Account Creation or Existing Customer Detection

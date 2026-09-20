@@ -438,7 +438,14 @@ export default function AdminOrderDetailPage() {
                   <div key={it.id || idx} className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 flex justify-between items-center text-xs">
                     <div>
                       <h3 className="font-bold text-slate-900 text-sm">{it.product_name}</h3>
-                      <div className="text-[10px] font-mono text-slate-400 mt-0.5">SKU: {it.sku}</div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] font-mono text-slate-400">SKU: {it.sku}</span>
+                        {(it.selected_size || it.size || (it.attributes && it.attributes.size)) && (
+                          <span className="bg-amber-100 text-amber-950 font-bold px-2 py-0.5 rounded-md text-[11px] border border-amber-300 shadow-2xs">
+                            Size: {it.selected_size || it.size || it.attributes?.size}
+                          </span>
+                        )}
+                      </div>
                       <div className="text-[11px] text-slate-500 mt-1">
                         {formatPrice(it.unit_price)} × {it.quantity} piece{it.quantity > 1 ? 's' : ''}
                       </div>

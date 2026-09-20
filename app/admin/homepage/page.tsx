@@ -24,7 +24,7 @@ export default function AdminHomepageCMSPage() {
   const [whatsappNumber, setWhatsappNumber] = useState(SEED_ANNOUNCEMENT.whatsapp_number || '+92 300 1234567');
   const [isActive, setIsActive] = useState(true);
   const [tickerMessages, setTickerMessages] = useState<string[]>([
-    'Complimentary Express Nationwide Delivery on orders over PKR 5,000',
+    'Flat Rs. 100 Express Nationwide Delivery on all orders across Pakistan',
     'Haute Couture 2026: Pure Handcrafted Lawn, Silk & Chiffon Heirlooms',
     '100% Genuine Designer Fabrics & 7-Day Seamless Return Privilege',
     'First Order Privilege: Unlock 10% Off with Code MFE10',
@@ -193,7 +193,7 @@ export default function AdminHomepageCMSPage() {
                 value={announcement}
                 onChange={(e) => setAnnouncement(e.target.value)}
                 className="w-full text-xs p-3 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-2xs"
-                placeholder="Complimentary Express Delivery..."
+                placeholder="Flat Rs. 100 Express Delivery..."
               />
             </div>
 

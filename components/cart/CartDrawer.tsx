@@ -26,6 +26,8 @@ export function CartDrawer() {
     subtotal, 
     shipping, 
     grandTotal, 
+    deliveryCharge,
+    freeDeliveryThreshold,
     isCartDrawerOpen, 
     closeCartDrawer, 
     updateQuantity, 
@@ -61,9 +63,9 @@ export function CartDrawer() {
 
   if (!isCartDrawerOpen) return null;
 
-  const freeShippingThreshold = 5000;
-  const progressPercent = Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
-  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
+  const hasThreshold = Boolean(freeDeliveryThreshold && freeDeliveryThreshold > 0);
+  const progressPercent = hasThreshold ? Math.min(100, Math.round((subtotal / freeDeliveryThreshold!) * 100)) : 100;
+  const remainingForFreeShipping = hasThreshold ? Math.max(0, freeDeliveryThreshold! - subtotal) : 0;
 
   return (
     <div className="fixed inset-0 z-[120] flex justify-end font-sans">
@@ -110,29 +112,43 @@ export function CartDrawer() {
             </button>
           </div>
 
-          {/* Free Nationwide Shipping Progress Bar */}
+          {/* Nationwide Shipping Status Banner */}
           <div className="mt-3.5 pt-3 border-t border-[#eae7e2]/60">
-            <div className="flex items-center justify-between text-[11px] mb-1.5">
-              <span className="text-[#141414] font-semibold flex items-center gap-1.5">
-                <Truck className="w-3.5 h-3.5 text-[#b87414]" />
-                {remainingForFreeShipping === 0 ? (
-                  <span className="text-emerald-600 font-bold">Free Express Delivery Unlocked!</span>
-                ) : (
-                  <span>
-                    Add <strong className="text-[#b87414]">PKR {remainingForFreeShipping.toLocaleString()}</strong> for Free Delivery
+            {hasThreshold ? (
+              <>
+                <div className="flex items-center justify-between text-[11px] mb-1.5">
+                  <span className="text-[#141414] font-semibold flex items-center gap-1.5">
+                    <Truck className="w-3.5 h-3.5 text-[#b87414]" />
+                    {remainingForFreeShipping === 0 ? (
+                      <span className="text-emerald-600 font-bold">Free Express Delivery Unlocked!</span>
+                    ) : (
+                      <span>
+                        Add <strong className="text-[#b87414]">PKR {remainingForFreeShipping.toLocaleString()}</strong> for Free Delivery
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              <span className="font-mono text-[10px] font-bold text-[#8c827a]">
-                {progressPercent}%
-              </span>
-            </div>
-            <div className="w-full h-1.5 bg-[#eae7e2] rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-[#d99026] to-[#b87414] transition-all duration-500 rounded-full"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
+                  <span className="font-mono text-[10px] font-bold text-[#8c827a]">
+                    {progressPercent}%
+                  </span>
+                </div>
+                <div className="w-full h-1.5 bg-[#eae7e2] rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#d99026] to-[#b87414] transition-all duration-500 rounded-full"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-between text-[11px] bg-white py-1 px-2 rounded-lg border border-[#eae7e2]">
+                <span className="text-[#141414] font-semibold flex items-center gap-1.5">
+                  <Truck className="w-3.5 h-3.5 text-[#b87414]" />
+                  <span>Express Courier: <strong className="text-[#b87414] font-mono">PKR {deliveryCharge}</strong> Flat Rate</span>
+                </span>
+                <span className="text-[10px] font-bold text-slate-700 bg-[#f7f5f2] px-2 py-0.5 rounded border border-[#eae7e2]">
+                  Nationwide
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

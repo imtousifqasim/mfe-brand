@@ -31,6 +31,8 @@ export default function CartPage() {
     grandTotal,
     couponCode,
     couponDiscount,
+    deliveryCharge,
+    freeDeliveryThreshold,
     updateQuantity,
     removeFromCart,
     clearCart,
@@ -54,9 +56,9 @@ export default function CartPage() {
     setIsApplying(false);
   };
 
-  const freeShippingThreshold = 5000;
-  const progressPercent = Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
-  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
+  const hasThreshold = Boolean(freeDeliveryThreshold && freeDeliveryThreshold > 0);
+  const progressPercent = hasThreshold ? Math.min(100, Math.round((subtotal / freeDeliveryThreshold!) * 100)) : 100;
+  const remainingForFreeShipping = hasThreshold ? Math.max(0, freeDeliveryThreshold! - subtotal) : 0;
 
   if (!isLoaded) {
     return (
@@ -171,29 +173,52 @@ export default function CartPage() {
         </div>
       </div>
 
-      {/* Free Nationwide Shipping Progress Bar Banner */}
+      {/* Nationwide Shipping Flat Rate Banner */}
       <div className="mb-8 p-4 rounded-2xl bg-[#faf8f5] border border-[#eae7e2] shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs mb-2">
-          <span className="text-[#141414] font-semibold flex items-center gap-2">
-            <Truck className="w-4 h-4 text-[#b87414]" />
-            {remainingForFreeShipping === 0 ? (
-              <strong className="text-emerald-700">Congratulations! You unlocked Free Nationwide Express Delivery.</strong>
-            ) : (
-              <span>
-                Add <strong className="text-[#b87414] font-mono font-bold">PKR {remainingForFreeShipping.toLocaleString()}</strong> more to enjoy Complimentary Delivery across Pakistan.
+        {hasThreshold ? (
+          <>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs mb-2">
+              <span className="text-[#141414] font-semibold flex items-center gap-2">
+                <Truck className="w-4 h-4 text-[#b87414]" />
+                {remainingForFreeShipping === 0 ? (
+                  <strong className="text-emerald-700">Congratulations! You unlocked Free Nationwide Express Delivery.</strong>
+                ) : (
+                  <span>
+                    Add <strong className="text-[#b87414] font-mono font-bold">PKR {remainingForFreeShipping.toLocaleString()}</strong> more to enjoy Complimentary Delivery across Pakistan.
+                  </span>
+                )}
               </span>
-            )}
-          </span>
-          <span className="font-mono text-xs font-bold text-[#8c827a]">
-            {progressPercent}% Met
-          </span>
-        </div>
-        <div className="w-full h-2 bg-[#eae7e2] rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-[#d99026] to-[#b87414] transition-all duration-500 rounded-full"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
+              <span className="font-mono text-xs font-bold text-[#8c827a]">
+                {progressPercent}% Met
+              </span>
+            </div>
+            <div className="w-full h-2 bg-[#eae7e2] rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-[#d99026] to-[#b87414] transition-all duration-500 rounded-full"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#b87414]/10 text-[#b87414] flex items-center justify-center shrink-0">
+                <Truck className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-bold text-[#141414] block text-sm">
+                  Fixed Nationwide Delivery: {formatPrice(deliveryCharge)}
+                </span>
+                <span className="text-[#6b6b6b] text-[11px]">
+                  Flat delivery fee of Rs. {deliveryCharge} applied automatically to every order nationwide.
+                </span>
+              </div>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full shrink-0 self-start sm:self-auto">
+              Cash on Delivery Available
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">

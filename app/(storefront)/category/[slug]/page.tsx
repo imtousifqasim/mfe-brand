@@ -1,8 +1,8 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { ProductRepository } from '@/repositories/product.repository';
+import { notFound, redirect } from 'next/navigation';
+import { ProductRepository, CATEGORY_ALIASES } from '@/repositories/product.repository';
 import { ProductCard } from '@/components/storefront/ProductCard';
 import { Compass, ArrowUpDown, ChevronRight, Sparkles } from 'lucide-react';
 import { resolveHighResImageUrl } from '@/lib/image-resolver';
@@ -20,8 +20,9 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const canonicalSlug = CATEGORY_ALIASES[slug.toLowerCase()] || slug;
   const categories = await ProductRepository.getCategories();
-  const category = categories.find((c) => c.slug === slug);
+  const category = categories.find((c) => c.slug === canonicalSlug || c.slug === slug);
 
   if (!category) {
     return {
@@ -69,6 +70,12 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params;
+  const cleanSlug = slug.toLowerCase().trim();
+  
+  if (CATEGORY_ALIASES[cleanSlug]) {
+    redirect(`/category/${CATEGORY_ALIASES[cleanSlug]}`);
+  }
+
   const { sortBy = 'newest' } = await searchParams;
 
   const [categories, { products, total }] = await Promise.all([

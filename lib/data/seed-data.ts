@@ -196,13 +196,13 @@ export const SEED_ADVANTAGES: Advantage[] = [
 
 export const SEED_ANNOUNCEMENT: Announcement = {
   id: 'ann-1',
-  message: 'Complimentary Express Nationwide Delivery on orders over PKR 5,000',
+  message: 'Flat Rs. 100 Express Nationwide Delivery on all orders across Pakistan',
   coupon_code: 'MFE10',
   link_url: '/products',
   is_active: true,
   whatsapp_number: '+92 300 1234567',
   ticker_messages: [
-    'Complimentary Express Nationwide Delivery on orders over PKR 5,000',
+    'Flat Rs. 100 Express Nationwide Delivery on all orders across Pakistan',
     'Haute Couture 2026: Pure Handcrafted Lawn, Silk & Chiffon Heirlooms',
     '100% Genuine Designer Fabrics & 7-Day Seamless Return Privilege',
     'First Order Privilege: Unlock 10% Off with Code MFE10',
@@ -1122,6 +1122,22 @@ export const SEED_PRODUCTS: Product[] = [
     is_popular: true,
     is_published: true,
     view_count: 240,
+    has_sizes: true,
+    available_sizes: ['S', 'M', 'L', 'XL'],
+    size_chart: {
+      trouser: [
+        { size: 'S', waist: '26-30', length: '39' },
+        { size: 'M', waist: '28-44', length: '39' },
+        { size: 'L', waist: '32-48', length: '39' },
+        { size: 'XL', waist: '36-52', length: '40' },
+      ],
+      shirt: [
+        { size: 'S', chest: '19', sleeves: '20.5', length: '25.5' },
+        { size: 'M', chest: '20', sleeves: '20.5', length: '27' },
+        { size: 'L', chest: '21', sleeves: '21.5', length: '28' },
+        { size: 'XL', chest: '22', sleeves: '22', length: '30' },
+      ],
+    },
     category: SEED_CATEGORIES[1],
     brand: SEED_BRANDS[2],
     images: [

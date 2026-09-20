@@ -1,4 +1,4 @@
-import { createAdminClient, queryAcrossAllShards, findAcrossAllShards, getActiveWriteAdmin } from '@/lib/supabase/admin';
+import { createAdminClient, queryAcrossAllShards, findAcrossAllShards, getActiveWriteAdmin, getAllAdminClients } from '@/lib/supabase/admin';
 import { Product, Category, Brand } from '@/types/database';
 import { SEED_PRODUCTS, SEED_CATEGORIES, SEED_BRANDS } from '@/lib/data/seed-data';
 import { resolveHighResImageUrl } from '@/lib/image-resolver';
@@ -38,10 +38,56 @@ export interface ProductFilterOptions {
   offset?: number;
 }
 
+export const CATEGORY_ALIASES: Record<string, string> = {
+  'pret': 'womens-unstitched-stitched-suits',
+  'ready-to-wear-pret': 'womens-unstitched-stitched-suits',
+  'festive': 'womens-unstitched-stitched-suits',
+  'festive-formals': 'womens-unstitched-stitched-suits',
+  'unstitched-luxury': 'womens-unstitched-stitched-suits',
+  'suits': 'womens-unstitched-stitched-suits',
+  'winter': 'winter-wear-shawls',
+  'shawls': 'winter-wear-shawls',
+  'menswear': 'mens-clothing',
+  'mens-wear': 'mens-clothing',
+  'wallets': 'mens-accessories-wallets',
+  'bags': 'womens-accessories-bags',
+  'fragrance': 'fragrance-perfumes',
+  'perfumes': 'fragrance-perfumes',
+  'wellness': 'health-fitness-wellness',
+  'bath': 'bath-personal-care',
+  'home': 'home-living',
+};
+
 export class ProductRepository {
   private static mockProducts: Product[] = SEED_PRODUCTS.map(normalizeProductImages);
 
   static async getProducts(filters: ProductFilterOptions = {}): Promise<{ products: Product[]; total: number }> {
+    const cleanCategorySlug = filters.categorySlug?.toLowerCase().trim();
+    const resolvedCategorySlug = cleanCategorySlug ? (CATEGORY_ALIASES[cleanCategorySlug] || cleanCategorySlug) : undefined;
+    
+    // Resolve target category if slug is provided
+    let targetCategory: Category | undefined = undefined;
+    if (resolvedCategorySlug || cleanCategorySlug) {
+      try {
+        const categories = await this.getCategories();
+        targetCategory = categories.find(c => 
+          c.slug.toLowerCase() === resolvedCategorySlug ||
+          c.slug.toLowerCase() === cleanCategorySlug ||
+          c.id === cleanCategorySlug
+        );
+      } catch {}
+    }
+
+    // Resolve target brand if slug is provided
+    let targetBrand: Brand | undefined = undefined;
+    if (filters.brandSlug) {
+      try {
+        const cleanBrand = filters.brandSlug.toLowerCase().trim();
+        const brands = await this.getBrands();
+        targetBrand = brands.find(b => b.slug.toLowerCase() === cleanBrand || b.id === cleanBrand);
+      } catch {}
+    }
+
     try {
       const shardProducts = await queryAcrossAllShards<Product>(async (supabase) => {
         let query = supabase
@@ -53,6 +99,16 @@ export class ProductRepository {
             images:product_images(*)
           `, { count: 'exact' })
           .eq('is_published', true);
+
+        if (targetCategory) {
+          query = query.eq('category_id', targetCategory.id);
+        } else if (resolvedCategorySlug) {
+          query = query.eq('category_id', resolvedCategorySlug);
+        }
+
+        if (targetBrand) {
+          query = query.eq('brand_id', targetBrand.id);
+        }
 
         if (filters.isBestDeal) query = query.eq('is_best_deal', true);
         if (filters.isNewArrival) query = query.eq('is_new_arrival', true);
@@ -77,10 +133,29 @@ export class ProductRepository {
         // Deduplicate across shards by slug or id and normalize images
         const map = new Map<string, Product>();
         items.forEach(p => map.set(p.slug || p.id, normalizeProductImages(p)));
-        return Array.from(map.values());
+        let list = Array.from(map.values());
+
+        // Client-side category partition filter to guarantee zero leakage
+        if (targetCategory || resolvedCategorySlug || cleanCategorySlug) {
+          list = list.filter(p => 
+            (targetCategory && (p.category_id === targetCategory.id || p.category?.id === targetCategory.id)) ||
+            (resolvedCategorySlug && p.category?.slug?.toLowerCase() === resolvedCategorySlug) ||
+            (cleanCategorySlug && p.category?.slug?.toLowerCase() === cleanCategorySlug)
+          );
+        }
+
+        if (targetBrand || filters.brandSlug) {
+          const bSlug = filters.brandSlug?.toLowerCase();
+          list = list.filter(p =>
+            (targetBrand && (p.brand_id === targetBrand.id || p.brand?.id === targetBrand.id)) ||
+            (bSlug && p.brand?.slug?.toLowerCase() === bSlug)
+          );
+        }
+
+        return list;
       });
 
-      if (shardProducts && shardProducts.length > 0) {
+      if (Array.isArray(shardProducts)) {
         const offset = filters.offset || 0;
         const limit = filters.limit || 50;
         return {
@@ -95,11 +170,19 @@ export class ProductRepository {
     // Fallback filter logic
     let result = [...this.mockProducts];
 
-    if (filters.categorySlug) {
-      result = result.filter(p => p.category?.slug === filters.categorySlug);
+    if (targetCategory || resolvedCategorySlug || cleanCategorySlug) {
+      result = result.filter(p => 
+        (targetCategory && (p.category_id === targetCategory.id || p.category?.id === targetCategory.id)) ||
+        (resolvedCategorySlug && p.category?.slug?.toLowerCase() === resolvedCategorySlug) ||
+        (cleanCategorySlug && p.category?.slug?.toLowerCase() === cleanCategorySlug)
+      );
     }
-    if (filters.brandSlug) {
-      result = result.filter(p => p.brand?.slug === filters.brandSlug);
+    if (targetBrand || filters.brandSlug) {
+      const bSlug = filters.brandSlug?.toLowerCase();
+      result = result.filter(p => 
+        (targetBrand && (p.brand_id === targetBrand.id || p.brand?.id === targetBrand.id)) ||
+        (bSlug && p.brand?.slug?.toLowerCase() === bSlug)
+      );
     }
     if (filters.isBestDeal) {
       result = result.filter(p => p.is_best_deal);
@@ -290,7 +373,6 @@ export class ProductRepository {
 
   static async updateProduct(id: string, updates: Partial<Product>): Promise<Product | null> {
     try {
-      const supabase = createAdminClient();
       const updateData: Record<string, any> = {
         updated_at: new Date().toISOString(),
       };
@@ -305,35 +387,56 @@ export class ProductRepository {
       if (updates.is_featured !== undefined) updateData.is_featured = updates.is_featured;
       if (updates.is_best_deal !== undefined) updateData.is_best_deal = updates.is_best_deal;
       if (updates.is_new_arrival !== undefined) updateData.is_new_arrival = updates.is_new_arrival;
+      if (updates.has_sizes !== undefined) updateData.has_sizes = updates.has_sizes;
+      if (updates.available_sizes !== undefined) updateData.available_sizes = updates.available_sizes;
+      if (updates.size_chart !== undefined) updateData.size_chart = updates.size_chart;
+      if (updates.size_stock !== undefined) updateData.size_stock = updates.size_stock;
 
-      const { data: dbProduct, error } = await supabase
-        .from('products')
-        .update(updateData)
-        .eq('id', id)
-        .select(`
-          *,
-          category:categories(*),
-          brand:brands(*),
-          images:product_images(*)
-        `)
-        .single();
+      const shards = getAllAdminClients();
+      let lastUpdatedProduct: Product | null = null;
 
-      if (!error && dbProduct) {
-        const idx = this.mockProducts.findIndex(p => p.id === id);
-        if (idx > -1) this.mockProducts[idx] = { ...this.mockProducts[idx], ...(dbProduct as Product) };
-        return dbProduct as Product;
+      for (const { client } of shards) {
+        // Find product by id, sku, or slug
+        const targetIdentifier = updates.sku || updates.slug || id;
+        const { data: dbProduct, error } = await client
+          .from('products')
+          .update(updateData)
+          .or(`id.eq.${id},sku.eq.${targetIdentifier},slug.eq.${targetIdentifier}`)
+          .select(`
+            *,
+            category:categories(*),
+            brand:brands(*),
+            images:product_images(*)
+          `)
+          .maybeSingle();
+
+        if (!error && dbProduct) {
+          lastUpdatedProduct = dbProduct as Product;
+        }
       }
-    } catch {
-      // Fallback
+
+      if (lastUpdatedProduct) {
+        const idx = this.mockProducts.findIndex(p => p.id === id || p.slug === updates.slug || p.sku === updates.sku);
+        if (idx > -1) {
+          this.mockProducts[idx] = { ...this.mockProducts[idx], ...lastUpdatedProduct };
+        }
+        return lastUpdatedProduct;
+      }
+    } catch (err) {
+      console.error('Failed to update product in shards:', err);
     }
 
-    const idx = this.mockProducts.findIndex(p => p.id === id);
+    const idx = this.mockProducts.findIndex(p => p.id === id || p.slug === id || p.sku === id);
     if (idx > -1) {
       this.mockProducts[idx] = {
         ...this.mockProducts[idx],
         ...updates,
         regular_price: updates.regular_price !== undefined ? Number(updates.regular_price) : this.mockProducts[idx].regular_price,
         sale_price: updates.sale_price !== undefined ? (updates.sale_price === null ? null : Number(updates.sale_price)) : this.mockProducts[idx].sale_price,
+        has_sizes: updates.has_sizes !== undefined ? updates.has_sizes : this.mockProducts[idx].has_sizes,
+        available_sizes: updates.available_sizes !== undefined ? updates.available_sizes : this.mockProducts[idx].available_sizes,
+        size_chart: updates.size_chart !== undefined ? updates.size_chart : this.mockProducts[idx].size_chart,
+        size_stock: updates.size_stock !== undefined ? updates.size_stock : this.mockProducts[idx].size_stock,
         updated_at: new Date().toISOString(),
       };
       return this.mockProducts[idx];
