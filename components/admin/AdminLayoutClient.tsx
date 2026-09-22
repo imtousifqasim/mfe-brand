@@ -86,9 +86,11 @@ export function AdminLayoutClient({
           </button>
 
           <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 flex items-center justify-center font-black text-sm shadow-xs">
-              MFE
-            </div>
+            <img
+              src="/logo.png"
+              alt="MFE BRAND Logo"
+              className="w-8 h-8 rounded-xl object-contain shadow-xs bg-white p-0.5 border border-slate-200"
+            />
             <div>
               <span className="font-extrabold text-sm tracking-tight text-slate-900 block leading-tight">
                 MFE BRAND CONTROL

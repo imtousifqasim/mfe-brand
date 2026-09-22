@@ -109,8 +109,8 @@ function AdminLoginForm() {
       
       {/* Brand Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 mb-4 shadow-2xs">
-          <ShieldCheck className="w-7 h-7 text-amber-600" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white border border-slate-200 p-1 mb-4 shadow-sm">
+          <img src="/logo.png" alt="MFE BRAND Logo" className="w-full h-full object-contain" />
         </div>
         <h1 className="font-display text-2xl font-black tracking-[0.2em] uppercase text-slate-900">
           MFE BRAND
