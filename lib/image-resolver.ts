@@ -67,7 +67,11 @@ export const HIGHRES_IMAGE_MAP: Record<string, string> = {
   "https://i.postimg.cc/KRMCf3Tx/Whats-App-Image-2026-09-19-at-11-42-49-PM.jpg": "https://i.postimg.cc/hcgG1rkr/Whats-App-Image-2026-09-19-at-11-42-49-PM.jpg",
   "https://i.postimg.cc/xczB5Nm0/Whats-App-Image-2026-09-19-at-11-42-55-PM.jpg": "https://i.postimg.cc/YMkSz358/Whats-App-Image-2026-09-19-at-11-42-55-PM.jpg",
   "https://i.postimg.cc/F73n3tM6/Whats-App-Image-2026-09-19-at-11-48-38-PM-(1).jpg": "https://i.postimg.cc/L2HH1sPg/Whats-App-Image-2026-09-19-at-11-48-38-PM-(1).jpg",
-  "https://i.postimg.cc/sv707dFF/Whats-App-Image-2026-09-19-at-11-48-39-PM.jpg": "https://i.postimg.cc/JM11khXj/Whats-App-Image-2026-09-19-at-11-48-39-PM.jpg"
+  "https://i.postimg.cc/sv707dFF/Whats-App-Image-2026-09-19-at-11-48-39-PM.jpg": "https://i.postimg.cc/JM11khXj/Whats-App-Image-2026-09-19-at-11-48-39-PM.jpg",
+  "https://i.postimg.cc/NLKHfQwH/Whats-App-Image-2026-09-22-at-10-33-57-PM.jpg": "https://i.postimg.cc/TG87RLrM/Whats-App-Image-2026-09-22-at-10-33-57-PM.jpg",
+  "https://i.postimg.cc/gLLXMHDm/Whats-App-Image-2026-09-22-at-10-33-57-PM-(1).jpg": "https://i.postimg.cc/h4qpM6Sr/Whats-App-Image-2026-09-22-at-10-33-57-PM-(1).jpg",
+  "https://i.postimg.cc/4nY9NXTt/Whats-App-Image-2026-09-22-at-10-33-58-PM.jpg": "https://i.postimg.cc/gd9SYXvP/Whats-App-Image-2026-09-22-at-10-33-58-PM.jpg",
+  "https://i.postimg.cc/K41MvmyT/Whats-App-Image-2026-09-22-at-10-33-58-PM-(1).jpg": "https://i.postimg.cc/syF6VQpC/Whats-App-Image-2026-09-22-at-10-33-58-PM-(1).jpg"
 };
 
 /**

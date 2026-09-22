@@ -96,6 +96,13 @@ const MEGA_CATEGORIES = [
     image: 'https://i.postimg.cc/VfYs1Lzt/Whats-App-Image-2026-09-19-at-10-48-33-PM.jpg',
     tag: 'Fragrance',
   },
+  {
+    name: "Luxury Watches",
+    slug: 'luxury-watches',
+    subtitle: 'Rhinestone Quartz Chain Timepieces',
+    image: 'https://i.postimg.cc/TG87RLrM/Whats-App-Image-2026-09-22-at-10-33-57-PM.jpg',
+    tag: 'Watches',
+  },
 ];
 
 const TRENDING_SEARCHES = [

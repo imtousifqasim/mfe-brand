@@ -56,6 +56,9 @@ export const CATEGORY_ALIASES: Record<string, string> = {
   'wellness': 'health-fitness-wellness',
   'bath': 'bath-personal-care',
   'home': 'home-living',
+  'watches': 'luxury-watches',
+  'watch': 'luxury-watches',
+  'luxury-watches': 'luxury-watches',
 };
 
 export class ProductRepository {

@@ -181,6 +181,19 @@ function getProductRealOptions(product: Product): RealProductOption {
     return { colorName: 'Tan Brown' };
   }
 
+  if (sku.includes('SBHJ717') || sku.includes('WCH') || name.includes('rhinestone') || name.includes('watch')) {
+    return {
+      colors: [
+        { name: 'Golden', hex: '#D4AF37' },
+        { name: 'Silver', hex: '#C0C0C0' },
+        { name: 'Black', hex: '#1C1C1C' },
+        { name: 'Rose Gold', hex: '#B76E79' },
+      ],
+      colorName: 'Golden',
+      hasSizeGuide: false,
+    };
+  }
+
   let extractedColor = undefined;
   const colorMatch = desc.match(/color:\s*([a-zA-Z\s]+?)(•|\n|\$|<|$)/i);
   if (colorMatch && colorMatch[1].trim().length < 25) {

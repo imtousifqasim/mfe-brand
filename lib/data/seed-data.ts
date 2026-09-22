@@ -91,6 +91,15 @@ export const SEED_CATEGORIES: Category[] = [
     sort_order: 10,
     is_active: true,
   },
+  {
+    id: 'cat-11',
+    name: 'Luxury Watches',
+    slug: 'luxury-watches',
+    description: 'Exquisite iced-out quartz wristwatches, diamond rhinestone dials, and stainless steel chain strap timepieces for men and women.',
+    image_url: 'https://i.postimg.cc/TG87RLrM/Whats-App-Image-2026-09-22-at-10-33-57-PM.jpg',
+    sort_order: 11,
+    is_active: true,
+  },
 ];
 
 export const SEED_BRANDS: Brand[] = [
@@ -1297,5 +1306,91 @@ export const SEED_PRODUCTS: Product[] = [
     ],
     average_rating: 4.9,
     review_count: 18,
+  },
+  {
+    id: 'prod-18',
+    name: "Luxury Rhinestone White & Gold Watch Women Men",
+    slug: "luxury-rhinestone-white-gold-watch-women-men",
+    sku: "MFE-WCH-SBHJ717",
+    short_description: "Exquisite iced-out quartz luxury square wristwatch adorned with shimmering diamond rhinestones, stainless steel chain bracelet, and premium folding clasp.",
+    full_description: `Luxury Rhinestone White & Gold Watch for Men & Women – High Precision Quartz Timepiece
+
+HOT DEALS: Luxury Diamond Men Women Watches Gold Watch Ladies Wrist Watch Luxury Rhinestone Unisex Bracelet Watches Female Clock 2025 New. Specifications for Ice Out Relogioss Men's Square Watches Fashion Luxury Quartz Wrist Watches Business Stainless Steel Watch.
+
+SPECIFICATIONS & DETAILS:
+• Material: Stainless Steel
+• Pattern: Chain Strap
+• Gender: Men's / Women's (Unisex)
+• Number Of Pieces: 1 Pc
+• Color Options: Golden, Silver, Black, Rose Gold
+• Package Includes: 1 x Chain Watch
+
+PRODUCT SPECIFICS:
+• Movement: High-Precision Quartz
+• Case Thickness: 10mm
+• Band Width: 22mm
+• Band Material Type: Stainless Steel
+• Case Shape: Square
+• Dial Window Material Type: Glass
+• Boxes & Cases Material: Paper Box
+• Model Number: SBHJ717
+• Dial Diameter: 44mm
+• Water Resistance Depth: Daily splash resistant / No Waterproof deep submersion
+
+WHY SHOULD YOU CHOOSE OUR PRODUCTS?
+• The way we do business: This is about our process, policies, product quality, and rigorous craftsmanship standards.
+• Customer service: Our customers love the way we treat them. Our employees are friendly, knowledgeable, and quick to respond.
+• 100% Satisfaction Guarantee: If any quality problems with the product, please feel free to contact us, we will FULLY REFUND or provide a new one!
+• Note: There might be slight color differences as a result of varying lighting and monitor effects.`,
+    regular_price: 2999,
+    sale_price: 1999,
+    cost_price: 1100,
+    stock_quantity: 35,
+    stock_status: 'in_stock',
+    low_stock_threshold: 5,
+    category_id: 'cat-11',
+    brand_id: 'brand-1',
+    weight: 0.35,
+    dimensions: '10x10x6 cm',
+    is_featured: true,
+    is_best_deal: true,
+    is_new_arrival: true,
+    is_popular: true,
+    is_published: true,
+    view_count: 310,
+    category: SEED_CATEGORIES[10],
+    brand: SEED_BRANDS[0],
+    images: [
+      {
+        id: 'img-18-1',
+        image_url: "https://i.postimg.cc/TG87RLrM/Whats-App-Image-2026-09-22-at-10-33-57-PM.jpg",
+        alt_text: "Luxury Rhinestone White & Gold Watch Front View",
+        sort_order: 1,
+        is_primary: true,
+      },
+      {
+        id: 'img-18-2',
+        image_url: "https://i.postimg.cc/h4qpM6Sr/Whats-App-Image-2026-09-22-at-10-33-57-PM-(1).jpg",
+        alt_text: "Diamond Rhinestone Dial and Stainless Steel Chain Strap",
+        sort_order: 2,
+        is_primary: false,
+      },
+      {
+        id: 'img-18-3',
+        image_url: "https://i.postimg.cc/gd9SYXvP/Whats-App-Image-2026-09-22-at-10-33-58-PM.jpg",
+        alt_text: "Iced Out Square Bezel and Folding Clasp Detail",
+        sort_order: 3,
+        is_primary: false,
+      },
+      {
+        id: 'img-18-4',
+        image_url: "https://i.postimg.cc/syF6VQpC/Whats-App-Image-2026-09-22-at-10-33-58-PM-(1).jpg",
+        alt_text: "Luxury Rhinestone Quartz Watch On Display",
+        sort_order: 4,
+        is_primary: false,
+      },
+    ],
+    average_rating: 4.95,
+    review_count: 24,
   }
 ];
