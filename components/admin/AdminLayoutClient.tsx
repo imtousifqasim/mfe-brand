@@ -85,20 +85,15 @@ export function AdminLayoutClient({
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <Link href="/admin" className="flex items-center gap-2.5">
+          <Link href="/admin" className="flex items-center gap-3">
             <img
               src="/logo.png"
-              alt="MFE BRAND Logo"
-              className="w-8 h-8 rounded-xl object-contain shadow-xs bg-white p-0.5 border border-slate-200"
+              alt="MFE BRAND"
+              className="h-10 w-auto object-contain"
             />
-            <div>
-              <span className="font-extrabold text-sm tracking-tight text-slate-900 block leading-tight">
-                MFE BRAND CONTROL
-              </span>
-              <span className="text-[10px] text-amber-700 font-semibold tracking-wider uppercase block">
-                Atelier Administration Suite
-              </span>
-            </div>
+            <span className="text-[10px] text-amber-700 font-bold tracking-[0.2em] uppercase border-l border-slate-200 pl-3">
+              Admin Suite
+            </span>
           </Link>
         </div>
 

@@ -109,14 +109,11 @@ function AdminLoginForm() {
       
       {/* Brand Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white border border-slate-200 p-1 mb-4 shadow-sm">
-          <img src="/logo.png" alt="MFE BRAND Logo" className="w-full h-full object-contain" />
-        </div>
-        <h1 className="font-display text-2xl font-black tracking-[0.2em] uppercase text-slate-900">
-          MFE BRAND
-        </h1>
-        <p className="text-[10px] font-sans font-bold tracking-[0.3em] uppercase text-amber-700 mt-1">
-          Haute Couture • Control Center
+        <Link href="/" className="inline-block mb-3">
+          <img src="/logo.png" alt="MFE BRAND" className="h-20 w-auto mx-auto object-contain" />
+        </Link>
+        <p className="text-[11px] font-sans font-bold tracking-[0.25em] uppercase text-amber-700">
+          Administration Portal
         </p>
         <p className="text-xs text-slate-500 mt-2">
           {step === 'credentials'

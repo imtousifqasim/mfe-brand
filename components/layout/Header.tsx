@@ -283,20 +283,12 @@ export function Header() {
 
           {/* Logo & Reduced Focused Navigation Links */}
           <div className="flex items-center gap-5 xl:gap-8 min-w-0">
-            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group py-1 shrink-0">
+            <Link href="/" className="flex items-center group py-1 shrink-0">
               <img
                 src="/logo.png"
-                alt="MFE BRAND Logo"
-                className="w-9 h-9 sm:w-10 sm:h-10 object-contain drop-shadow-xs transition-transform duration-300 group-hover:scale-105"
+                alt="MFE BRAND"
+                className="h-11 sm:h-13 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="flex flex-col justify-center">
-                <span className="font-display text-lg sm:text-xl lg:text-[22px] font-bold tracking-[0.20em] uppercase text-[#141414] transition-colors duration-300 group-hover:text-[#b87414] leading-none">
-                  MFE BRAND
-                </span>
-                <span className="text-[7.5px] sm:text-[8px] tracking-[0.35em] font-sans font-medium text-[#b87414] uppercase mt-1 leading-none">
-                  HAUTE COUTURE • EST. 2026
-                </span>
-              </div>
             </Link>
 
             {/* Reduced, clean navigation menus (NO OVERLAP) */}
@@ -695,21 +687,13 @@ export function Header() {
                 <Link 
                   href="/" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 group"
+                  className="flex items-center group"
                 >
                   <img
                     src="/logo.png"
-                    alt="MFE BRAND Logo"
-                    className="w-10 h-10 object-contain drop-shadow-xs"
+                    alt="MFE BRAND"
+                    className="h-12 w-auto object-contain"
                   />
-                  <div className="flex flex-col">
-                    <span className="font-display text-base font-bold tracking-[0.2em] text-[#141414] uppercase leading-none">
-                      MFE BRAND
-                    </span>
-                    <span className="text-[7.5px] tracking-[0.35em] font-sans font-semibold text-[#b87414] uppercase mt-1">
-                      HAUTE COUTURE • EST. 2026
-                    </span>
-                  </div>
                 </Link>
 
                 <button

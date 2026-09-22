@@ -91,20 +91,12 @@ export function Footer() {
           
           {/* Column 1: Brand & Social */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link href="/" className="inline-block group">
               <img
                 src="/logo.png"
-                alt="MFE BRAND Logo"
-                className="w-11 h-11 object-contain rounded-xl p-0.5 bg-white/5 border border-white/10 group-hover:border-[#d99026]/40 transition"
+                alt="MFE BRAND"
+                className="h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
-              <div>
-                <span className="font-display text-2xl tracking-[0.22em] uppercase font-bold text-white group-hover:text-[#d99026] transition">
-                  MFE BRAND
-                </span>
-                <div className="text-[9px] tracking-[0.35em] font-sans font-bold text-[#d99026] uppercase mt-0.5">
-                  Haute Couture • Est. 2026
-                </div>
-              </div>
             </Link>
             <p className="text-xs text-neutral-400 leading-relaxed font-sans">
               MFE Brand defines contemporary Pakistani high fashion, combining heirloom artisanal zardozi embroidery with modern pret silhouettes for timeless luxury.
