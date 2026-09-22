@@ -12,7 +12,7 @@ import {
 export default function AdminSettingsPage() {
   const [storeName, setStoreName] = useState('MFE BRAND');
   const [storeEmail, setStoreEmail] = useState('support@mfebrand.com');
-  const [storePhone, setStorePhone] = useState('+92 300 1234567');
+  const [storePhone, setStorePhone] = useState('+92 326 7727318');
   const [logoUrl, setLogoUrl] = useState('https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=400&auto=format&fit=crop');
   const [currency, setCurrency] = useState('PKR');
 

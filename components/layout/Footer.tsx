@@ -176,11 +176,13 @@ export function Footer() {
             <ul className="space-y-3 text-xs text-neutral-300 font-sans">
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-[#d99026] shrink-0 mt-0.5" />
-                <span>MFE Tower, Main Boulevard, Gulberg III, Lahore, Pakistan</span>
+                <span>Near Meezan Bank Branch, Peco Road, Lahore, Punjab, Pakistan</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-[#d99026] shrink-0" />
-                <span>+92 300 1234567</span>
+                <a href="tel:+923267727318" className="hover:text-[#d99026] transition">
+                  +92 326 7727318
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-[#d99026] shrink-0" />

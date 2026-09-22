@@ -24,7 +24,7 @@ interface AnnouncementBarProps {
 export function AnnouncementBar({
   message = 'Flat Rs. 100 Express Nationwide Delivery on all orders across Pakistan',
   couponCode = 'MFE10',
-  whatsappNumber = '+92 300 1234567',
+  whatsappNumber = '+92 326 7727318',
   tickerMessages,
 }: AnnouncementBarProps) {
   const [copied, setCopied] = useState(false);
@@ -68,7 +68,7 @@ export function AnnouncementBar({
       ? 'Flat Rs. 100 Express Nationwide Delivery on all orders across Pakistan'
       : message;
 
-  const activeWhatsApp = whatsappNumber || '+92 300 1234567';
+  const activeWhatsApp = whatsappNumber || '+92 326 7727318';
   const cleanPhoneDigits = activeWhatsApp.replace(/[^0-9]/g, '');
 
   const copyCode = (e: React.MouseEvent) => {

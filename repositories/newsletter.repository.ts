@@ -268,7 +268,7 @@ export class NewsletterRepository {
     }
 
     const storeUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mfebrand.com';
-    const storePhone = process.env.NEXT_PUBLIC_STORE_PHONE || '+92 300 1234567';
+    const storePhone = process.env.NEXT_PUBLIC_STORE_PHONE || '+92 326 7727318';
 
     // Build Luxury Branded HTML Email Template
     const brandedHtml = `
@@ -301,7 +301,7 @@ export class NewsletterRepository {
               </div>
               <h2 style="margin: 0 0 20px; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; color: #ffffff; line-height: 1.4;">${subject}</h2>
               <div style="color: #d4d4d8; font-size: 14px; line-height: 1.8; white-space: pre-line;">
-                ${messageHtml}
+                 ${messageHtml}
               </div>
               <div style="margin-top: 36px; padding-top: 24px; border-top: 1px solid #222228; text-align: center;">
                 <a href="${storeUrl}/products" style="display: inline-block; background-color: #d99026; color: #0b0b0d; text-decoration: none; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; padding: 15px 32px; border-radius: 30px; box-shadow: 0 4px 15px rgba(217,144,38,0.3);">Explore Private Collection</a>
@@ -312,7 +312,7 @@ export class NewsletterRepository {
           <tr>
             <td style="padding: 24px 32px 32px; background-color: #0f0f13; border-top: 1px solid #22222a; text-align: center; color: #71717a; font-size: 11px; line-height: 1.7;">
               <p style="margin: 0 0 6px; color: #a1a1aa; font-weight: 600;">MFE BRAND HAUTE COUTURE • VIP CONCIERGE</p>
-              <p style="margin: 0 0 12px;">Helpline / WhatsApp: ${storePhone} • Gulberg III, Lahore, Pakistan</p>
+              <p style="margin: 0 0 12px;">Helpline / WhatsApp: ${storePhone} • Near Meezan Bank Branch, Peco Road, Lahore, Punjab, Pakistan</p>
               <p style="margin: 0 0 8px;">You are receiving this private communication as an esteemed patron of MFE Brand.</p>
               <p style="margin: 0;">
                 <a href="${storeUrl}" style="color: #d99026; text-decoration: none; margin-right: 15px;">Atelier Storefront</a>

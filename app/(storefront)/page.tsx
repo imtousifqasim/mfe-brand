@@ -72,10 +72,11 @@ export default async function HomePage() {
         'logo': 'https://mfe-brand.com/favicon.ico',
         'description':
           'Premier Pakistani haute couture maison specializing in hand-embroidered unstitched suits, festive formals, pure wool shawls, and fine leather accessories.',
-        'telephone': '+923001234567',
+        'telephone': '+923267727318',
         'priceRange': 'PKR 1,500 - PKR 25,000',
         'address': {
           '@type': 'PostalAddress',
+          'streetAddress': 'Near Meezan Bank Branch, Peco Road',
           'addressLocality': 'Lahore',
           'addressRegion': 'Punjab',
           'addressCountry': 'PK',

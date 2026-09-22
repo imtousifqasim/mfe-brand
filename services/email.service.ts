@@ -232,8 +232,8 @@ export class EmailService {
                 <!-- Footer -->
                 <tr>
                   <td style="background-color: #f7f5f2; padding: 26px 30px; text-align: center; border-top: 1px solid #eae7e2; font-size: 11px; color: #8c827a; line-height: 1.6;">
-                    MFE Brand Haute Couture Atelier • Gulberg III, Lahore, Pakistan<br>
-                    Concierge Helpline: +92 300 1234567 • concierge@mfebrand.com
+                    MFE Brand Haute Couture Atelier • Near Meezan Bank Branch, Peco Road, Lahore, Punjab, Pakistan<br>
+                    Concierge Helpline: +92 326 7727318 • concierge@mfebrand.com
                   </td>
                 </tr>
               </table>
@@ -333,7 +333,7 @@ export class EmailService {
 
                 <tr>
                   <td style="background-color: #f7f5f2; padding: 26px 30px; text-align: center; border-top: 1px solid #eae7e2; font-size: 11px; color: #8c827a; line-height: 1.6;">
-                    MFE Brand Haute Couture Atelier • Gulberg III, Lahore, Pakistan<br>
+                    MFE Brand Haute Couture Atelier • Near Meezan Bank Branch, Peco Road, Lahore, Punjab, Pakistan<br>
                     Security Notice: For your protection, never share your password with anyone.
                   </td>
                 </tr>
@@ -417,7 +417,7 @@ export class EmailService {
 
                 <tr>
                   <td style="background-color: #f7f5f2; padding: 26px 30px; text-align: center; border-top: 1px solid #eae7e2; font-size: 11px; color: #8c827a; line-height: 1.6;">
-                    MFE Brand Haute Couture Atelier • Gulberg III, Lahore, Pakistan<br>
+                    MFE Brand Haute Couture Atelier • Near Meezan Bank Branch, Peco Road, Lahore, Punjab, Pakistan<br>
                     Standard delivery takes 2 to 3 business days across all major Pakistani cities.
                   </td>
                 </tr>
@@ -487,7 +487,7 @@ As a registered member of our Private Salon, your priority atelier reservations 
 
                 <tr>
                   <td style="background-color: #f7f5f2; padding: 26px 30px; text-align: center; border-top: 1px solid #eae7e2; font-size: 11px; color: #8c827a; line-height: 1.6;">
-                    MFE Brand Haute Couture Atelier • Gulberg III, Lahore, Pakistan<br>
+                    MFE Brand Haute Couture Atelier • Near Meezan Bank Branch, Peco Road, Lahore, Punjab, Pakistan<br>
                     You are receiving this bespoke bulletin as a distinguished member of MFE Private Salon.
                   </td>
                 </tr>

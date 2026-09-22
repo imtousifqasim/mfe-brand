@@ -209,7 +209,7 @@ export const SEED_ANNOUNCEMENT: Announcement = {
   coupon_code: 'MFE10',
   link_url: '/products',
   is_active: true,
-  whatsapp_number: '+92 300 1234567',
+  whatsapp_number: '+92 326 7727318',
   ticker_messages: [
     'Flat Rs. 100 Express Nationwide Delivery on all orders across Pakistan',
     'Haute Couture 2026: Pure Handcrafted Lawn, Silk & Chiffon Heirlooms',

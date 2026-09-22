@@ -21,7 +21,7 @@ export default function AdminHomepageCMSPage() {
   const [slides, setSlides] = useState<HeroSlide[]>(SEED_HERO_SLIDES);
   const [announcement, setAnnouncement] = useState(SEED_ANNOUNCEMENT.message);
   const [couponCode, setCouponCode] = useState(SEED_ANNOUNCEMENT.coupon_code || 'MFE10');
-  const [whatsappNumber, setWhatsappNumber] = useState(SEED_ANNOUNCEMENT.whatsapp_number || '+92 300 1234567');
+  const [whatsappNumber, setWhatsappNumber] = useState(SEED_ANNOUNCEMENT.whatsapp_number || '+92 326 7727318');
   const [isActive, setIsActive] = useState(true);
   const [tickerMessages, setTickerMessages] = useState<string[]>([
     'Flat Rs. 100 Express Nationwide Delivery on all orders across Pakistan',

@@ -418,7 +418,7 @@ function TrackOrderContent() {
       {/* Support Concierge Notice */}
       <div className="text-center text-xs text-[#8c827a] pt-4 space-y-1">
         <p>Questions regarding your shipment? Our concierge is available daily from 10 AM to 8 PM PKT.</p>
-        <p>WhatsApp Helpline: <strong>+92 300 1234567</strong> • concierge@mfebrand.com</p>
+        <p>WhatsApp Helpline: <a href="https://wa.me/923267727318" target="_blank" rel="noopener noreferrer" className="font-bold text-[#b87414] hover:underline">+92 326 7727318</a> • concierge@mfebrand.com</p>
       </div>
 
     </div>
